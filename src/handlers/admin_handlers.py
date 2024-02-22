@@ -13,11 +13,12 @@ def get_admin_handlers() -> list:
         CommandHandler("rejectseller", remove_seller, AdminFilter & ApprovalGroupFilter),
         CommandHandler("makescammer", make_scammer, AdminFilter & ApprovalGroupFilter),
         CommandHandler("removescammer", remove_scammer, AdminFilter & ApprovalGroupFilter),
+        CommandHandler("announce", announce, False),
+        CommandHandler("resetdate", make_reset_date, AdminFilter),
         CommandHandler("getid", get_id_by_username, AdminFilter),
-        CommandHandler("get_username", get_username_by_id, AdminFilter),
+        CommandHandler("getusername", get_username_by_id, AdminFilter),
         CommandHandler("makeadmin", make_admin, False),
         CommandHandler("remove_admin", remove_admin, False),
-        CommandHandler("announce", announce, False),
         CommandHandler("shutdown", shutdown, False),
     ]
 
@@ -36,6 +37,12 @@ async def make_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def remove_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pass
 
+async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pass
+
+async def make_reset_date(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pass
+
 async def get_id_by_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pass
 
@@ -46,9 +53,6 @@ async def make_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pass
 
 async def remove_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    pass
-
-async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pass
 
 async def shutdown(update: Update, context: ContextTypes.DEFAULT_TYPE):
