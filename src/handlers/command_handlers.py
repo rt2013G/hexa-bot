@@ -4,10 +4,16 @@ from telegram.ext import (
     CommandHandler,
     filters
 )
+from src.filters import MainGroupFilter, AdminFilter
 
 def get_command_handlers() -> list:
     return [
-        CommandHandler("start", start, filters=filters.ChatType.PRIVATE)
+        CommandHandler("start", start, filters.ChatType.PRIVATE),
+        CommandHandler("search", get_card_search, filters.ChatType.PRIVATE | MainGroupFilter),
+        CommandHandler("checkseller", get_card_search, filters.ChatType.PRIVATE | MainGroupFilter | AdminFilter),
+        CommandHandler("checkscammer", get_card_search, filters.ChatType.PRIVATE | MainGroupFilter | AdminFilter),
+        CommandHandler("gdpr", gdpr, filters.ChatType.PRIVATE),
+        CommandHandler("feedback", get_feedback_list, filters.ChatType.PRIVATE),
     ]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

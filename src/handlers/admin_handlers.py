@@ -4,10 +4,21 @@ from telegram.ext import (
     CommandHandler,
     filters
 )
+from src.filters import AdminFilter, ApprovalGroupFilter
 
 def get_admin_handlers() -> list:
     return [
-        
+        CommandHandler("makeseller", make_seller, AdminFilter & ApprovalGroupFilter),
+        CommandHandler("removeseller", remove_seller, AdminFilter & ApprovalGroupFilter),
+        CommandHandler("rejectseller", remove_seller, AdminFilter & ApprovalGroupFilter),
+        CommandHandler("makescammer", make_scammer, AdminFilter & ApprovalGroupFilter),
+        CommandHandler("removescammer", remove_scammer, AdminFilter & ApprovalGroupFilter),
+        CommandHandler("getid", get_id_by_username, AdminFilter),
+        CommandHandler("get_username", get_username_by_id, AdminFilter),
+        CommandHandler("makeadmin", make_admin, False),
+        CommandHandler("remove_admin", remove_admin, False),
+        CommandHandler("announce", announce, False),
+        CommandHandler("shutdown", shutdown, False),
     ]
 
 async def make_seller(update: Update, context: ContextTypes.DEFAULT_TYPE):
