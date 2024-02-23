@@ -1,6 +1,6 @@
 from telegram import Message
 from telegram.ext.filters import MessageFilter
-from src import utils
+from src.utils import utils
 
 class AdminFilter(MessageFilter):
     def filter(self, message: Message) -> bool:

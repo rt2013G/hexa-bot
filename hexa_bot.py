@@ -7,13 +7,14 @@ from src.handlers import (
     admin_handlers as ah,
     chat_handlers as chh,
 )
-
+from src.utils import config
 
 def main():
     if not len(sys.argv) == 2:
         print("error. usage: python hexa_bot.py <mode>")
         sys.exit(0)
     load_dotenv()
+    config.GLOBAL_CONFIGS = config.load_configs()
     params = BotParameters(
         token=os.getenv("BOT_TOKEN") if sys.argv[1] == "deploy" else os.getenv("BOT_TOKEN_DEBUG"),
         handlers={
@@ -25,5 +26,6 @@ def main():
     bot = Bot(parameters=params)
     bot.run()
 
+    
 if __name__ == "__main__":
     main()
