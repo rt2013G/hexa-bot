@@ -9,3 +9,21 @@ def load_configs() -> dict:
     with open(os.path.abspath(path)) as f:
         return json.load(f)
     
+def get_bot_tag() -> str:
+    return GLOBAL_CONFIGS["bot_tag"]
+
+def get_main_id() -> int:
+    return int(GLOBAL_CONFIGS["groups_info"]["main_id"])
+
+def get_market_id() -> int:
+    return int(GLOBAL_CONFIGS["groups_info"]["market_id"])
+
+def get_approval_id() -> int:
+    return int(GLOBAL_CONFIGS["groups_info"]["approval_id"])
+
+def get_feedback_channel_id() -> int:
+    return int(GLOBAL_CONFIGS["channel_info"]["feedback_id"])
+ 
+def get_logging_channel_id() -> int:
+    return int(GLOBAL_CONFIGS["channel_info"]["logging_id"])
+    
