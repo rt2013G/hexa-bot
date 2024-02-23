@@ -5,8 +5,7 @@ from dotenv import load_dotenv
 from src.handlers import (
     command_handlers as ch,
     admin_handlers as ah,
-    market_handlers as mkh,
-    main_handlers as mh,
+    chat_handlers as chh,
 )
 
 
@@ -20,8 +19,7 @@ def main():
         handlers={
             0: ch.get_command_handlers(),
             1: ah.get_admin_handlers(),
-            2: mkh.get_market_handlers(),
-            3: mh.get_main_handlers(),
+            2: chh.get_chat_handlers(),
         }
     )
     bot = Bot(parameters=params)
