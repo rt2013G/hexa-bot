@@ -61,9 +61,33 @@ def init_db() -> None:
                         PRIMARY KEY (user_id, role_id)
                 );
                 """)
-            cur.execute("INSERT INTO role(name) VALUES (%s)", ("admin", ))
-            cur.execute("INSERT INTO role(name) VALUES (%s)", ("seller", ))
-            cur.execute("INSERT INTO role(name) VALUES (%s)", ("announcer", ))
+            cur.execute("""
+                INSERT INTO role(name) 
+                SELECT %s
+                WHERE NOT EXISTS (
+                    SELECT *
+                    FROM role
+                    WHERE name=%s
+                )
+                """, ("admin", "admin"))
+            cur.execute("""
+                INSERT INTO role(name) 
+                SELECT %s
+                WHERE NOT EXISTS (
+                    SELECT *
+                    FROM role
+                    WHERE name=%s
+                )
+                """, ("seller", "seller"))
+            cur.execute("""
+                INSERT INTO role(name) 
+                SELECT %s
+                WHERE NOT EXISTS (
+                    SELECT *
+                    FROM role
+                    WHERE name=%s
+                )
+                """, ("announce", "announce"))
             conn.commit()
             conn.close()
 
@@ -72,8 +96,8 @@ def insert_user(
         name: str,
         surname: str,
         username: str,
-        last_buy_post = "2015-01-15",
-        last_sell_post = "2015-01-15"
+        last_buy_post = datetime(year=2015, month=1, day=15),
+        last_sell_post = datetime(year=2015, month=1, day=15)
         ) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
