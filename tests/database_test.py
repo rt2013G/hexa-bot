@@ -1,22 +1,28 @@
 import unittest
 from datetime import datetime
 from dotenv import load_dotenv
-from src.database.dbms import get_connection, init_db, insert_user, get_user_from_id
+from src.database.dbms import get_connection, init_db, insert_user, get_user_from_id, make_seller ,get_seller_list
 
 class DatabaseTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         load_dotenv()
         init_db()
-        insert_user("1", "test1", "test11", None)
-        insert_user("2", "test2", "test22", "test222", datetime.now())
+        insert_user(1, "test1", "test11", None)
+        insert_user(2, "test2", "test22", "test222", datetime.now())
+        insert_user(3, "test3", "test33", "test333", datetime.now(), datetime.now())
+        insert_user(4, "test3", "test33", None)
 
     @classmethod
     def tearDownClass(cls) -> None:
         with get_connection() as conn:
             with conn.cursor() as cur:
+                cur.execute("DELETE FROM users_role WHERE user_id=1;")
+                cur.execute("DELETE FROM users_role WHERE user_id=3;")
                 cur.execute("DELETE FROM users WHERE id=1;")
                 cur.execute("DELETE FROM users WHERE id=2;")  
+                cur.execute("DELETE FROM users WHERE id=3;")
+                cur.execute("DELETE FROM users WHERE id=4;")
 
     def test_user_class(self):
         user = get_user_from_id(1)
@@ -33,5 +39,26 @@ class DatabaseTest(unittest.TestCase):
     def test_user_class_2(self):
         user = get_user_from_id(2)
         self.assertFalse(user.username is None)
-        self.assertEqual(type(user.last_buy_post), datetime)
-        
+        self.assertEqual(type(user.last_buy_post), datetime)  
+
+    def test_seller_role(self):
+        self.assertEqual(len(get_seller_list()), 0)
+        make_seller(1)
+        self.assertEqual(len(get_seller_list()), 1)
+        make_seller(3)
+        self.assertEqual(len(get_seller_list()), 2)
+
+        seller_list = get_seller_list()
+        for seller in seller_list:
+            self.assertEqual(type(seller.id), int)
+            self.assertEqual(type(seller.first_name), str)
+            self.assertEqual(type(seller.last_name), str)
+            self.assertEqual(type(seller.last_buy_post), datetime)
+            self.assertEqual(type(seller.last_sell_post), datetime)
+        id_list = []
+        for seller in seller_list:
+            id_list.append(seller.id)
+        self.assertEqual(1 in id_list, True)
+        self.assertEqual(2 in id_list, False)
+        self.assertEqual(3 in id_list, True)
+        self.assertEqual(4 in id_list, False)

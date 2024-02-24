@@ -202,3 +202,38 @@ def get_feedbacks(seller_id: int, size = 10) -> list[Feedback]:
                 feedbacks.append(Feedback(record))
             conn.close()
             return feedbacks
+
+def make_seller(user_id: int) -> None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    INSERT INTO users_role(user_id, role_id)
+                    SELECT %s, role.id
+                    FROM role
+                    WHERE role.name=%s;
+                """, (user_id, "seller"))
+            except psycopg.Error as err:
+                print(err)
+            conn.commit()
+            conn.close()
+
+def get_seller_list() -> list[User]:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    SELECT users.id, users.username,
+                    users.name, users.surname,
+                    users.last_buy_post, users.last_sell_post
+                    FROM (users JOIN users_role ON users.id = users_role.user_id)
+                        JOIN role ON role.id = users_role.role_id
+                    WHERE role.name = %s;
+                """, ("seller", ))
+            except psycopg.Error as err:
+                print(err)
+            sellers = []
+            for record in cur.fetchall():
+                sellers.append(User(record))
+            conn.close()
+            return sellers
