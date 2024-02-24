@@ -1,5 +1,6 @@
 import psycopg
 import os
+from src.database.model import User
 
 def get_connection() -> psycopg.Connection:
     return psycopg.connect(
@@ -63,7 +64,7 @@ def insert_user(
             conn.commit()
             conn.close()
 
-def get_user_from_id(id: int) -> tuple:
+def get_user_from_id(id: int) -> User:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -76,4 +77,21 @@ def get_user_from_id(id: int) -> tuple:
                 print(err)
             record = cur.fetchone()
             conn.close()
-            return record
+            return User(record)
+        
+def get_users(size: int) -> list[User]:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    SELECT *
+                    FROM users;
+                """)
+            except psycopg.Error as err:
+                print(err)
+            records = cur.fetchmany(size)
+            users = []
+            for record in records:
+                users.append(User(record))
+            conn.close()
+            return users

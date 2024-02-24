@@ -8,15 +8,15 @@ from src.handlers import (
     chat_handlers as chh,
 )
 from src.utils import config
-from src.database import init_db
+from src.database.dbms import init_db
 
 def main():
     if not len(sys.argv) == 2:
         print("error. usage: python hexa_bot.py <mode>")
         sys.exit(0)
     load_dotenv()
-    init_db()
     config.GLOBAL_CONFIGS = config.load_configs()
+    init_db()
     params = BotParameters(
         token=os.getenv("BOT_TOKEN") if sys.argv[1] == "deploy" else os.getenv("BOT_TOKEN_DEBUG"),
         handlers={
