@@ -5,6 +5,7 @@ from telegram.ext import (
     filters
 )
 from src.filters import MainGroupFilter, AdminFilter
+from src.database import insert_user, get_user_from_id
 
 def get_command_handlers() -> list:
     return [
