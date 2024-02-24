@@ -1,5 +1,6 @@
 import psycopg
 import os
+from datetime import datetime
 from src.database.model import User
 
 def get_connection() -> psycopg.Connection:
@@ -22,6 +23,23 @@ def init_db() -> None:
                     is_seller BOOLEAN,
                     last_buy_post TIMESTAMP,
                     last_sell_post TIMESTAMP
+                );
+                """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS feedback(
+                    id SERIAL PRIMARY KEY,
+                    seller_id INTEGER,
+                    CONSTRAINT seller_fk
+                        FOREIGN KEY(seller_id)
+                        REFERENCES users(id),
+                    buyer_id INTEGER,
+                    CONSTRAINT buyer_fk
+                        FOREIGN KEY(buyer_id)
+                        REFERENCES users(id),
+                    CONSTRAINT seller_is_not_buyer 
+                        CHECK(seller_id != buyer_id),
+                    contents TEXT,
+                    date TIMESTAMP
                 );
                 """)
             conn.commit()
@@ -64,6 +82,34 @@ def insert_user(
             conn.commit()
             conn.close()
 
+def insert_feedback(
+        seller_id: int,
+        buyer_id: int,
+        contents: str,
+        date = datetime.now()
+        ) -> None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                INSERT INTO feedback(
+                    seller_id,
+                    buyer_id,
+                    contents,
+                    date
+                ) VALUES (%s, %s, %s, %s);
+                """,
+                (
+                    seller_id,
+                    buyer_id,
+                    contents,
+                    date
+                ))
+            except psycopg.Error as err:
+                print(err)
+            conn.commit()
+            conn.close()
+
 def get_user_from_id(id: int) -> User:
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -79,7 +125,7 @@ def get_user_from_id(id: int) -> User:
             conn.close()
             return User(record)
         
-def get_users(size: int) -> list[User]:
+def get_users(size = 10) -> list[User]:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -95,3 +141,21 @@ def get_users(size: int) -> list[User]:
                 users.append(User(record))
             conn.close()
             return users
+        
+def get_feedbacks(seller_id: int, size = 10) -> list:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    SELECT *
+                    FROM feedback
+                    WHERE seller_id=%s;
+                """, (seller_id, ))
+            except psycopg.Error as err:
+                print(err)
+            records = cur.fetchmany(size)
+            feedbacks = []
+            for record in records:
+                feedbacks.append(record)
+            conn.close()
+            return feedbacks

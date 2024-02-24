@@ -8,4 +8,10 @@ class User():
         self.last_buy_post = user_data[5]
         self.last_sell_post = user_data[6]
 
-    
+class Feedback():
+    def __init__(self, feedback_data: tuple) -> None:
+        self.id = feedback_data[0]
+        self.seller_id = feedback_data[1]
+        self.buyer_id = feedback_data[2]
+        self.contents = feedback_data[3]
+        self.date = feedback_data[4]
