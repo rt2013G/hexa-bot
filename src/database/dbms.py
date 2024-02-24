@@ -1,7 +1,7 @@
 import psycopg
 import os
 from datetime import datetime
-from src.database.model import User
+from src.database.model import User, Feedback
 
 def get_connection() -> psycopg.Connection:
     return psycopg.connect(
@@ -20,7 +20,6 @@ def init_db() -> None:
                     username VARCHAR(32) UNIQUE,
                     name TEXT,
                     surname TEXT,
-                    is_seller BOOLEAN,
                     last_buy_post TIMESTAMP,
                     last_sell_post TIMESTAMP
                 );
@@ -42,6 +41,29 @@ def init_db() -> None:
                     date TIMESTAMP
                 );
                 """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS role(
+                    id SERIAL PRIMARY KEY,
+                    name TEXT UNIQUE NOT NULL
+                );
+                """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS users_role(
+                    user_id INTEGER,
+                    CONSTRAINT user_fk
+                        FOREIGN KEY(user_id)
+                        REFERENCES users(id),
+                    role_id INTEGER,
+                    CONSTRAINT role_fk
+                        FOREIGN KEY(role_id)
+                        REFERENCES role(id),
+                    CONSTRAINT users_role_pk
+                        PRIMARY KEY (user_id, role_id)
+                );
+                """)
+            cur.execute("INSERT INTO role(name) VALUES (%s)", ("admin", ))
+            cur.execute("INSERT INTO role(name) VALUES (%s)", ("seller", ))
+            cur.execute("INSERT INTO role(name) VALUES (%s)", ("announcer", ))
             conn.commit()
             conn.close()
 
@@ -50,7 +72,6 @@ def insert_user(
         name: str,
         surname: str,
         username: str,
-        is_seller = False,
         last_buy_post = "2015-01-15",
         last_sell_post = "2015-01-15"
         ) -> None:
@@ -63,17 +84,15 @@ def insert_user(
                     username,
                     name,
                     surname,
-                    is_seller,
                     last_buy_post,
                     last_sell_post
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s);
+                ) VALUES (%s, %s, %s, %s, %s, %s);
                 """,
                 (
                     id,
                     username,
                     name,
                     surname,
-                    is_seller,
                     last_buy_post,
                     last_sell_post
                 ))
@@ -142,7 +161,7 @@ def get_users(size = 10) -> list[User]:
             conn.close()
             return users
         
-def get_feedbacks(seller_id: int, size = 10) -> list:
+def get_feedbacks(seller_id: int, size = 10) -> list[Feedback]:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -156,6 +175,6 @@ def get_feedbacks(seller_id: int, size = 10) -> list:
             records = cur.fetchmany(size)
             feedbacks = []
             for record in records:
-                feedbacks.append(record)
+                feedbacks.append(Feedback(record))
             conn.close()
             return feedbacks

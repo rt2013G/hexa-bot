@@ -4,9 +4,8 @@ class User():
         self.username = user_data[1]
         self.first_name = user_data[2]
         self.last_name = user_data[3]
-        self.is_seller = user_data[4]
-        self.last_buy_post = user_data[5]
-        self.last_sell_post = user_data[6]
+        self.last_buy_post = user_data[4]
+        self.last_sell_post = user_data[5]
 
 class Feedback():
     def __init__(self, feedback_data: tuple) -> None:
