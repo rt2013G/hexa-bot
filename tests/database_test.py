@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 from dotenv import load_dotenv
 from src.utils import config
-from src.database.dbms import get_connection, init_db, insert_user, get_user_from_id, make_role, get_role_list
+from src.database.dbms import get_connection, init_db, insert_user, get_user_from_id, make_role, get_role_list, set_dates_for_user
 
 class DatabaseTest(unittest.TestCase):
     @classmethod
@@ -84,3 +84,14 @@ class DatabaseTest(unittest.TestCase):
         self.assertEqual(2 in id_list, True)
         self.assertEqual(3 in id_list, True)
         self.assertEqual(4 in id_list, False)
+
+    def test_set_date(self):
+        set_dates_for_user(1, datetime(year=2022, month=6, day=2), datetime(year=2021, month=1, day=12))
+        user = get_user_from_id(1)
+        self.assertEqual(user.last_buy_post, datetime(year=2022, month=6, day=2))
+        self.assertEqual(user.last_sell_post, datetime(year=2021, month=1, day=12))
+
+        set_dates_for_user(1)
+        user = get_user_from_id(1)
+        self.assertEqual(user.last_buy_post, datetime(year=2015, month=1, day=15))
+        self.assertEqual(user.last_sell_post, datetime(year=2015, month=1, day=15))

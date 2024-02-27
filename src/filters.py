@@ -1,7 +1,7 @@
 from telegram import Message
 from telegram.ext.filters import MessageFilter
 from src.utils.utils import is_admin
-from src.utils.config import get_main_id, get_market_id, get_approval_id
+from src.utils.config import get_main_id, get_market_id, get_approval_id, get_debug_user_id
 
 class AdminFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
@@ -18,3 +18,8 @@ class MainGroupFilter(MessageFilter):
 class ApprovalGroupFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
         return message.chat.id == get_approval_id()
+
+class DebugUserFilter(MessageFilter):
+    def filter(self, message: Message) -> bool:
+        return message.from_user.id == get_debug_user_id()
+    

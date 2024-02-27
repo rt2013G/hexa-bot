@@ -29,3 +29,6 @@ def get_logging_channel_id() -> int:
 
 def get_roles() -> list[str]:
     return GLOBAL_CONFIGS["roles"]
+
+def get_debug_user_id() -> int:
+    return int(GLOBAL_CONFIGS["debug_user_id"])

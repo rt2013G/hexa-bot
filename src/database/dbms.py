@@ -221,3 +221,22 @@ def get_role_list(role_name: str) -> list[User]:
                 users.append(User(record))
             conn.close()
             return users
+
+def set_dates_for_user(
+        id: int,
+        last_buy_post = datetime(year=2015, month=1, day=15),
+        last_sell_post = datetime(year=2015, month=1, day=15)
+        ) -> None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    UPDATE users
+                    SET last_buy_post=%s, last_sell_post=%s
+                    WHERE users.id=%s;
+                """, (last_buy_post, last_sell_post, id))
+            except psycopg.Error as err:
+                print(err)
+            conn.commit()
+            conn.close()
+            

@@ -1,5 +1,6 @@
 {
     "bot_tag": "tag-example",
+    "debug_user_id": "123456789",
     "groups_info": {
         "main_id": "123456789",
         "market_id": "123456789",
