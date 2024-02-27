@@ -283,9 +283,6 @@ def update_user_info(
         first_name: str | None,
         last_name: str | None
         ) -> None:
-    user = get_user_from_id(id)
-    if user is None:
-        return
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:

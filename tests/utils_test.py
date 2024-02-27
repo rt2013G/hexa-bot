@@ -34,7 +34,8 @@ class DatabaseTest(unittest.TestCase):
             ("/makeadmin bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "/makeadmin"),
             ("/makescammer @bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "/makescammer"),
             ("/resetdate @notlongbutdoesntexist", "/resetdate"),
-            (f"/checkseller {mock_data[2].username}", "/checkseller")
+            (f"/checkseller {mock_data[2].username}", "/checkseller"),
+            (f"/checkseller 15", "/checkseller"),
         ]
         users : list[User] = []
         for message in messages:
@@ -53,3 +54,4 @@ class DatabaseTest(unittest.TestCase):
         self.assertEqual(users[4], None)
         self.assertEqual(users[5], None)
         self.assertEqual(users[6], None)
+        self.assertEqual(users[7], None)

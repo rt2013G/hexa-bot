@@ -5,7 +5,7 @@ from src.config import get_main_id, get_market_id, get_approval_id, get_debug_us
 
 class AdminFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
-        return is_role(message.from_user.id,"admin")
+        return is_role(message.from_user.id, "admin")
     
 class MarketGroupFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
@@ -22,4 +22,8 @@ class ApprovalGroupFilter(MessageFilter):
 class DebugUserFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
         return message.from_user.id == get_debug_user_id()
+    
+class AnnounceFilter(MessageFilter):
+    def filter(self, message: Message) -> bool:
+        return is_role(message.from_user.id, "announce")
     
