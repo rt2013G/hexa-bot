@@ -7,7 +7,7 @@ from src.handlers import (
     admin_handlers as ah,
     chat_handlers as chh,
 )
-from src.utils import config
+from src import config
 from src.database.dbms import init_db
 
 def main():

@@ -2,7 +2,7 @@ import psycopg
 import os
 from datetime import datetime
 from src.database.model import User, Feedback
-from src.utils.config import get_roles
+from src.config import get_roles
 
 def get_connection() -> psycopg.Connection:
     return psycopg.connect(
@@ -151,7 +151,22 @@ def get_user_from_id(id: int) -> User:
             record = cur.fetchone()
             conn.close()
             return User(record)
-        
+
+def get_user_from_username(username: str) -> User:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    SELECT *
+                    FROM users
+                    WHERE username=%s;
+                """, (username, ))
+            except psycopg.Error as err:
+                print(err)
+            record = cur.fetchone()
+            conn.close()
+            return User(record)
+
 def get_users(size = 10) -> list[User]:
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -239,4 +254,3 @@ def set_dates_for_user(
                 print(err)
             conn.commit()
             conn.close()
-            

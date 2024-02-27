@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 from dotenv import load_dotenv
-from src.utils import config
+from src import config
 from src.database.dbms import get_connection, init_db, insert_user, get_user_from_id, make_role, get_role_list, set_dates_for_user
 
 class DatabaseTest(unittest.TestCase):

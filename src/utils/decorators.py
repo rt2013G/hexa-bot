@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import (
     ContextTypes
 )
-from src.utils.config import get_logging_channel_id
+from src.config import get_logging_channel_id
 from datetime import datetime
 
 def with_logging(func):
