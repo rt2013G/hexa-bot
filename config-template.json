@@ -13,6 +13,7 @@
         "admin",
         "seller",
         "announce",
-        "judge"
+        "judge",
+        "scammer"
     ]
 }
