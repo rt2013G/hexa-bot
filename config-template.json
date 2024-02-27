@@ -1,6 +1,9 @@
 {
-    "bot_tag": "tag-example",
+    "bot_username": "tag-example",
     "debug_user_id": "123456789",
+    "global_variables": {
+        "max_username_length": 32
+    },
     "groups_info": {
         "main_id": "123456789",
         "market_id": "123456789",
