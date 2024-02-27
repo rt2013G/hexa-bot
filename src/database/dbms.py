@@ -19,8 +19,8 @@ def init_db() -> None:
                 CREATE TABLE IF NOT EXISTS users(
                     id INTEGER PRIMARY KEY,
                     username VARCHAR(32) UNIQUE,
-                    name TEXT,
-                    surname TEXT,
+                    first_name TEXT,
+                    last_name TEXT,
                     last_buy_post TIMESTAMP,
                     last_sell_post TIMESTAMP
                 );
@@ -77,9 +77,9 @@ def init_db() -> None:
 
 def insert_user(
         id: int,
-        name: str,
-        surname: str,
-        username: str,
+        username: str = None,
+        first_name: str = None,
+        last_name: str = None,
         last_buy_post = datetime(year=2015, month=1, day=15),
         last_sell_post = datetime(year=2015, month=1, day=15)
         ) -> None:
@@ -90,8 +90,8 @@ def insert_user(
                 INSERT INTO users(
                     id,
                     username,
-                    name,
-                    surname,
+                    first_name,
+                    last_name,
                     last_buy_post,
                     last_sell_post
                 ) VALUES (%s, %s, %s, %s, %s, %s);
@@ -99,8 +99,8 @@ def insert_user(
                 (
                     id,
                     username,
-                    name,
-                    surname,
+                    first_name,
+                    last_name,
                     last_buy_post,
                     last_sell_post
                 ))
@@ -150,6 +150,8 @@ def get_user_from_id(id: int) -> User:
                 print(err)
             record = cur.fetchone()
             conn.close()
+            if record is None:
+                return None
             return User(record)
 
 def get_user_from_username(username: str) -> User:
@@ -165,6 +167,8 @@ def get_user_from_username(username: str) -> User:
                 print(err)
             record = cur.fetchone()
             conn.close()
+            if record is None:
+                return None
             return User(record)
 
 def get_users(size = 10) -> list[User]:
@@ -223,7 +227,7 @@ def get_role_list(role_name: str) -> list[User]:
             try:
                 cur.execute("""
                     SELECT users.id, users.username,
-                    users.name, users.surname,
+                    users.first_name, users.last_name,
                     users.last_buy_post, users.last_sell_post
                     FROM (users JOIN users_role ON users.id = users_role.user_id)
                         JOIN role ON role.id = users_role.role_id
@@ -237,7 +241,7 @@ def get_role_list(role_name: str) -> list[User]:
             conn.close()
             return users
 
-def set_dates_for_user(
+def update_user_dates(
         id: int,
         last_buy_post = datetime(year=2015, month=1, day=15),
         last_sell_post = datetime(year=2015, month=1, day=15)
@@ -250,6 +254,28 @@ def set_dates_for_user(
                     SET last_buy_post=%s, last_sell_post=%s
                     WHERE users.id=%s;
                 """, (last_buy_post, last_sell_post, id))
+            except psycopg.Error as err:
+                print(err)
+            conn.commit()
+            conn.close()
+
+def update_user_info(
+        id: int,
+        username: str | None,
+        first_name: str | None,
+        last_name: str | None
+        ) -> None:
+    user = get_user_from_id(id)
+    if user is None:
+        return
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    UPDATE users
+                    SET username=%s, first_name=%s, last_name=%s
+                    WHERE users.id=%s;
+                """, (username, first_name, last_name, id))
             except psycopg.Error as err:
                 print(err)
             conn.commit()
