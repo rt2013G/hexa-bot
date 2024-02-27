@@ -2,7 +2,7 @@ import os
 import sys
 import json
 
-GLOBAL_CONFIGS = None
+GLOBAL_CONFIGS: dict
 
 def load_configs() -> dict:
     path = "/configs/deploy.json" if sys.argv[1] == "deploy" else "configs/debug.json"
@@ -26,4 +26,6 @@ def get_feedback_channel_id() -> int:
  
 def get_logging_channel_id() -> int:
     return int(GLOBAL_CONFIGS["channel_info"]["logging_id"])
-    
+
+def get_roles() -> list[str]:
+    return GLOBAL_CONFIGS["roles"]

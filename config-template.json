@@ -8,5 +8,11 @@
     "channel_info": {
         "feedback_id": "123456789",
         "logging_id": "123456789"
-    }
+    },
+    "roles": [
+        "admin",
+        "seller",
+        "announce",
+        "judge"
+    ]
 }
