@@ -221,6 +221,24 @@ def make_role(user_id: int, role_name: str) -> None:
             conn.commit()
             conn.close()
 
+def remove_role(user_id: int, role_name: str) -> None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    DELETE FROM users_role
+                    WHERE users_role.user_id = %s
+                    AND users_role.role_id = (
+                        SELECT role.id
+                        FROM role
+                        WHERE role.name=%s
+                    );
+                """, (user_id, role_name))
+            except psycopg.Error as err:
+                print(err)
+            conn.commit()
+            conn.close()
+
 def get_role_list(role_name: str) -> list[User]:
     with get_connection() as conn:
         with conn.cursor() as cur:

@@ -2,9 +2,10 @@ import unittest
 from datetime import datetime
 from dotenv import load_dotenv
 from src import config
+from src.utils.utils import is_role
 from src.database.dbms import (
     get_connection, init_db, 
-    insert_user, get_user_from_id, make_role, get_role_list, 
+    insert_user, get_user_from_id, make_role, remove_role, get_role_list, 
     update_user_dates, update_user_info
     )
 from dataclasses import dataclass
@@ -136,3 +137,14 @@ class DatabaseTest(unittest.TestCase):
         self.assertEqual(user.first_name, "update")
         self.assertEqual(user.last_name, "updatelastname") 
         self.reset_users()
+
+    def test_remove_role(self):
+        make_role(2, "seller")
+        make_role(2, "admin")
+        self.assertEqual(is_role(2, "admin"), True)
+        remove_role(2, "admin")
+        self.assertEqual(is_role(2, "admin"), False)
+        self.assertEqual(is_role(2, "seller"), True)
+        remove_role(2, "seller")
+        self.assertEqual(is_role(2, "seller"), False)
+        
