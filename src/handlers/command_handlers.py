@@ -4,9 +4,9 @@ from telegram.ext import (
     CommandHandler,
     filters
 )
-from src.filters import MainGroupFilter, AdminFilter
+from src.filters import MainGroupFilter, AdminFilter, DebugUserFilter
 from src.config import get_market_group_link
-from src.database.dbms import get_user_from_id, insert_user
+from src.database.dbms import get_user_from_id, insert_user, get_feedbacks
 from src.utils.decorators import with_logging
 from src.utils.utils import get_user_from_message_command, is_role
 
@@ -46,30 +46,36 @@ async def get_card_search(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 async def check_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = get_user_from_message_command(update.message.text, "/checkseller")
     if user is None:
-        await update.message.reply_text("Utente non trovato!", 
-                                        reply_markup=ReplyKeyboardRemove())
+        await context.bot.send_message(update.message.chat.id,
+                                       "Utente non trovato!",
+                                       reply_markup=ReplyKeyboardRemove())
         return
     if is_role(user.id, "seller"):
-        await update.message.reply_text("L'utente è un venditore!", 
-                                        reply_markup=ReplyKeyboardRemove())
+        await context.bot.send_message(update.message.chat.id,
+                                       "L'utente è un venditore!",
+                                       reply_markup=ReplyKeyboardRemove())
     else:
-        await update.message.reply_text("L'utente NON è un venditore!", 
-                                        reply_markup=ReplyKeyboardRemove())
+        await context.bot.send_message(update.message.chat.id,
+                                       "L'utente NON è un venditore!",
+                                       reply_markup=ReplyKeyboardRemove())
 
 
 @with_logging
 async def check_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = get_user_from_message_command(update.message.text, "/checkscammer")
     if user is None:
-        await update.message.reply_text("Utente non trovato!", 
-                                        reply_markup=ReplyKeyboardRemove())
+        await context.bot.send_message(update.message.chat.id,
+                                       "Utente non trovato!",
+                                       reply_markup=ReplyKeyboardRemove())
         return
     if is_role(user.id, "scammer"):
-        await update.message.reply_text("L'utente è uno scammer!", 
-                                        reply_markup=ReplyKeyboardRemove())
+        await context.bot.send_message(update.message.chat.id,
+                                       "L'utente è uno scammer!",
+                                       reply_markup=ReplyKeyboardRemove())
     else:
-        await update.message.reply_text("L'utente NON è uno scammer!", 
-                                        reply_markup=ReplyKeyboardRemove())
+        await context.bot.send_message(update.message.chat.id,
+                                       "L'utente NON è uno scammer!",
+                                       reply_markup=ReplyKeyboardRemove())
 
 
 async def gdpr(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -83,4 +89,37 @@ Il video non viene utilizzato per nessuno scopo ECCETTO in caso di truffa da par
 
 @with_logging
 async def get_feedback_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    pass
+    seller = get_user_from_message_command(update.message.text, "/feedback")
+    if seller is None:
+        await context.bot.send_message(update.message.from_user.id,
+                                       "Utente non trovato!",
+                                       reply_markup=ReplyKeyboardRemove())
+        return
+    if not is_role(seller.id, "seller"):
+        await context.bot.send_message(update.message.from_user.id,
+                                       "L'utente non è un venditore!",
+                                       reply_markup=ReplyKeyboardRemove())
+        return
+    
+    feedbacks = get_feedbacks(seller.id)
+    if len(feedbacks) == 0:
+        await context.bot.send_message(update.message.from_user.id,
+                                       "L'utente non ha feedback.",
+                                       reply_markup=ReplyKeyboardRemove())
+        return
+    
+    await context.bot.send_message(update.message.from_user.id,
+                                       f"L'utente {seller.username} ha {len(feedbacks)} feedback, eccone alcuni:",
+                                       reply_markup=ReplyKeyboardRemove())
+    for feedback in feedbacks:
+        buyer = get_user_from_id(feedback.buyer_id)
+        if buyer.username is None:
+            buyer.username = buyer.first_name + " " + buyer.last_name
+        else:
+            buyer.username = "@" + buyer.username
+        await context.bot.send_message(update.message.from_user.id,
+                                       f"Feedback inviato da {buyer.username} in data {feedback.date}:",
+                                       reply_markup=ReplyKeyboardRemove())
+        await context.bot.send_message(update.message.from_user.id,
+                                       f"\"{feedback.contents}\"",
+                                       reply_markup=ReplyKeyboardRemove())
