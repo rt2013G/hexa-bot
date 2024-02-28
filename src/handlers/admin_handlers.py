@@ -7,7 +7,7 @@ from telegram.ext import (
 from src.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter, AnnounceFilter
 from src.utils.decorators import with_logging
 from src.utils.utils import get_user_from_message_command, is_role
-from src.database.dbms import make_role
+from src.database.dbms import make_role, remove_role
 
 def get_admin_handlers() -> list:
     return [
@@ -44,9 +44,22 @@ async def make_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
                                    "Sei stato approvato come venditore, ora puoi vendere nel gruppo market!", 
                                    reply_markup=ReplyKeyboardRemove())
 
+@with_logging
+async def remove_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user = get_user_from_message_command(update.message.text, "/removeseller")
+    if user is None:
+        await update.message.reply_text("Utente non trovato!", 
+                                        reply_markup=ReplyKeyboardRemove())
+        return
+    if not is_role(user.id, "seller"):
+        await update.message.reply_text("L'utente non è un venditore!", 
+                                        reply_markup=ReplyKeyboardRemove())
+        return
+    
+    remove_role(user.id, "seller")
+    await update.message.reply_text("L'utete non è più un venditore!", 
+                                    reply_markup=ReplyKeyboardRemove())
 
-async def remove_seller(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    pass
 
 async def reject_seller(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pass

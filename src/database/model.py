@@ -12,5 +12,5 @@ class Feedback():
         self.id = feedback_data[0]
         self.seller_id = feedback_data[1]
         self.buyer_id = feedback_data[2]
-        self.contents = feedback_data[3]
+        self.contents = feedback_data[3].decode("utf-8")
         self.date = feedback_data[4]

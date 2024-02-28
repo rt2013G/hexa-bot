@@ -38,7 +38,7 @@ def init_db() -> None:
                         REFERENCES users(id),
                     CONSTRAINT seller_is_not_buyer 
                         CHECK(seller_id != buyer_id),
-                    contents TEXT,
+                    contents TEXT NOT NULL,
                     date TIMESTAMP
                 );
                 """)
