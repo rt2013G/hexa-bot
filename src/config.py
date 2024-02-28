@@ -35,3 +35,6 @@ def get_debug_user_id() -> int:
 
 def get_max_username_length() -> int:
     return int(GLOBAL_CONFIGS["global_variables"]["max_username_length"])
+
+def get_market_group_link() -> str:
+    return GLOBAL_CONFIGS["links"]["market_group_link"]

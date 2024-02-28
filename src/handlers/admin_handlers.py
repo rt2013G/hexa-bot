@@ -23,7 +23,7 @@ def get_admin_handlers() -> list:
         CommandHandler("getusername", get_username_by_id, AdminFilter()),
         CommandHandler("makeadmin", make_admin, DebugUserFilter()),
         CommandHandler("removeadmin", remove_admin, DebugUserFilter()),
-        CommandHandler("shutdown", shutdown, DebugUserFilter()),
+        CommandHandler("shutdown", shutdown, DebugUserFilter() & filters.ChatType.PRIVATE),
     ]
 
 @with_logging
@@ -204,7 +204,6 @@ async def remove_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     remove_role(user.id, "admin")
     await update.message.reply_text("L'utente non è più admin!", 
                                     reply_markup=ReplyKeyboardRemove())
-
 
 
 async def shutdown(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

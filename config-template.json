@@ -4,6 +4,9 @@
     "global_variables": {
         "max_username_length": 32
     },
+    "links": {
+        "market_group_link": ""
+    },
     "groups_info": {
         "main_id": "123456789",
         "market_id": "123456789",
