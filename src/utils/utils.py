@@ -2,9 +2,9 @@ from src.database.dbms import get_role_list, get_user_from_id, get_user_from_use
 from src.database.model import User
 from src.config import get_roles, get_bot_username, get_max_username_length
 
+
 def get_user_from_message_command(message_text: str, command_text: str) -> User | None:
-    msg = remove_bot_username(message_text)
-    msg = msg.replace(command_text, "").replace(" ", "")
+    msg = clean_command_text(message_text, command_text)
     if len(msg) > 1 + get_max_username_length():
         return None
     
@@ -19,6 +19,7 @@ def get_user_from_message_command(message_text: str, command_text: str) -> User 
     
     return None
 
+
 def is_role(user_id: int, role_name: str) -> bool:
     if role_name not in get_roles():
         return False
@@ -26,6 +27,7 @@ def is_role(user_id: int, role_name: str) -> bool:
     for user in get_role_list(role_name):
         id_list.append(user.id)
     return user_id in id_list
-    
-def remove_bot_username(text: str) -> str:
-    return text.replace(get_bot_username(), "")
+
+
+def clean_command_text(text: str, command: str) -> str:
+    return text.replace(get_bot_username(), "").replace(command, "").replace(" ", "")

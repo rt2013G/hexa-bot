@@ -171,7 +171,7 @@ def get_user_from_username(username: str) -> User:
                 return None
             return User(record)
 
-def get_users(size = 10) -> list[User]:
+def get_users(size = 1000000) -> list[User]:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
