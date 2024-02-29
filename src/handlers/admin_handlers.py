@@ -142,7 +142,7 @@ async def reset_date(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         return
     
     update_user_dates(user.id)
-    await update.message.reply_text("Date resettate!", 
+    await update.message.reply_text(f"Date di {user.username} resettate!", 
                                     reply_markup=ReplyKeyboardRemove())
     await context.bot.send_message(user.id, 
                                    "Le date del tuo vendo e cerco giornalieri sono state resettate, puoi inviare un altro post oggi!", 
