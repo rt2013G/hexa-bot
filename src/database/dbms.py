@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from src.database.model import User, Feedback
 from src.config import get_roles
+from src.cache import db_cache as c
 
 def get_connection() -> psycopg.Connection:
     return psycopg.connect(
@@ -238,6 +239,10 @@ def remove_role(user_id: int, role_name: str) -> None:
                 print(err)
             conn.commit()
             conn.close()
+    if role_name == "admin" and user_id in c.ADMIN_CACHE:
+        c.ADMIN_CACHE.remove(user_id)
+    elif role_name == "seller" and user_id in c.USERS_CACHE.keys():
+        c.USERS_CACHE[user_id].is_seller = False
 
 def get_role_list(role_name: str) -> list[User]:
     with get_connection() as conn:

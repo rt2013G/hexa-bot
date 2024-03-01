@@ -1,6 +1,7 @@
 import unittest
 from datetime import datetime
 from dotenv import load_dotenv
+from dataclasses import dataclass
 from src import config
 from src.utils.utils import is_role
 from src.database.dbms import (
@@ -8,7 +9,7 @@ from src.database.dbms import (
     insert_user, get_user_from_id, make_role, remove_role, get_role_list, 
     update_user_dates, update_user_info
     )
-from dataclasses import dataclass
+from src.cache.db_cache import init_cache
 
 @dataclass
 class MockUser:
@@ -30,6 +31,7 @@ class DatabaseTest(unittest.TestCase):
         load_dotenv()
         config.GLOBAL_CONFIGS = config.load_configs()
         init_db()
+        init_cache()
         for mock_user in mock_data:
             insert_user(mock_user.id, mock_user.username, mock_user.first_name, mock_user.last_name)
 

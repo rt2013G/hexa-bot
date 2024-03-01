@@ -5,6 +5,7 @@ from src.utils.utils import get_user_from_message_command
 from src.database.dbms import init_db, get_connection, insert_user
 from tests.database_test import mock_data
 from src.database.model import User
+from src.cache.db_cache import init_cache
 
 class DatabaseTest(unittest.TestCase):
     @classmethod
@@ -12,6 +13,7 @@ class DatabaseTest(unittest.TestCase):
         load_dotenv()
         config.GLOBAL_CONFIGS = config.load_configs()
         init_db()
+        init_cache()
         for mock_user in mock_data:
             insert_user(mock_user.id, mock_user.username, mock_user.first_name, mock_user.last_name)
 
