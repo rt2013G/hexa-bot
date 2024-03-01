@@ -2,17 +2,17 @@ import json
 import os
 import sys
 
-GLOBAL_CONFIGS = {}
+GLOBAL_CONFIGS: dict = {}
 
 
 def load_configs() -> dict:
     path = "/configs/deploy.json" if sys.argv[1] == "deploy" else "configs/debug.json"
     with open(os.path.abspath(path)) as f:
-        return json.load(f)
+        return dict(json.load(f))
 
 
 def get_bot_username() -> str:
-    return GLOBAL_CONFIGS["bot_username"]
+    return str(GLOBAL_CONFIGS["bot_username"])
 
 
 def get_main_id() -> int:
@@ -36,7 +36,7 @@ def get_logging_channel_id() -> int:
 
 
 def get_roles() -> list[str]:
-    return GLOBAL_CONFIGS["roles"]
+    return list(GLOBAL_CONFIGS["roles"])
 
 
 def get_debug_user_id() -> int:
@@ -48,4 +48,4 @@ def get_max_username_length() -> int:
 
 
 def get_market_group_link() -> str:
-    return GLOBAL_CONFIGS["links"]["market_group_link"]
+    return str(GLOBAL_CONFIGS["links"]["market_group_link"])

@@ -30,9 +30,9 @@ def is_role(user_id: int, role_name: str) -> bool:
         if user_id in c.ADMIN_CACHE:
             return True
     if role_name == "seller":
-        user: c.UserCacheEntry = c.USERS_CACHE.get(user_id)
-        if user is not None:
-            return user.is_seller
+        user_entry: c.UserCacheEntry | None = c.USERS_CACHE.get(user_id)
+        if user_entry is not None:
+            return user_entry.is_seller
 
     for user in get_role_list(role_name):
         if user.id == user_id:

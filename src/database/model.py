@@ -4,13 +4,13 @@ from datetime import datetime
 class User:
     def __init__(self, user_data: tuple) -> None:
         self.id: int = user_data[0]
-        self.username: str = (
+        self.username: str | None = (
             None if user_data[1] is None else user_data[1].decode("utf-8")
         )
-        self.first_name: str = (
+        self.first_name: str | None = (
             None if user_data[2] is None else user_data[2].decode("utf-8")
         )
-        self.last_name: str = (
+        self.last_name: str | None = (
             None if user_data[3] is None else user_data[3].decode("utf-8")
         )
         self.last_buy_post: datetime = user_data[4]

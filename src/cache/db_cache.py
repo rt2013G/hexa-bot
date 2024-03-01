@@ -6,12 +6,12 @@ from src.database.model import User
 
 @dataclass
 class UserCacheEntry:
-    username: str
+    user: User
     is_seller: bool
     time: datetime
 
 
-USERS_CACHE: dict
+USERS_CACHE: dict[int, UserCacheEntry]
 ADMIN_CACHE: list[int]
 
 
@@ -23,5 +23,5 @@ def init_cache() -> None:
 
 
 def insert_into_cache(user: User, is_seller: bool, time: datetime) -> None:
-    entry = UserCacheEntry(username=user.username, is_seller=is_seller, time=time)
+    entry = UserCacheEntry(user=user, is_seller=is_seller, time=time)
     USERS_CACHE[user.id] = entry

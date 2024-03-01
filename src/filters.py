@@ -12,19 +12,19 @@ class AdminFilter(MessageFilter):
 
 class MarketGroupFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
-        return message.chat.id == get_market_id()
+        return True if message.chat.id == get_market_id() else False
 
 
 class MainGroupFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
-        return message.chat.id == get_main_id()
+        return True if message.chat.id == get_main_id() else False
 
 
 class ApprovalGroupFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
-        return message.chat.id == get_approval_id()
+        return True if message.chat.id == get_approval_id() else False
 
 
 class DebugUserFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
-        return message.from_user.id == get_debug_user_id()
+        return True if message.from_user.id == get_debug_user_id() else False

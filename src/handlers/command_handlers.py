@@ -3,6 +3,7 @@ from telegram.ext import CommandHandler, ContextTypes, filters
 
 from src.config import get_market_group_link
 from src.database.dbms import get_feedbacks, get_user_from_id, insert_user
+from src.database.model import User
 from src.filters import AdminFilter, MainGroupFilter
 from src.utils.decorators import with_logging
 from src.utils.utils import get_user_from_message_command, is_role
@@ -150,7 +151,13 @@ async def get_feedback_list(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         reply_markup=ReplyKeyboardRemove(),
     )
     for feedback in feedbacks:
-        buyer = get_user_from_id(feedback.buyer_id)
+        buyer: User | None = get_user_from_id(feedback.buyer_id)
+        if buyer is None:
+            continue
+        if buyer.first_name is None:
+            buyer.first_name = ""
+        if buyer.last_name is None:
+            buyer.last_name = ""
         if buyer.username is None:
             buyer.username = buyer.first_name + " " + buyer.last_name
         else:

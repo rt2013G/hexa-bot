@@ -94,9 +94,9 @@ def init_db() -> None:
 
 def insert_user(
     id: int,
-    username: str = None,
-    first_name: str = None,
-    last_name: str = None,
+    username: str | None = None,
+    first_name: str | None = None,
+    last_name: str | None = None,
     last_buy_post=datetime(year=2015, month=1, day=15),
     last_sell_post=datetime(year=2015, month=1, day=15),
 ) -> None:
@@ -152,7 +152,10 @@ def insert_feedback(
             conn.close()
 
 
-def get_user_from_id(id: int) -> User:
+def get_user_from_id(id: int) -> User | None:
+    user_entry: c.UserCacheEntry | None = c.USERS_CACHE.get(id)
+    if user_entry is not None:
+        return user_entry.user
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -173,7 +176,7 @@ def get_user_from_id(id: int) -> User:
             return User(record)
 
 
-def get_user_from_username(username: str) -> User:
+def get_user_from_username(username: str) -> User | None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -345,3 +348,5 @@ def update_user_info(
                 print(err)
             conn.commit()
             conn.close()
+    if id in c.USERS_CACHE.keys():
+        del c.USERS_CACHE[id]

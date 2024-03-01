@@ -13,7 +13,7 @@ from src.handlers import command_handlers as ch
 from src.utils.logger import set_up_logger
 
 
-def main():
+def main() -> None:
     if not len(sys.argv) == 2:
         print("error. usage: python hexa_bot.py <mode>")
         sys.exit(0)
@@ -25,12 +25,16 @@ def main():
     init_db()
     init_cache()
 
+    bot_token = (
+        os.getenv("BOT_TOKEN")
+        if sys.argv[1] == "deploy"
+        else os.getenv("BOT_TOKEN_DEBUG")
+    )
+    if bot_token is None:
+        print("error. bot token env variabile is not set")
+        sys.exit(0)
     params = BotParameters(
-        token=(
-            os.getenv("BOT_TOKEN")
-            if sys.argv[1] == "deploy"
-            else os.getenv("BOT_TOKEN_DEBUG")
-        ),
+        token=bot_token,
         handlers={
             0: ch.get_command_handlers(),
             1: ah.get_admin_handlers(),

@@ -18,7 +18,7 @@ class Bot:
         self.job_queue = self.application.job_queue
         self.add_jobs()
 
-    def add_handlers(self, handlers) -> None:
+    def add_handlers(self, handlers: dict[int, list]) -> None:
         self.application.add_handlers(handlers=handlers)
 
     def add_jobs(self) -> None:

@@ -192,6 +192,7 @@ async def get_id_by_username(
         await update.message.reply_text(
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
+        return
     await update.message.reply_text(
         f"id di @{user.username}: {user.id}", reply_markup=ReplyKeyboardRemove()
     )

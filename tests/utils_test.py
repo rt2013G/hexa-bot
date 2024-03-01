@@ -34,7 +34,7 @@ class DatabaseTest(unittest.TestCase):
                 cur.execute("DELETE FROM users WHERE id=3;")
                 cur.execute("DELETE FROM users WHERE id=4;")
 
-    def test_get_user_from_command_arg(self):
+    def test_get_user_from_command_arg(self) -> None:
         messages = [
             (f"/makeseller @{mock_data[2].username}", "/makeseller"),
             (f"/makeseller @{mock_data[0].id}", "/makeseller"),
