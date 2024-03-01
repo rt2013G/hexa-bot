@@ -5,7 +5,7 @@ from telegram.ext import (
     CommandHandler,
     filters
 )
-from src.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter, AnnounceFilter
+from src.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
 from src.utils.decorators import with_logging
 from src.utils.utils import get_user_from_message_command, is_role, clean_command_text
 from src.database.dbms import make_role, remove_role, get_users, update_user_dates
@@ -17,7 +17,7 @@ def get_admin_handlers() -> list:
         CommandHandler("reject", remove_seller, AdminFilter() & ApprovalGroupFilter()),
         CommandHandler("makescammer", make_scammer, AdminFilter()),
         CommandHandler("removescammer", remove_scammer, AdminFilter()),
-        CommandHandler("announce", announce, AnnounceFilter()),
+        CommandHandler("announce", announce, DebugUserFilter()),
         CommandHandler("resetdate", reset_date, AdminFilter()),
         CommandHandler("getid", get_id_by_username, AdminFilter()),
         CommandHandler("getusername", get_username_by_id, AdminFilter()),

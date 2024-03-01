@@ -23,7 +23,3 @@ class DebugUserFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
         return message.from_user.id == get_debug_user_id()
     
-class AnnounceFilter(MessageFilter):
-    def filter(self, message: Message) -> bool:
-        return is_role(message.from_user.id, "announce")
-    
