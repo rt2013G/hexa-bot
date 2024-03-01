@@ -17,7 +17,7 @@ def init_db() -> None:
         with conn.cursor() as cur:
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS users(
-                    id INTEGER PRIMARY KEY,
+                    id NUMERIC PRIMARY KEY,
                     username VARCHAR(32) UNIQUE,
                     first_name TEXT,
                     last_name TEXT,
@@ -28,11 +28,11 @@ def init_db() -> None:
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS feedback(
                     id SERIAL PRIMARY KEY,
-                    seller_id INTEGER,
+                    seller_id NUMERIC,
                     CONSTRAINT seller_fk
                         FOREIGN KEY(seller_id)
                         REFERENCES users(id),
-                    buyer_id INTEGER,
+                    buyer_id NUMERIC,
                     CONSTRAINT buyer_fk
                         FOREIGN KEY(buyer_id)
                         REFERENCES users(id),
@@ -50,7 +50,7 @@ def init_db() -> None:
                 """)
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS users_role(
-                    user_id INTEGER,
+                    user_id NUMERIC,
                     CONSTRAINT user_fk
                         FOREIGN KEY(user_id)
                         REFERENCES users(id),
