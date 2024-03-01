@@ -10,6 +10,7 @@ from src.handlers import (
 from src import config
 from src.database.dbms import init_db
 from src.cache.db_cache import init_cache
+from src.utils.logger import set_up_logger
 
 def main():
     if not len(sys.argv) == 2:
@@ -17,8 +18,12 @@ def main():
         sys.exit(0)
     load_dotenv()
     config.GLOBAL_CONFIGS = config.load_configs()
+
+    set_up_logger() 
+    
     init_db()
     init_cache()
+
     params = BotParameters(
         token=os.getenv("BOT_TOKEN") if sys.argv[1] == "deploy" else os.getenv("BOT_TOKEN_DEBUG"),
         handlers={
@@ -33,3 +38,4 @@ def main():
     
 if __name__ == "__main__":
     main()
+    

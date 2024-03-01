@@ -1,3 +1,4 @@
+import logging
 from telegram import Update
 from telegram.ext import (
     ContextTypes,
@@ -6,6 +7,7 @@ from telegram.ext import (
 )
 from src.filters import MainGroupFilter, AdminFilter
 from src.database.dbms import get_user_from_id, insert_user, update_user_info
+from src.utils.decorators import with_logging
 
 def get_chat_handlers() -> list:
     return [
