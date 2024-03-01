@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from telegram.ext import Application
+from src.jobs import clean_cache_job
 
 @dataclass
 class BotParameters:
@@ -8,11 +9,16 @@ class BotParameters:
 
 class Bot:
     def __init__(self, parameters: BotParameters) -> None:
-        self.__application = Application.builder().token(parameters.token).build()
-        self.__add_handlers(parameters.handlers)
+        self.application = Application.builder().token(parameters.token).build()
+        self.add_handlers(parameters.handlers)
+        self.job_queue = self.application.job_queue
+        self.add_jobs()
 
-    def __add_handlers(self, handlers) -> None:
-        self.__application.add_handlers(handlers=handlers)
+    def add_handlers(self, handlers) -> None:
+        self.application.add_handlers(handlers=handlers)
+
+    def add_jobs(self) -> None:
+        self.job_queue.run_repeating(clean_cache_job, interval=300, first=300)
 
     def run(self) -> None:
-        self.__application.run_polling(drop_pending_updates=True)
+        self.application.run_polling(drop_pending_updates=True)

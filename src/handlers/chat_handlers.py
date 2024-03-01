@@ -6,6 +6,7 @@ from telegram.ext import (
 )
 from src.filters import MainGroupFilter, AdminFilter
 from src.database.dbms import get_user_from_id, insert_user, update_user_info
+from src.cache.db_cache import insert_into_cache
 
 def get_chat_handlers() -> list:
     return [
@@ -25,7 +26,8 @@ async def main_msg_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             username=update.message.from_user.username,
             first_name=update.message.from_user.first_name,
             last_name=update.message.from_user.last_name
-        )
+        )     
+    insert_into_cache(user=get_user_from_id(id), is_seller=False)
 
 async def market_msg_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     pass

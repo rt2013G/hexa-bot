@@ -9,6 +9,7 @@ from src.handlers import (
 )
 from src import config
 from src.database.dbms import init_db
+from src.cache.db_cache import init_cache
 
 def main():
     if not len(sys.argv) == 2:
@@ -17,6 +18,7 @@ def main():
     load_dotenv()
     config.GLOBAL_CONFIGS = config.load_configs()
     init_db()
+    init_cache()
     params = BotParameters(
         token=os.getenv("BOT_TOKEN") if sys.argv[1] == "deploy" else os.getenv("BOT_TOKEN_DEBUG"),
         handlers={
