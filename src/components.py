@@ -1,11 +1,15 @@
 from dataclasses import dataclass
+
 from telegram.ext import Application
+
 from src.jobs import clean_cache_job, post_logs_job
+
 
 @dataclass
 class BotParameters:
     token: str
     handlers: dict
+
 
 class Bot:
     def __init__(self, parameters: BotParameters) -> None:
@@ -23,4 +27,3 @@ class Bot:
 
     def run(self) -> None:
         self.application.run_polling(drop_pending_updates=True)
-        

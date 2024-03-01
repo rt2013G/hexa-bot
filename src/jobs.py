@@ -1,11 +1,12 @@
+import logging
 from datetime import datetime, timedelta
-from telegram.ext import (
-    ContextTypes,
-)
+
+import telegram.error
+from telegram.ext import ContextTypes
+
 from src.cache import db_cache as c
 from src.config import get_logging_channel_id
 from src.utils import logger as l
-import logging
 
 
 def clean_cache_job(context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -22,9 +23,9 @@ async def post_logs_job(context: ContextTypes.DEFAULT_TYPE) -> None:
         timed_out = False
         try:
             await context.bot.send_message(
-                chat_id=get_logging_channel_id(), 
-                text=message)
-        except:
+                chat_id=get_logging_channel_id(), text=message
+            )
+        except telegram.error:
             timed_out = True
 
         if timed_out:

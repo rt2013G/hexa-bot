@@ -1,9 +1,12 @@
-import psycopg
 import os
 from datetime import datetime
-from src.database.model import User, Feedback
-from src.config import get_roles
+
+import psycopg
+
 from src.cache import db_cache as c
+from src.config import get_roles
+from src.database.model import Feedback, User
+
 
 def get_connection() -> psycopg.Connection:
     return psycopg.connect(
@@ -11,12 +14,14 @@ def get_connection() -> psycopg.Connection:
         dbname={os.getenv("DB_NAME")} 
         user={os.getenv("DB_USER")} 
         password={os.getenv("DB_PASSWORD")}"""
-        )
+    )
+
 
 def init_db() -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 CREATE TABLE IF NOT EXISTS users(
                     id NUMERIC PRIMARY KEY,
                     username VARCHAR(32) UNIQUE,
@@ -25,8 +30,10 @@ def init_db() -> None:
                     last_buy_post TIMESTAMP,
                     last_sell_post TIMESTAMP
                 );
-                """)
-            cur.execute("""
+                """
+            )
+            cur.execute(
+                """
                 CREATE TABLE IF NOT EXISTS feedback(
                     id SERIAL PRIMARY KEY,
                     seller_id NUMERIC,
@@ -42,14 +49,18 @@ def init_db() -> None:
                     contents TEXT NOT NULL,
                     date TIMESTAMP
                 );
-                """)
-            cur.execute("""
+                """
+            )
+            cur.execute(
+                """
                 CREATE TABLE IF NOT EXISTS role(
                     id SERIAL PRIMARY KEY,
                     name TEXT UNIQUE NOT NULL
                 );
-                """)
-            cur.execute("""
+                """
+            )
+            cur.execute(
+                """
                 CREATE TABLE IF NOT EXISTS users_role(
                     user_id NUMERIC,
                     CONSTRAINT user_fk
@@ -62,9 +73,11 @@ def init_db() -> None:
                     CONSTRAINT users_role_pk
                         PRIMARY KEY (user_id, role_id)
                 );
-                """)
+                """
+            )
             for role in get_roles():
-                cur.execute("""
+                cur.execute(
+                    """
                 INSERT INTO role(name) 
                 SELECT %s
                 WHERE NOT EXISTS (
@@ -72,22 +85,26 @@ def init_db() -> None:
                     FROM role
                     WHERE name=%s
                 )
-                """, (role, role))
+                """,
+                    (role, role),
+                )
             conn.commit()
             conn.close()
 
+
 def insert_user(
-        id: int,
-        username: str = None,
-        first_name: str = None,
-        last_name: str = None,
-        last_buy_post = datetime(year=2015, month=1, day=15),
-        last_sell_post = datetime(year=2015, month=1, day=15)
-        ) -> None:
+    id: int,
+    username: str = None,
+    first_name: str = None,
+    last_name: str = None,
+    last_buy_post=datetime(year=2015, month=1, day=15),
+    last_sell_post=datetime(year=2015, month=1, day=15),
+) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                 INSERT INTO users(
                     id,
                     username,
@@ -97,29 +114,29 @@ def insert_user(
                     last_sell_post
                 ) VALUES (%s, %s, %s, %s, %s, %s);
                 """,
-                (
-                    id,
-                    username,
-                    first_name,
-                    last_name,
-                    last_buy_post,
-                    last_sell_post
-                ))
+                    (
+                        id,
+                        username,
+                        first_name,
+                        last_name,
+                        last_buy_post,
+                        last_sell_post,
+                    ),
+                )
             except psycopg.Error as err:
                 print(err)
             conn.commit()
             conn.close()
 
+
 def insert_feedback(
-        seller_id: int,
-        buyer_id: int,
-        contents: str,
-        date = datetime.now()
-        ) -> None:
+    seller_id: int, buyer_id: int, contents: str, date: datetime
+) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                 INSERT INTO feedback(
                     seller_id,
                     buyer_id,
@@ -127,26 +144,26 @@ def insert_feedback(
                     date
                 ) VALUES (%s, %s, %s, %s);
                 """,
-                (
-                    seller_id,
-                    buyer_id,
-                    contents,
-                    date
-                ))
+                    (seller_id, buyer_id, contents, date),
+                )
             except psycopg.Error as err:
                 print(err)
             conn.commit()
             conn.close()
 
+
 def get_user_from_id(id: int) -> User:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT *
                     FROM users
                     WHERE id=%s;
-                """, (id, ))
+                """,
+                    (id,),
+                )
             except psycopg.Error as err:
                 print(err)
             record = cur.fetchone()
@@ -154,16 +171,20 @@ def get_user_from_id(id: int) -> User:
             if record is None:
                 return None
             return User(record)
+
 
 def get_user_from_username(username: str) -> User:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT *
                     FROM users
                     WHERE username=%s;
-                """, (username, ))
+                """,
+                    (username,),
+                )
             except psycopg.Error as err:
                 print(err)
             record = cur.fetchone()
@@ -172,14 +193,17 @@ def get_user_from_username(username: str) -> User:
                 return None
             return User(record)
 
-def get_users(size = 1000000) -> list[User]:
+
+def get_users(size=1000000) -> list[User]:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT *
                     FROM users;
-                """)
+                """
+                )
             except psycopg.Error as err:
                 print(err)
             records = cur.fetchmany(size)
@@ -188,16 +212,20 @@ def get_users(size = 1000000) -> list[User]:
                 users.append(User(record))
             conn.close()
             return users
-        
-def get_feedbacks(seller_id: int, size = 10) -> list[Feedback]:
+
+
+def get_feedbacks(seller_id: int, size=10) -> list[Feedback]:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT *
                     FROM feedback
                     WHERE seller_id=%s;
-                """, (seller_id, ))
+                """,
+                    (seller_id,),
+                )
             except psycopg.Error as err:
                 print(err)
             records = cur.fetchmany(size)
@@ -207,26 +235,32 @@ def get_feedbacks(seller_id: int, size = 10) -> list[Feedback]:
             conn.close()
             return feedbacks
 
+
 def make_role(user_id: int, role_name: str) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT INTO users_role(user_id, role_id)
                     SELECT %s, role.id
                     FROM role
                     WHERE role.name=%s;
-                """, (user_id, role_name))
+                """,
+                    (user_id, role_name),
+                )
             except psycopg.Error as err:
                 print(err)
             conn.commit()
             conn.close()
 
+
 def remove_role(user_id: int, role_name: str) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                     DELETE FROM users_role
                     WHERE users_role.user_id = %s
                     AND users_role.role_id = (
@@ -234,7 +268,9 @@ def remove_role(user_id: int, role_name: str) -> None:
                         FROM role
                         WHERE role.name=%s
                     );
-                """, (user_id, role_name))
+                """,
+                    (user_id, role_name),
+                )
             except psycopg.Error as err:
                 print(err)
             conn.commit()
@@ -244,18 +280,22 @@ def remove_role(user_id: int, role_name: str) -> None:
     elif role_name == "seller" and user_id in c.USERS_CACHE.keys():
         c.USERS_CACHE[user_id].is_seller = False
 
+
 def get_role_list(role_name: str) -> list[User]:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT users.id, users.username,
                     users.first_name, users.last_name,
                     users.last_buy_post, users.last_sell_post
                     FROM (users JOIN users_role ON users.id = users_role.user_id)
                         JOIN role ON role.id = users_role.role_id
                     WHERE role.name = %s;
-                """, (role_name, ))
+                """,
+                    (role_name,),
+                )
             except psycopg.Error as err:
                 print(err)
             users = []
@@ -264,38 +304,43 @@ def get_role_list(role_name: str) -> list[User]:
             conn.close()
             return users
 
+
 def update_user_dates(
-        id: int,
-        last_buy_post = datetime(year=2015, month=1, day=15),
-        last_sell_post = datetime(year=2015, month=1, day=15)
-        ) -> None:
+    id: int,
+    last_buy_post=datetime(year=2015, month=1, day=15),
+    last_sell_post=datetime(year=2015, month=1, day=15),
+) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                     UPDATE users
                     SET last_buy_post=%s, last_sell_post=%s
                     WHERE users.id=%s;
-                """, (last_buy_post, last_sell_post, id))
+                """,
+                    (last_buy_post, last_sell_post, id),
+                )
             except psycopg.Error as err:
                 print(err)
             conn.commit()
             conn.close()
 
+
 def update_user_info(
-        id: int,
-        username: str | None,
-        first_name: str | None,
-        last_name: str | None
-        ) -> None:
+    id: int, username: str | None, first_name: str | None, last_name: str | None
+) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                     UPDATE users
                     SET username=%s, first_name=%s, last_name=%s
                     WHERE users.id=%s;
-                """, (username, first_name, last_name, id))
+                """,
+                    (username, first_name, last_name, id),
+                )
             except psycopg.Error as err:
                 print(err)
             conn.commit()

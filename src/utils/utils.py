@@ -1,14 +1,16 @@
+from datetime import datetime
+
+from src.cache import db_cache as c
+from src.config import get_bot_username, get_max_username_length, get_roles
 from src.database.dbms import get_role_list, get_user_from_id, get_user_from_username
 from src.database.model import User
-from src.config import get_roles, get_bot_username, get_max_username_length
-from src.cache import db_cache as c
 
 
 def get_user_from_message_command(message_text: str, command_text: str) -> User | None:
     msg = clean_command_text(message_text, command_text)
     if len(msg) > 1 + get_max_username_length():
         return None
-    
+
     if "@" in msg:
         msg = msg.replace("@", "")
         if msg.isnumeric():
@@ -17,7 +19,7 @@ def get_user_from_message_command(message_text: str, command_text: str) -> User 
             return get_user_from_username(username=msg)
     elif msg.isnumeric():
         return get_user_from_id(int(msg))
-    
+
     return None
 
 
@@ -37,9 +39,9 @@ def is_role(user_id: int, role_name: str) -> bool:
             if role_name == "admin" and user_id not in c.ADMIN_CACHE:
                 c.ADMIN_CACHE.append(user_id)
             elif role_name == "seller":
-                c.insert_into_cache(user, True)
+                c.insert_into_cache(user, True, datetime.now())
             return True
-        
+
     return False
 
 
