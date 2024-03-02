@@ -30,7 +30,7 @@ def insert_into_cache(user: User, is_seller: bool, time: datetime) -> None:
     USERS_CACHE[user.id] = entry
 
 
-def clean_cache_job(context: ContextTypes.DEFAULT_TYPE) -> None:
+async def clean_cache_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     for key in list(USERS_CACHE):
         if USERS_CACHE[key].time < datetime.now() - timedelta(minutes=30):
             del USERS_CACHE[key]

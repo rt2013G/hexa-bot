@@ -3,7 +3,7 @@ from datetime import datetime
 
 class User:
     def __init__(self, user_data: tuple) -> None:
-        self.id: int = user_data[0]
+        self.id: int = int(user_data[0])
         self.username: str | None = (
             None if user_data[1] is None else user_data[1].decode("utf-8")
         )

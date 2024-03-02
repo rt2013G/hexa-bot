@@ -256,6 +256,8 @@ def make_role(user_id: int, role_name: str) -> None:
                 print(err)
             conn.commit()
             conn.close()
+    if role_name == "seller" and user_id in c.USERS_CACHE.keys():
+        c.USERS_CACHE[user_id].is_seller = True
 
 
 def remove_role(user_id: int, role_name: str) -> None:
