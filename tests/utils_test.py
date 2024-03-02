@@ -1,38 +1,18 @@
 import unittest
 
-from dotenv import load_dotenv
-
-from src import config
-from src.cache import init_cache
-from src.database.dbms import get_connection, init_db, insert_user
 from src.database.model import User
 from src.utils.utils import get_user_from_message_command
-from tests.database_test import mock_data
+from tests.test_data import clean_test_database, mock_data, start_test_database
 
 
-class DatabaseTest(unittest.TestCase):
+class UtilsTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        load_dotenv()
-        config.GLOBAL_CONFIGS = config.load_configs()
-        init_db()
-        init_cache()
-        for mock_user in mock_data:
-            insert_user(
-                mock_user.id,
-                mock_user.username,
-                mock_user.first_name,
-                mock_user.last_name,
-            )
+        start_test_database()
 
     @classmethod
     def tearDownClass(cls) -> None:
-        with get_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("DELETE FROM users WHERE id=1;")
-                cur.execute("DELETE FROM users WHERE id=2;")
-                cur.execute("DELETE FROM users WHERE id=3;")
-                cur.execute("DELETE FROM users WHERE id=4;")
+        clean_test_database()
 
     def test_get_user_from_command_arg(self) -> None:
         messages = [
