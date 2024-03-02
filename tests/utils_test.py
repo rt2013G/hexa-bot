@@ -3,7 +3,7 @@ import unittest
 from dotenv import load_dotenv
 
 from src import config
-from src.cache.db_cache import init_cache
+from src.cache import init_cache
 from src.database.dbms import get_connection, init_db, insert_user
 from src.database.model import User
 from src.utils.utils import get_user_from_message_command

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.cache import db_cache as c
+from src import cache as c
 from src.config import get_bot_username, get_max_username_length, get_roles
 from src.database.dbms import get_role_list, get_user_from_id, get_user_from_username
 from src.database.model import User

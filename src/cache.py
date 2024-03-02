@@ -1,5 +1,8 @@
+import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from telegram.ext import ContextTypes
 
 from src.database.model import User
 
@@ -25,3 +28,10 @@ def init_cache() -> None:
 def insert_into_cache(user: User, is_seller: bool, time: datetime) -> None:
     entry = UserCacheEntry(user=user, is_seller=is_seller, time=time)
     USERS_CACHE[user.id] = entry
+
+
+def clean_cache_job(context: ContextTypes.DEFAULT_TYPE) -> None:
+    for key in list(USERS_CACHE):
+        if USERS_CACHE[key].time < datetime.now() - timedelta(minutes=30):
+            del USERS_CACHE[key]
+    logging.log(logging.INFO, "Cache cleaned")

@@ -2,7 +2,8 @@ from dataclasses import dataclass
 
 from telegram.ext import Application
 
-from src.jobs import clean_cache_job, post_logs_job
+from src.cache import clean_cache_job
+from src.utils.logger import post_logs_job
 
 
 @dataclass

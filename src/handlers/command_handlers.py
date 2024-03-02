@@ -5,7 +5,7 @@ from src.config import get_market_group_link
 from src.database.dbms import get_feedbacks, get_user_from_id, insert_user
 from src.database.model import User
 from src.filters import AdminFilter, MainGroupFilter
-from src.utils.decorators import with_logging
+from src.utils.logger import with_logging
 from src.utils.utils import get_user_from_message_command, is_role
 
 

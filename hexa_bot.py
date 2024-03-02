@@ -4,7 +4,7 @@ import sys
 from dotenv import load_dotenv
 
 from src import config
-from src.cache.db_cache import init_cache
+from src.cache import init_cache
 from src.components import Bot, BotParameters
 from src.database.dbms import init_db
 from src.handlers import admin_handlers as ah

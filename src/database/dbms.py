@@ -3,7 +3,7 @@ from datetime import datetime
 
 import psycopg
 
-from src.cache import db_cache as c
+from src import cache as c
 from src.config import get_roles
 from src.database.model import Feedback, User
 
@@ -328,6 +328,8 @@ def update_user_dates(
                 print(err)
             conn.commit()
             conn.close()
+    if id in c.USERS_CACHE.keys():
+        del c.USERS_CACHE[id]
 
 
 def update_user_info(

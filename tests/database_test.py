@@ -5,7 +5,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 from src import config
-from src.cache.db_cache import init_cache
+from src.cache import init_cache
 from src.database.dbms import (
     get_connection,
     get_role_list,
