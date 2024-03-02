@@ -34,7 +34,6 @@ def get_admin_handlers() -> list:
 
 @with_logging
 async def make_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print(update)
     user = get_user_from_message_command(update.message.text, "/makeseller")
     if user is None:
         await update.message.reply_text(

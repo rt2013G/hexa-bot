@@ -2,7 +2,7 @@ from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
 from src.config import get_market_group_link
-from src.database.dbms import get_feedbacks, get_user_from_id, insert_user
+from src.database.dbms import get_feedbacks, get_user_from_id
 from src.database.model import User
 from src.filters import AdminFilter, MainGroupFilter
 from src.utils.logger import with_logging
@@ -31,24 +31,17 @@ def get_command_handlers() -> list:
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    id = update.message.from_user.id
     msg = f"""Benvenuto sul gruppo Yu-Gi-Oh ITA Main.
 Per entrare nel gruppo market segui questo link: {get_market_group_link()}.\n
 Ricorda di leggere le regole! Solo i venditori approvati possono vendere sul gruppo.
 Se vuoi diventare venditore, usa il comando /seller.\n
 Ricorda che in ogni caso, puoi effettuare solo 1 post di vendita e 1 post di acquisto al giorno."""
     await context.bot.send_message(
-        id, msg, disable_web_page_preview=True, reply_markup=ReplyKeyboardRemove()
+        update.message.from_user.id,
+        msg,
+        disable_web_page_preview=True,
+        reply_markup=ReplyKeyboardRemove(),
     )
-
-    user = get_user_from_id(id)
-    if user is None:
-        insert_user(
-            id=id,
-            username=update.message.from_user.username,
-            first_name=update.message.from_user.first_name,
-            last_name=update.message.from_user.last_name,
-        )
 
 
 @with_logging

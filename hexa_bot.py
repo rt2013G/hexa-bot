@@ -7,9 +7,10 @@ from src import config
 from src.cache import init_cache
 from src.components import Bot, BotParameters
 from src.database.dbms import init_db
-from src.handlers import admin_handlers as ah
-from src.handlers import chat_handlers as chh
-from src.handlers import command_handlers as ch
+from src.handlers.admin_handlers import get_admin_handlers
+from src.handlers.chat_handlers import get_chat_handlers
+from src.handlers.command_handlers import get_command_handlers
+from src.handlers.service_handlers import get_service_handlers
 from src.utils.logger import set_up_logger
 
 
@@ -36,9 +37,10 @@ def main() -> None:
     params = BotParameters(
         token=bot_token,
         handlers={
-            0: ch.get_command_handlers(),
-            1: ah.get_admin_handlers(),
-            2: chh.get_chat_handlers(),
+            0: get_service_handlers(),
+            1: get_admin_handlers(),
+            2: get_command_handlers(),
+            3: get_chat_handlers(),
         },
     )
     bot = Bot(parameters=params)
