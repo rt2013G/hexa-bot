@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from telegram.ext import Application
 
 from src.cache import clean_cache_job
+from src.card_search import clean_card_data_job
 from src.utils.logger import post_logs_job
 
 
@@ -24,7 +25,8 @@ class Bot:
 
     def add_jobs(self) -> None:
         self.job_queue.run_repeating(clean_cache_job, interval=300, first=300)
-        self.job_queue.run_repeating(post_logs_job, interval=60, first=30)
+        self.job_queue.run_repeating(post_logs_job, interval=60, first=60)
+        self.job_queue.run_repeating(clean_card_data_job, interval=21600, first=21600)
 
     def run(self) -> None:
         self.application.run_polling(drop_pending_updates=True)

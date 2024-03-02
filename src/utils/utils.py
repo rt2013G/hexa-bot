@@ -46,4 +46,4 @@ def is_role(user_id: int, role_name: str) -> bool:
 
 
 def clean_command_text(text: str, command: str) -> str:
-    return text.replace(get_bot_username(), "").replace(command, "").replace(" ", "")
+    return text.replace(get_bot_username(), "").replace(command, "").lstrip()

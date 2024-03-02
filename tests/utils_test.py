@@ -1,7 +1,7 @@
 import unittest
 
 from src.database.model import User
-from src.utils.utils import get_user_from_message_command
+from src.utils.utils import clean_command_text, get_user_from_message_command
 from tests.test_data import clean_test_database, mock_data, start_test_database
 
 
@@ -13,6 +13,24 @@ class UtilsTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         clean_test_database()
+
+    def test_clean_command_text(self) -> None:
+        commands = [
+            "/command hello",
+            "/search test",
+            "/testtest",
+            "/testcommand hello world  ",
+        ]
+        results = [
+            clean_command_text(text=commands[0], command="/command"),
+            clean_command_text(text=commands[1], command="/search"),
+            clean_command_text(text=commands[2], command="/testtest"),
+            clean_command_text(text=commands[3], command="/testcommand"),
+        ]
+        self.assertEqual(results[0], "hello")
+        self.assertEqual(results[1], "test")
+        self.assertEqual(results[2], "")
+        self.assertEqual(results[3], "hello world  ")
 
     def test_get_user_from_command_arg(self) -> None:
         messages = [
