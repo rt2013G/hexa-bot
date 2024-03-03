@@ -48,6 +48,7 @@ class UtilsTest(unittest.TestCase):
             ("/resetdate @notlongbutdoesntexist", "/resetdate"),
             (f"/checkseller {mock_data[2].username}", "/checkseller"),
             ("/checkseller 15", "/checkseller"),
+            ("/reject @username", "/reject"),
         ]
         users: list[User] = []
         for message in messages:
@@ -67,3 +68,4 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual(users[5], None)
         self.assertEqual(users[6], None)
         self.assertEqual(users[7], None)
+        self.assertEqual(users[8].id, mock_data[2].id)

@@ -17,7 +17,7 @@ def get_admin_handlers() -> list:
         CommandHandler(
             "removeseller", remove_seller, AdminFilter() & ApprovalGroupFilter()
         ),
-        CommandHandler("reject", remove_seller, AdminFilter() & ApprovalGroupFilter()),
+        CommandHandler("reject", reject_seller, AdminFilter() & ApprovalGroupFilter()),
         CommandHandler("makescammer", make_scammer, AdminFilter()),
         CommandHandler("removescammer", remove_scammer, AdminFilter()),
         CommandHandler("announce", announce, DebugUserFilter()),
@@ -88,6 +88,13 @@ async def reject_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     if user is None:
         await update.message.reply_text(
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
+        )
+        return
+
+    if is_role(user.id, "seller"):
+        await update.message.reply_text(
+            "L'utente è già un venditore! Per rimuoverlo usa il comando /removeseller",
+            reply_markup=ReplyKeyboardRemove(),
         )
         return
 

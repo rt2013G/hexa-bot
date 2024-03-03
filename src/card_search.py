@@ -30,7 +30,6 @@ def get_card_data(card_name: str) -> CardData | None:
 
     err: str | None = response_json.get("error")
     if err is not None:
-        print(err)
         return None
 
     data = response_json["data"][0]

@@ -47,3 +47,7 @@ def is_role(user_id: int, role_name: str) -> bool:
 
 def clean_command_text(text: str, command: str) -> str:
     return text.replace(get_bot_username(), "").replace(command, "").lstrip()
+
+
+def get_auth_code_from_id(user_id: int) -> int:
+    return int(str(user_id**2)[0:6])
