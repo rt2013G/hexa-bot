@@ -1,7 +1,14 @@
 import unittest
+from datetime import datetime, timedelta
 
+from src.database.dbms import update_user_dates
 from src.database.model import User
-from src.utils.utils import clean_command_text, get_user_from_message_command
+from src.utils.utils import (
+    clean_command_text,
+    get_user_from_message_command,
+    has_sent_buy_post_today,
+    has_sent_sell_post_today,
+)
 from tests.test_data import clean_test_database, mock_data, start_test_database
 
 
@@ -69,3 +76,23 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual(users[6], None)
         self.assertEqual(users[7], None)
         self.assertEqual(users[8].id, mock_data[2].id)
+
+    def test_has_sent_posts_today(self) -> None:
+        update_user_dates(1, datetime.now(), datetime.now() - timedelta(days=5))
+        update_user_dates(2, datetime.now(), datetime.now())
+        update_user_dates(3, datetime.now() - timedelta(days=10), datetime.now())
+        update_user_dates(
+            4, datetime.now() - timedelta(days=2), datetime.now() - timedelta(days=1)
+        )
+
+        self.assertEqual(has_sent_buy_post_today(1), True)
+        self.assertEqual(has_sent_sell_post_today(1), False)
+
+        self.assertEqual(has_sent_buy_post_today(2), True)
+        self.assertEqual(has_sent_sell_post_today(2), True)
+
+        self.assertEqual(has_sent_buy_post_today(3), False)
+        self.assertEqual(has_sent_sell_post_today(3), True)
+
+        self.assertEqual(has_sent_buy_post_today(4), False)
+        self.assertEqual(has_sent_sell_post_today(4), False)

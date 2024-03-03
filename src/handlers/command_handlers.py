@@ -152,7 +152,7 @@ async def get_feedback_list(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
     await context.bot.send_message(
         update.message.from_user.id,
-        f"L'utente {seller.username} ha {len(feedbacks)} feedback, eccone alcuni:",
+        f"L'utente @{seller.username} ha {len(feedbacks)} feedback, eccone alcuni:",
         reply_markup=ReplyKeyboardRemove(),
     )
     for feedback in feedbacks:
@@ -169,7 +169,7 @@ async def get_feedback_list(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             buyer.username = "@" + buyer.username
         await context.bot.send_message(
             update.message.from_user.id,
-            f"Feedback inviato da {buyer.username} in data {feedback.date}:",
+            f"Feedback inviato da {buyer.username} in data {feedback.date.date()}:",
             reply_markup=ReplyKeyboardRemove(),
         )
         await context.bot.send_message(

@@ -23,6 +23,19 @@ def get_user_from_message_command(message_text: str, command_text: str) -> User 
     return None
 
 
+def get_user_from_text(message_text: str) -> User | None:
+    if "@" not in message_text:
+        return None
+
+    for word in message_text.split():
+        if "@" in word:
+            username = word.replace("@", "")
+            if len(username) > 0:
+                return get_user_from_username(username=username)
+
+    return None
+
+
 def is_role(user_id: int, role_name: str) -> bool:
     if role_name not in get_roles():
         return False
@@ -91,3 +104,19 @@ def is_feedback_post(text: str) -> bool:
         or "feed" in text in text
         else False
     )
+
+
+def has_sent_sell_post_today(user_id: int) -> bool:
+    user = get_user_from_id(user_id)
+    if user is None:
+        return False
+
+    return True if user.last_sell_post.date() == datetime.today().date() else False
+
+
+def has_sent_buy_post_today(user_id: int) -> bool:
+    user = get_user_from_id(user_id)
+    if user is None:
+        return False
+
+    return True if user.last_buy_post.date() == datetime.today().date() else False

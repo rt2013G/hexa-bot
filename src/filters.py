@@ -2,7 +2,7 @@ from telegram import Message
 from telegram.ext.filters import MessageFilter
 
 from src.config import get_approval_id, get_debug_user_id, get_main_id, get_market_id
-from src.utils.utils import is_role
+from src.utils.utils import is_feedback_post, is_role
 
 
 class AdminFilter(MessageFilter):
@@ -33,3 +33,13 @@ class DebugUserFilter(MessageFilter):
 class MediaGroupFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
         return True if message.media_group_id is not None else False
+
+
+class FeedbackFilter(MessageFilter):
+    def filter(self, message: Message) -> bool:
+        text: str
+        try:
+            text = message.text
+        except AttributeError:
+            return False
+        return is_feedback_post(text=text)
