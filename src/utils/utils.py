@@ -75,6 +75,7 @@ def is_sell_post(text: str) -> bool:
         or "vendere" in text
         or "vendesi" in text
         or "vendono" in text
+        or "ammortizzo" in text
         else False
     )
 

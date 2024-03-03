@@ -14,13 +14,7 @@ from telegram.helpers import effective_message_type
 
 from src.config import get_feedback_channel_id
 from src.database.dbms import get_user_from_id, insert_feedback, update_user_dates
-from src.filters import (
-    AdminFilter,
-    FeedbackFilter,
-    MainGroupFilter,
-    MarketGroupFilter,
-    MediaGroupFilter,
-)
+from src.filters import AdminFilter, FeedbackFilter, MarketGroupFilter, MediaGroupFilter
 from src.utils.utils import (
     get_user_from_text,
     has_sent_buy_post_today,
@@ -31,11 +25,8 @@ from src.utils.utils import (
 )
 
 
-def get_chat_handlers() -> list:
+def get_market_handlers() -> list:
     return [
-        MessageHandler(
-            ~filters.COMMAND & MainGroupFilter() & ~AdminFilter(), main_msg_handler
-        ),
         MessageHandler(
             ~filters.COMMAND
             & MarketGroupFilter()
@@ -59,10 +50,6 @@ def get_chat_handlers() -> list:
             feedback_msg_handler,
         ),
     ]
-
-
-async def main_msg_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    pass
 
 
 @dataclass
@@ -214,7 +201,7 @@ async def feedback_msg_handler(
         )
         await update.message.delete()
         return
-    if user.id == seller.id:
+    if seller.id == user.id:
         await context.bot.send_message(
             user.id,
             "Non puoi aggiungere un feedback a te stesso!",

@@ -42,4 +42,6 @@ class FeedbackFilter(MessageFilter):
             text = message.text
         except AttributeError:
             return False
+        if text is None:
+            return False
         return is_feedback_post(text=text)
