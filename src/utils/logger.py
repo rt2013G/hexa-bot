@@ -48,7 +48,7 @@ async def post_logs_job(context: ContextTypes.DEFAULT_TYPE) -> None:
             await context.bot.send_message(
                 chat_id=get_logging_channel_id(), text=message
             )
-        except telegram.error:
+        except (telegram.error.TimedOut, telegram.error.Forbidden):
             timed_out = True
 
         if timed_out:

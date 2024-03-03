@@ -28,3 +28,8 @@ class ApprovalGroupFilter(MessageFilter):
 class DebugUserFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
         return True if message.from_user.id == get_debug_user_id() else False
+
+
+class MediaGroupFilter(MessageFilter):
+    def filter(self, message: Message) -> bool:
+        return True if message.media_group_id is not None else False
