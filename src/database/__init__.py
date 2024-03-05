@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from src.config import get_default_post_datetime
 
 from .cache import (
     CACHE,
     RolesEntry,
+    UserEntry,
     get_id_from_username_cache,
     get_user_from_cache,
     insert_into_roles_cache,
@@ -19,22 +22,28 @@ def get_user(id: int | None = None, username: str | None = None) -> User | None:
 
     user: User | None
     if id is not None:
-        if user := get_user_from_cache(id=id) is not None:
-            print("Cache hit!")  # TODO remove debug
+        user = get_user_from_cache(id=id)
+        if user is not None:
             return user
+        else:
+            user = get_user_from_id(id=id)
+            if user is not None:
+                insert_into_users_cache(id=id, user=user)
 
-        if user := get_user_from_id(id=id) is not None:
-            insert_into_users_cache(id=id, user=user)
             return user
 
     elif username is not None:
-        if id := get_id_from_username_cache(username=username) is not None:
-            if user := get_user_from_cache(id=id) is not None:
+        id = get_id_from_username_cache(username=username)
+        if id is not None:
+            user: User = get_user_from_cache(id=id)
+            if user is not None:
                 return user
 
-        if user := get_user_from_username(username=username) is not None:
+        user = get_user_from_username(username=username)
+        if user is not None:
             insert_into_username_cache(username=user.username, id=user.id)
             insert_into_users_cache(id=id, user=user)
+
             return user
 
 
@@ -50,10 +59,34 @@ def update_user_info(
         id=id, username=username, first_name=first_name, last_name=last_name
     )
 
+    insert_into_username_cache(username=username, id=id)
+    cache_entry: UserEntry = CACHE.cached_users.get(id)
+    if cache_entry is not None:
+        del CACHE.cached_users[id]
+
+
+def update_user_post_dates(
+    id: int,
+    last_buy_post: datetime | None = None,
+    last_sell_post: datetime | None = None,
+) -> None:
+    from .models.user import update_user_dates
+
     user: User = get_user(id=id)
-    if user is not None:
-        insert_into_username_cache(username=user.username, id=user.id)
-        insert_into_users_cache(id=user.id, user=user)
+    if user is None:
+        return
+
+    if last_buy_post is None:
+        last_buy_post = user.last_buy_post
+    if last_sell_post is None:
+        last_sell_post = user.last_sell_post
+
+    update_user_dates(
+        id=user.id, last_buy_post=last_buy_post, last_sell_post=last_sell_post
+    )
+    user.last_buy_post = last_buy_post
+    user.last_sell_post = last_sell_post
+    insert_into_users_cache(id=id, user=user)
 
 
 def reset_user_buy_post(id: int) -> None:

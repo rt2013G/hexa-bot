@@ -2,14 +2,22 @@ import unittest
 from datetime import datetime
 
 from src.config import get_default_post_datetime
-from src.database import has_role, remove_role_from_user
-from src.database.models.role import get_role_list, make_role
-from src.database.models.user import (
-    get_user_from_id,
-    update_user_dates,
+from src.database import (
+    add_role_to_user,
+    get_user,
+    has_role,
+    remove_role_from_user,
+    reset_user_buy_post,
+    reset_user_sell_post,
     update_user_info,
+    update_user_post_dates,
 )
-from tests.test_data import clean_test_database, mock_data, start_test_database
+from tests.test_data import (
+    clean_test_database,
+    compare_mock_to_user,
+    mock_data,
+    start_test_database,
+)
 
 
 class DatabaseTest(unittest.TestCase):
@@ -21,119 +29,101 @@ class DatabaseTest(unittest.TestCase):
     def tearDownClass(cls) -> None:
         clean_test_database()
 
-    def reset_users(self) -> None:
-        for mock_user in mock_data:
-            update_user_info(
-                mock_user.id,
-                mock_user.username,
-                mock_user.first_name,
-                mock_user.last_name,
-            )
+    def test_get_user(self) -> None:
+        user = get_user(id=1)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), True)
 
-    def test_get_user_function(self):
-        user = get_user_from_id(10)
-        self.assertEqual(user, None)
+        user = get_user(id=1)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), True)
 
-    def test_user_class(self):
-        user = get_user_from_id(1)
-        self.assertEqual(user.username, mock_data[0].username)
-        self.assertEqual(user.first_name, mock_data[0].first_name)
-        self.assertEqual(user.last_name, mock_data[0].last_name)
-        self.assertEqual(user.last_buy_post.year, 2015)
-        self.assertEqual(user.last_buy_post.month, 1)
-        self.assertEqual(user.last_buy_post.day, 15)
-        self.assertEqual(user.last_sell_post.year, 2015)
-        self.assertEqual(user.last_sell_post.month, 1)
-        self.assertEqual(user.last_sell_post.day, 15)
+        user = get_user(id=1)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), True)
 
-        user = get_user_from_id(2)
-        self.assertEqual(user.username, mock_data[1].username)
-        self.assertEqual(user.first_name, mock_data[1].first_name)
-        self.assertEqual(user.last_name, mock_data[1].last_name)
-        self.assertEqual(user.last_buy_post.year, 2015)
-        self.assertEqual(user.last_buy_post.month, 1)
-        self.assertEqual(user.last_buy_post.day, 15)
-        self.assertEqual(user.last_sell_post.year, 2015)
-        self.assertEqual(user.last_sell_post.month, 1)
-        self.assertEqual(user.last_sell_post.day, 15)
+        user = get_user(id=2)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[1], user=user), True)
 
-    def test_seller_role(self):
-        self.assertEqual(len(get_role_list("seller")), 0)
-        make_role(1, "seller")
-        self.assertEqual(len(get_role_list("seller")), 1)
-        make_role(3, "seller")
-        self.assertEqual(len(get_role_list("seller")), 2)
+        user = get_user(id=2)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[1], user=user), True)
 
-        seller_list = get_role_list("seller")
+        user = get_user(username=mock_data[1].username)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[1], user=user), True)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[2], user=user), False)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), False)
 
-        id_list = []
-        for seller in seller_list:
-            id_list.append(seller.id)
-        self.assertEqual(1 in id_list, True)
-        self.assertEqual(2 in id_list, False)
-        self.assertEqual(3 in id_list, True)
-        self.assertEqual(4 in id_list, False)
+        user = get_user(username=mock_data[2].username)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[2], user=user), True)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[3], user=user), False)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), False)
 
-    def test_judge_role(self):
-        self.assertEqual(len(get_role_list("judge")), 0)
-        make_role(2, "judge")
-        self.assertEqual(len(get_role_list("judge")), 1)
-        make_role(3, "judge")
-        self.assertEqual(len(get_role_list("judge")), 2)
+        user = get_user(username=mock_data[2].username)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[2], user=user), True)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[3], user=user), False)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), False)
 
-        judge_list = get_role_list("judge")
-        id_list = []
-        for seller in judge_list:
-            id_list.append(seller.id)
-        self.assertEqual(1 in id_list, False)
-        self.assertEqual(2 in id_list, True)
-        self.assertEqual(3 in id_list, True)
-        self.assertEqual(4 in id_list, False)
+    def test_update_user(self) -> None:
+        user = get_user(username=mock_data[2].username)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[2], user=user), True)
 
-    def test_set_date(self):
-        update_user_dates(
-            1, datetime(year=2022, month=6, day=2), datetime(year=2021, month=1, day=12)
-        )
-        user = get_user_from_id(1)
-        self.assertEqual(user.last_buy_post, datetime(year=2022, month=6, day=2))
-        self.assertEqual(user.last_sell_post, datetime(year=2021, month=1, day=12))
-
-        update_user_dates(1, get_default_post_datetime(), get_default_post_datetime())
-        user = get_user_from_id(1)
-        self.assertEqual(user.last_buy_post, datetime(year=2015, month=1, day=15))
-        self.assertEqual(user.last_sell_post, datetime(year=2015, month=1, day=15))
-
-    def test_update_user(self):
         update_user_info(
+            id=3,
+            username="testupdate",
+            first_name="testfirstname",
+            last_name="testlastname",
+        )
+        user = get_user(id=3)
+        self.assertEqual(compare_mock_to_user(mock=mock_data[2], user=user), False)
+        self.assertEqual(user.username, "testupdate")
+        self.assertEqual(user.first_name, "testfirstname")
+        self.assertEqual(user.last_name, "testlastname")
+
+    def test_update_user_dates(self) -> None:
+        user = get_user(1)
+        previous_buy_post = user.last_buy_post
+        previous_sell_post = user.last_sell_post
+        update_user_post_dates(user.id)
+        user = get_user(1)
+        self.assertEqual(user.last_buy_post, previous_buy_post)
+        self.assertEqual(user.last_sell_post, previous_sell_post)
+
+        update_user_post_dates(
             1,
-            username="newusername",
-            first_name=mock_data[0].first_name,
-            last_name=mock_data[0].last_name,
+            datetime(year=2022, month=11, day=11),
+            datetime(year=2017, month=6, day=19),
         )
-        user = get_user_from_id(1)
-        self.assertEqual(user.username, "newusername")
-        self.assertEqual(user.first_name, mock_data[0].first_name)
-        self.assertEqual(user.last_name, mock_data[0].last_name)
-        self.reset_users()
+        user = get_user(1)
+        self.assertEqual(user.last_buy_post, datetime(year=2022, month=11, day=11))
+        self.assertEqual(user.last_sell_post, datetime(year=2017, month=6, day=19))
 
-        update_user_info(
-            2,
-            username=mock_data[1].username,
-            first_name="update",
-            last_name="updatelastname",
-        )
-        user = get_user_from_id(2)
-        self.assertEqual(user.username, mock_data[1].username)
-        self.assertEqual(user.first_name, "update")
-        self.assertEqual(user.last_name, "updatelastname")
-        self.reset_users()
+        reset_user_buy_post(1)
+        user = get_user(1)
+        self.assertEqual(user.last_buy_post, get_default_post_datetime())
+        self.assertEqual(user.last_sell_post, datetime(year=2017, month=6, day=19))
 
-    def test_remove_role(self):
-        make_role(2, "seller")
-        make_role(2, "admin")
+        reset_user_sell_post(1)
+        user = get_user(1)
+        self.assertEqual(user.last_buy_post, get_default_post_datetime())
+        self.assertEqual(user.last_sell_post, get_default_post_datetime())
+
+    def test_roles(self) -> None:
+        add_role_to_user(1, "seller")
+        self.assertEqual(has_role(1, "seller"), True)
+        self.assertEqual(has_role(1, "seller"), True)
+        self.assertEqual(has_role(1, "judge"), False)
+
+        add_role_to_user(2, "admin")
+        self.assertEqual(has_role(2, "seller"), False)
+        self.assertEqual(has_role(2, "judge"), False)
         self.assertEqual(has_role(2, "admin"), True)
+
         remove_role_from_user(2, "admin")
         self.assertEqual(has_role(2, "admin"), False)
-        self.assertEqual(has_role(2, "seller"), True)
-        remove_role_from_user(2, "seller")
-        self.assertEqual(has_role(2, "seller"), False)
+
+        add_role_to_user(1, "judge")
+        self.assertEqual(has_role(1, "seller"), True)
+        self.assertEqual(has_role(1, "judge"), True)
+        self.assertEqual(has_role(1, "admin"), False)
+
+        remove_role_from_user(1, "judge")
+        self.assertEqual(has_role(1, "seller"), True)
+        self.assertEqual(has_role(1, "judge"), False)
+        self.assertEqual(has_role(1, "admin"), False)
