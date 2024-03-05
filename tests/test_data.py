@@ -3,8 +3,10 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 
 from src import config
-from src.cache import init_cache
-from src.database.dbms import get_connection, init_db, insert_user
+from src import config as cfg
+from src.database.cache import init_cache
+from src.database.models.base import get_connection, init_db
+from src.database.models.user import insert_user
 
 
 @dataclass
@@ -26,7 +28,7 @@ mock_data = [
 def start_test_database():
     load_dotenv()
     config.GLOBAL_CONFIGS = config.load_configs()
-    init_db()
+    init_db(cfg.get_roles())
     init_cache()
     for mock_user in mock_data:
         insert_user(

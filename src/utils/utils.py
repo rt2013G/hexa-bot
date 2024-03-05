@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from src import cache as c
 from src.config import get_bot_username, get_max_username_length, get_roles
-from src.database.dbms import get_role_list, get_user_from_id, get_user_from_username
-from src.database.model import User
+from src.database import cache as c
+from src.database.models.role import get_role_list
+from src.database.models.user import User, get_user_from_id, get_user_from_username
 
 
 def get_user_from_message_command(message_text: str, command_text: str) -> User | None:

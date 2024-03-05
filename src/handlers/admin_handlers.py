@@ -3,7 +3,8 @@ import sys
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
-from src.database.dbms import get_users, make_role, remove_role, update_user_dates
+from src.database.models.role import make_role, remove_role
+from src.database.models.user import get_users, update_user_dates
 from src.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
 from src.utils.logger import with_logging
 from src.utils.utils import clean_command_text, get_user_from_message_command, is_role

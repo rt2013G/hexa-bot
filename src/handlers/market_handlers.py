@@ -13,7 +13,8 @@ from telegram.ext import ContextTypes, MessageHandler, filters
 from telegram.helpers import effective_message_type
 
 from src.config import get_feedback_channel_id
-from src.database.dbms import get_user_from_id, insert_feedback, update_user_dates
+from src.database.models.feedback import insert_feedback
+from src.database.models.user import get_user_from_id, update_user_dates
 from src.filters import AdminFilter, FeedbackFilter, MarketGroupFilter, MediaGroupFilter
 from src.utils.utils import (
     get_user_from_text,

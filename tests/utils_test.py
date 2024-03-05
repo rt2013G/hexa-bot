@@ -1,8 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
 
-from src.database.dbms import update_user_dates
-from src.database.model import User
+from src.database.models.user import User, update_user_dates
 from src.utils.utils import (
     clean_command_text,
     get_user_from_message_command,

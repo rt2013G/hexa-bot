@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from telegram.ext import ContextTypes
 
-from src.database.model import User
+from .models.user import User
 
 
 @dataclass

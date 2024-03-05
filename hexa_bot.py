@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 from telegram import LinkPreviewOptions
 from telegram.ext import Defaults
 
-from src import config
-from src.cache import init_cache
+from src import config as cfg
 from src.components import Bot, BotParameters
-from src.database.dbms import init_db
+from src.database.cache import init_cache
+from src.database.models.base import init_db
 from src.handlers.admin_handlers import get_admin_handlers
 from src.handlers.command_handlers import get_command_handlers
 from src.handlers.market_handlers import get_market_handlers
@@ -23,10 +23,10 @@ def main() -> None:
         sys.exit(0)
 
     load_dotenv()
-    config.GLOBAL_CONFIGS = config.load_configs()
+    cfg.GLOBAL_CONFIGS = cfg.load_configs()
 
     set_up_logger()
-    init_db()
+    init_db(roles=cfg.get_roles())
     init_cache()
 
     bot_token = (
