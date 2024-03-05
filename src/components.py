@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from telegram.ext import Application, Defaults
 
 from src.card_search import clean_card_data_job
-from src.database.cache import clean_cache_job
+from src.database.cache import clean_roles_cache_job, clean_users_cache_job
 from src.utils.logger import post_logs_job
 
 
@@ -30,7 +30,8 @@ class Bot:
         self.application.add_handlers(handlers=handlers)
 
     def add_jobs(self) -> None:
-        self.job_queue.run_repeating(clean_cache_job, interval=300, first=300)
+        self.job_queue.run_repeating(clean_users_cache_job, interval=300, first=300)
+        self.job_queue.run_repeating(clean_roles_cache_job, interval=43200, first=43200)
         self.job_queue.run_repeating(post_logs_job, interval=60, first=60)
         self.job_queue.run_repeating(clean_card_data_job, interval=21600, first=21600)
 

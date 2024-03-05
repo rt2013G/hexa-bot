@@ -2,7 +2,7 @@ from datetime import datetime
 
 import psycopg
 
-from src.database import cache as c
+from src.config import get_default_post_datetime
 
 from .base import get_connection
 
@@ -28,9 +28,13 @@ def insert_user(
     username: str | None = None,
     first_name: str | None = None,
     last_name: str | None = None,
-    last_buy_post: datetime = datetime(year=2015, month=1, day=15),
-    last_sell_post: datetime = datetime(year=2015, month=1, day=15),
+    last_buy_post: datetime | None = None,
+    last_sell_post: datetime | None = None,
 ) -> None:
+    if last_buy_post is None:
+        last_buy_post = get_default_post_datetime()
+    if last_sell_post is None:
+        last_sell_post = get_default_post_datetime()
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -61,9 +65,6 @@ def insert_user(
 
 
 def get_user_from_id(id: int) -> User | None:
-    user_entry: c.UserCacheEntry | None = c.USERS_CACHE.get(id)
-    if user_entry is not None:
-        return user_entry.user
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -125,30 +126,6 @@ def get_users(size=1000000) -> list[User]:
             return users
 
 
-def update_user_dates(
-    id: int,
-    last_buy_post=datetime(year=2015, month=1, day=15),
-    last_sell_post=datetime(year=2015, month=1, day=15),
-) -> None:
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            try:
-                cur.execute(
-                    """
-                    UPDATE users
-                    SET last_buy_post=%s, last_sell_post=%s
-                    WHERE users.id=%s;
-                """,
-                    (last_buy_post, last_sell_post, id),
-                )
-            except psycopg.Error as err:
-                print(err)
-            conn.commit()
-            conn.close()
-    if id in c.USERS_CACHE.keys():
-        del c.USERS_CACHE[id]
-
-
 def update_user_info(
     id: int, username: str | None, first_name: str | None, last_name: str | None
 ) -> None:
@@ -167,5 +144,25 @@ def update_user_info(
                 print(err)
             conn.commit()
             conn.close()
-    if id in c.USERS_CACHE.keys():
-        del c.USERS_CACHE[id]
+
+
+def update_user_dates(
+    id: int,
+    last_buy_post: datetime,
+    last_sell_post: datetime,
+) -> None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute(
+                    """
+                    UPDATE users
+                    SET last_buy_post=%s, last_sell_post=%s
+                    WHERE users.id=%s;
+                """,
+                    (last_buy_post, last_sell_post, id),
+                )
+            except psycopg.Error as err:
+                print(err)
+            conn.commit()
+            conn.close()

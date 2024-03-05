@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from datetime import datetime
 
 GLOBAL_CONFIGS: dict = {}
 
@@ -49,3 +50,7 @@ def get_max_username_length() -> int:
 
 def get_market_group_link() -> str:
     return str(GLOBAL_CONFIGS["links"]["market_group_link"])
+
+
+def get_default_post_datetime() -> datetime:
+    return datetime(year=2015, month=1, day=15)

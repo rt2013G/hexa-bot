@@ -1,8 +1,6 @@
 from datetime import datetime
 
-from src.config import get_bot_username, get_max_username_length, get_roles
-from src.database import cache as c
-from src.database.models.role import get_role_list
+from src.config import get_bot_username, get_max_username_length
 from src.database.models.user import User, get_user_from_id, get_user_from_username
 
 
@@ -34,28 +32,6 @@ def get_user_from_text(message_text: str) -> User | None:
                 return get_user_from_username(username=username)
 
     return None
-
-
-def is_role(user_id: int, role_name: str) -> bool:
-    if role_name not in get_roles():
-        return False
-    if role_name == "admin":
-        if user_id in c.ADMIN_CACHE:
-            return True
-    if role_name == "seller":
-        user_entry: c.UserCacheEntry | None = c.USERS_CACHE.get(user_id)
-        if user_entry is not None:
-            return user_entry.is_seller
-
-    for user in get_role_list(role_name):
-        if user.id == user_id:
-            if role_name == "admin" and user_id not in c.ADMIN_CACHE:
-                c.ADMIN_CACHE.append(user_id)
-            elif role_name == "seller":
-                c.insert_into_cache(user, True, datetime.now())
-            return True
-
-    return False
 
 
 def clean_command_text(text: str, command: str) -> str:

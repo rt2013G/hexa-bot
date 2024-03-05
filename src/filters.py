@@ -2,12 +2,13 @@ from telegram import Message
 from telegram.ext.filters import MessageFilter
 
 from src.config import get_approval_id, get_debug_user_id, get_main_id, get_market_id
-from src.utils.utils import is_feedback_post, is_role
+from src.database import has_role
+from src.utils.utils import is_feedback_post
 
 
 class AdminFilter(MessageFilter):
     def filter(self, message: Message) -> bool:
-        return is_role(message.from_user.id, "admin")
+        return has_role(message.from_user.id, "admin")
 
 
 class MarketGroupFilter(MessageFilter):

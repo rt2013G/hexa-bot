@@ -7,8 +7,9 @@ from telegram.ext import (
     filters,
 )
 
+from database import has_role
 from src.config import get_approval_id
-from src.utils.utils import get_auth_code_from_id, is_role
+from src.utils.utils import get_auth_code_from_id
 
 CODE, VIDEO = range(2)
 
@@ -58,7 +59,7 @@ async def auth_seller_handler(
         return ConversationHandler.END
 
     user_id = update.message.from_user.id
-    if is_role(user_id, "seller"):
+    if has_role(user_id, "seller"):
         await update.message.reply_text(
             "Sei già un venditore.", reply_markup=ReplyKeyboardRemove()
         )

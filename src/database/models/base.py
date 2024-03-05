@@ -3,16 +3,29 @@ import os
 import psycopg
 
 
-def get_connection() -> psycopg.Connection:
+def get_connection(
+    host: str | None = None,
+    name: str | None = None,
+    user: str | None = None,
+    password: str | None = None,
+) -> psycopg.Connection:
+    if host is None:
+        host = os.getenv("DB_HOST")
+    if name is None:
+        name = os.getenv("DB_NAME")
+    if user is None:
+        user = os.getenv("DB_USER")
+    if password is None:
+        password = os.getenv("DB_PASSWORD")
     return psycopg.connect(
-        f"""host={os.getenv("DB_HOST")} 
-        dbname={os.getenv("DB_NAME")} 
-        user={os.getenv("DB_USER")} 
-        password={os.getenv("DB_PASSWORD")}"""
+        f"""host={host}
+        dbname={name}
+        user={user}
+        password={password}"""
     )
 
 
-def init_db(roles: list[str]) -> None:
+def create_database(roles: list[str]) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(

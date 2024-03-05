@@ -13,6 +13,7 @@ from telegram.ext import ContextTypes, MessageHandler, filters
 from telegram.helpers import effective_message_type
 
 from src.config import get_feedback_channel_id
+from src.database import has_role
 from src.database.models.feedback import insert_feedback
 from src.database.models.user import get_user_from_id, update_user_dates
 from src.filters import AdminFilter, FeedbackFilter, MarketGroupFilter, MediaGroupFilter
@@ -21,7 +22,6 @@ from src.utils.utils import (
     has_sent_buy_post_today,
     has_sent_sell_post_today,
     is_buy_post,
-    is_role,
     is_sell_post,
 )
 
@@ -110,7 +110,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
         if media.caption is not None:
             if is_buy_post(media.caption):
                 post_type = "buy"
-            elif is_sell_post(media.caption) and is_role(user.id, "seller"):
+            elif is_sell_post(media.caption) and has_role(user.id, "seller"):
                 post_type = "sell"
 
         media_group.append(
@@ -172,7 +172,7 @@ async def market_post_handler(
     elif (
         is_sell_post(msg)
         and (update.message.photo or update.message.video or update.message.video_note)
-        and is_role(update.message.from_user.id, "seller")
+        and has_role(update.message.from_user.id, "seller")
     ):
         if has_sent_sell_post_today(user.id):
             await context.bot.send_message(
@@ -210,7 +210,7 @@ async def feedback_msg_handler(
         await update.message.delete()
         return
 
-    if not is_role(seller.id, "seller"):
+    if not has_role(seller.id, "seller"):
         await context.bot.send_message(
             user.id,
             "Il tuo feedback non è stato inserito! L'utente da cui hai acquistato non è un venditore!",

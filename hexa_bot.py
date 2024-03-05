@@ -7,8 +7,7 @@ from telegram.ext import Defaults
 
 from src import config as cfg
 from src.components import Bot, BotParameters
-from src.database.cache import init_cache
-from src.database.models.base import init_db
+from src.database.models.base import create_database
 from src.handlers.admin_handlers import get_admin_handlers
 from src.handlers.command_handlers import get_command_handlers
 from src.handlers.market_handlers import get_market_handlers
@@ -26,8 +25,7 @@ def main() -> None:
     cfg.GLOBAL_CONFIGS = cfg.load_configs()
 
     set_up_logger()
-    init_db(roles=cfg.get_roles())
-    init_cache()
+    create_database(roles=cfg.get_roles())
 
     bot_token = (
         os.getenv("BOT_TOKEN")

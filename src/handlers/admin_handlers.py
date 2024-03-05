@@ -3,11 +3,12 @@ import sys
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
+from src.database import has_role
 from src.database.models.role import make_role, remove_role
 from src.database.models.user import get_users, update_user_dates
 from src.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
 from src.utils.logger import with_logging
-from src.utils.utils import clean_command_text, get_user_from_message_command, is_role
+from src.utils.utils import clean_command_text, get_user_from_message_command
 
 
 def get_admin_handlers() -> list:
@@ -41,7 +42,7 @@ async def make_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if is_role(user.id, "seller"):
+    if has_role(user.id, "seller"):
         await update.message.reply_text(
             "Utente già venditore!", reply_markup=ReplyKeyboardRemove()
         )
@@ -66,7 +67,7 @@ async def remove_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if not is_role(user.id, "seller"):
+    if not has_role(user.id, "seller"):
         await update.message.reply_text(
             "L'utente non è un venditore!", reply_markup=ReplyKeyboardRemove()
         )
@@ -92,7 +93,7 @@ async def reject_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         )
         return
 
-    if is_role(user.id, "seller"):
+    if has_role(user.id, "seller"):
         await update.message.reply_text(
             "L'utente è già un venditore! Per rimuoverlo usa il comando /removeseller",
             reply_markup=ReplyKeyboardRemove(),
@@ -119,7 +120,7 @@ async def make_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if is_role(user.id, "scammer"):
+    if has_role(user.id, "scammer"):
         await update.message.reply_text(
             "Utente già nella lista scammer!", reply_markup=ReplyKeyboardRemove()
         )
@@ -139,7 +140,7 @@ async def remove_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if not is_role(user.id, "scammer"):
+    if not has_role(user.id, "scammer"):
         await update.message.reply_text(
             "L'utente non è nella lista scammer!", reply_markup=ReplyKeyboardRemove()
         )
@@ -175,7 +176,7 @@ async def reset_date(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         )
         return
 
-    if not is_role(user.id, "seller"):
+    if not has_role(user.id, "seller"):
         await update.message.reply_text(
             "L'utente non è un venditore!", reply_markup=ReplyKeyboardRemove()
         )
@@ -233,7 +234,7 @@ async def make_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if is_role(user.id, "admin"):
+    if has_role(user.id, "admin"):
         await update.message.reply_text(
             "Utente già admin!", reply_markup=ReplyKeyboardRemove()
         )
@@ -253,7 +254,7 @@ async def remove_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if not is_role(user.id, "admin"):
+    if not has_role(user.id, "admin"):
         await update.message.reply_text(
             "L'utente non è admin!", reply_markup=ReplyKeyboardRemove()
         )

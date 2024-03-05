@@ -1,13 +1,14 @@
 import unittest
 from datetime import datetime
 
-from src.database.models.role import get_role_list, make_role, remove_role
+from src.config import get_default_post_datetime
+from src.database import has_role, remove_role_from_user
+from src.database.models.role import get_role_list, make_role
 from src.database.models.user import (
     get_user_from_id,
     update_user_dates,
     update_user_info,
 )
-from src.utils.utils import is_role
 from tests.test_data import clean_test_database, mock_data, start_test_database
 
 
@@ -97,7 +98,7 @@ class DatabaseTest(unittest.TestCase):
         self.assertEqual(user.last_buy_post, datetime(year=2022, month=6, day=2))
         self.assertEqual(user.last_sell_post, datetime(year=2021, month=1, day=12))
 
-        update_user_dates(1)
+        update_user_dates(1, get_default_post_datetime(), get_default_post_datetime())
         user = get_user_from_id(1)
         self.assertEqual(user.last_buy_post, datetime(year=2015, month=1, day=15))
         self.assertEqual(user.last_sell_post, datetime(year=2015, month=1, day=15))
@@ -130,9 +131,9 @@ class DatabaseTest(unittest.TestCase):
     def test_remove_role(self):
         make_role(2, "seller")
         make_role(2, "admin")
-        self.assertEqual(is_role(2, "admin"), True)
-        remove_role(2, "admin")
-        self.assertEqual(is_role(2, "admin"), False)
-        self.assertEqual(is_role(2, "seller"), True)
-        remove_role(2, "seller")
-        self.assertEqual(is_role(2, "seller"), False)
+        self.assertEqual(has_role(2, "admin"), True)
+        remove_role_from_user(2, "admin")
+        self.assertEqual(has_role(2, "admin"), False)
+        self.assertEqual(has_role(2, "seller"), True)
+        remove_role_from_user(2, "seller")
+        self.assertEqual(has_role(2, "seller"), False)

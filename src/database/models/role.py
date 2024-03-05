@@ -1,12 +1,13 @@
-import psycopg
+from typing import Literal
 
-from src.database import cache as c
+import psycopg
 
 from .base import get_connection
 from .user import User
 
+type Role = Literal["admin", "seller", "judge", "scammer"]
 
-def make_role(user_id: int, role_name: str) -> None:
+def make_role(user_id: int, role_name: Role) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -23,11 +24,9 @@ def make_role(user_id: int, role_name: str) -> None:
                 print(err)
             conn.commit()
             conn.close()
-    if role_name == "seller" and user_id in c.USERS_CACHE.keys():
-        c.USERS_CACHE[user_id].is_seller = True
 
 
-def remove_role(user_id: int, role_name: str) -> None:
+def remove_role(user_id: int, role_name: Role) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -47,13 +46,9 @@ def remove_role(user_id: int, role_name: str) -> None:
                 print(err)
             conn.commit()
             conn.close()
-    if role_name == "admin" and user_id in c.ADMIN_CACHE:
-        c.ADMIN_CACHE.remove(user_id)
-    elif role_name == "seller" and user_id in c.USERS_CACHE.keys():
-        c.USERS_CACHE[user_id].is_seller = False
 
 
-def get_role_list(role_name: str) -> list[User]:
+def get_role_list(role_name: Role) -> list[User]:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -75,3 +70,25 @@ def get_role_list(role_name: str) -> list[User]:
                 users.append(User(record))
             conn.close()
             return users
+
+
+def get_roles_for_user(user_id: int) -> list[Role]:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute(
+                    """
+                    SELECT role.name
+                    FROM (users JOIN users_role ON users.id = users_role.user_id)
+                        JOIN role ON role.id = users_role.role_id
+                    WHERE users.id = %s;
+                """,
+                    (user_id,),
+                )
+            except psycopg.Error as err:
+                print(err)
+            roles = []
+            for record in cur.fetchall():
+                roles.append(record[0].decode("utf-8"))
+            conn.close()
+            return roles
