@@ -40,7 +40,6 @@ Ricorda che in ogni caso, puoi effettuare solo 1 post di vendita e 1 post di acq
     await context.bot.send_message(
         update.message.from_user.id,
         msg,
-        disable_web_page_preview=True,
         reply_markup=ReplyKeyboardRemove(),
     )
 
@@ -67,7 +66,7 @@ async def check_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     if user is None:
         await context.bot.send_message(
             update.message.chat.id,
-            "Utente non trovato!",
+            "Utente non trovato! Assicurati di aver scritto correttamente lo @username.",
             reply_markup=ReplyKeyboardRemove(),
         )
         return
@@ -91,7 +90,7 @@ async def check_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     if user is None:
         await context.bot.send_message(
             update.message.chat.id,
-            "Utente non trovato!",
+            "Utente non trovato! Assicurati di aver scritto correttamente lo @username.",
             reply_markup=ReplyKeyboardRemove(),
         )
         return
@@ -118,7 +117,6 @@ Il video non viene utilizzato per nessuno scopo ECCETTO in caso di truffa da par
     await context.bot.send_message(
         update.message.from_user.id,
         gdpr_msg,
-        disable_web_page_preview=True,
         reply_markup=ReplyKeyboardRemove(),
     )
 
@@ -129,7 +127,7 @@ async def get_feedback_list(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     if seller is None:
         await context.bot.send_message(
             update.message.from_user.id,
-            "Utente non trovato!",
+            "Utente non trovato! Assicurati di aver scritto correttamente lo @username.",
             reply_markup=ReplyKeyboardRemove(),
         )
         return

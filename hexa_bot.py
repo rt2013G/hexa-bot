@@ -2,6 +2,8 @@ import os
 import sys
 
 from dotenv import load_dotenv
+from telegram import LinkPreviewOptions
+from telegram.ext import Defaults
 
 from src import config
 from src.cache import init_cache
@@ -19,11 +21,11 @@ def main() -> None:
     if not len(sys.argv) == 2:
         print("error. usage: python hexa_bot.py <mode>")
         sys.exit(0)
+
     load_dotenv()
     config.GLOBAL_CONFIGS = config.load_configs()
 
     set_up_logger()
-
     init_db()
     init_cache()
 
@@ -44,6 +46,7 @@ def main() -> None:
             3: get_market_handlers(),
             4: get_auth_conv_handler(),
         },
+        defaults=Defaults(link_preview_options=LinkPreviewOptions(is_disabled=True)),
     )
     bot = Bot(parameters=params)
     bot.run()

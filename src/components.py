@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from telegram.ext import Application
+from telegram.ext import Application, Defaults
 
 from src.cache import clean_cache_job
 from src.card_search import clean_card_data_job
@@ -11,11 +11,17 @@ from src.utils.logger import post_logs_job
 class BotParameters:
     token: str
     handlers: dict
+    defaults: Defaults
 
 
 class Bot:
     def __init__(self, parameters: BotParameters) -> None:
-        self.application = Application.builder().token(parameters.token).build()
+        self.application = (
+            Application.builder()
+            .token(parameters.token)
+            .defaults(parameters.defaults)
+            .build()
+        )
         self.add_handlers(parameters.handlers)
         self.job_queue = self.application.job_queue
         self.add_jobs()

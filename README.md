@@ -5,7 +5,7 @@ Core bot of the Telegram groups @yugiohitatcgocg, @yugiohmarketingita and affili
 ## Description
 
 hexa-bot was created out of the need to manage thousands of users in a Telegram community I own, where we previously handled all requests by hand. \
-The main topic of the community, as you may have guessed by the name, is the trading card game known as "Yu-Gi-Oh", which I have been interesed in since 2010. \
+The main topic of the community, as you may have guessed by the name, is the trading card game known as "Yu-Gi-Oh", which I have been interested in since 2010. \
 The name of the bot comes from the card "Hexa Spirit of the Ice Barrier", a nice little fellow from the "Ice Barrier" archetype, which is the main theme across the groups. \
 If you are interested in the game you are more than welcome to join, at the moment we are focused mostly on the Italian-speaking groups, but we also have an English-speaking one that you can find at @yugiohgroup
 
@@ -29,7 +29,6 @@ Also please keep in mind that this bot works to serve a specific community on Te
 The bot is currently running on [an older version](https://github.com/rt2013G/YugiohHelper) that I've written almost a year ago. \
 This version is not 100% working yet, here is a list of things that needs to be done before the first deployment:
 
-- Add unit testing for all the handlers
 - Implement the _guess the card_ minigame and possibly track games and scores in the database
 - Set up CI/CD
 - Fix the announce command to send announces in batches, the same way as the logging works
