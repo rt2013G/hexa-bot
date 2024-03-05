@@ -5,7 +5,7 @@ from src.config import get_default_post_datetime
 from src.database.models.user import (
     get_user_from_id,
     update_user_dates,
-    update_user_info,
+    update_user_info_into_db,
 )
 from tests.test_data import (
     clean_test_database,
@@ -58,7 +58,7 @@ class DatabaseTest(unittest.TestCase):
         reset_users()
 
     def test_update_user(self):
-        update_user_info(
+        update_user_info_into_db(
             1,
             username="newusername",
             first_name=mock_data[0].first_name,
@@ -69,7 +69,7 @@ class DatabaseTest(unittest.TestCase):
         self.assertEqual(user.first_name, mock_data[0].first_name)
         self.assertEqual(user.last_name, mock_data[0].last_name)
 
-        update_user_info(
+        update_user_info_into_db(
             2,
             username=mock_data[1].username,
             first_name="update",

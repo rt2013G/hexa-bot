@@ -3,13 +3,9 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 
 from src import config as cfg
+from src.database import User, update_user_info, update_user_post_dates
 from src.database.models.base import create_database, get_connection
-from src.database.models.user import (
-    User,
-    insert_user,
-    update_user_dates,
-    update_user_info,
-)
+from src.database.models.user import insert_user
 
 
 @dataclass
@@ -61,7 +57,7 @@ def reset_users() -> None:
             mock_user.first_name,
             mock_user.last_name,
         )
-        update_user_dates(
+        update_user_post_dates(
             mock_user.id,
             cfg.get_default_post_datetime(),
             cfg.get_default_post_datetime(),

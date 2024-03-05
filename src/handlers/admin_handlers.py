@@ -3,9 +3,14 @@ import sys
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
-from src.database import has_role
-from src.database.models.role import make_role, remove_role
-from src.database.models.user import get_users, update_user_dates
+from src.database import (
+    add_role_to_user,
+    has_role,
+    remove_role_from_user,
+    reset_user_buy_post,
+    reset_user_sell_post,
+)
+from src.database.models.user import get_users
 from src.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
 from src.utils.logger import with_logging
 from src.utils.utils import clean_command_text, get_user_from_message_command
@@ -48,7 +53,7 @@ async def make_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         )
         return
 
-    make_role(user.id, "seller")
+    add_role_to_user(id=user.id, role_name="seller")
     await update.message.reply_text(
         "Utente approvato come venditore!", reply_markup=ReplyKeyboardRemove()
     )
@@ -73,7 +78,7 @@ async def remove_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         )
         return
 
-    remove_role(user.id, "seller")
+    remove_role_from_user(id=user.id, role_name="seller")
     await update.message.reply_text(
         "L'utente non è più un venditore!", reply_markup=ReplyKeyboardRemove()
     )
@@ -126,7 +131,7 @@ async def make_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         )
         return
 
-    make_role(user.id, "scammer")
+    add_role_to_user(id=user.id, role_name="scammer")
     await update.message.reply_text(
         "Utente inserito nella lista scammer!", reply_markup=ReplyKeyboardRemove()
     )
@@ -146,7 +151,7 @@ async def remove_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         )
         return
 
-    remove_role(user.id, "scammer")
+    remove_role_from_user(id=user.id, role_name="scammer")
     await update.message.reply_text(
         "L'utente non è più nella lista scammer!", reply_markup=ReplyKeyboardRemove()
     )
@@ -159,6 +164,7 @@ async def remove_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 @with_logging
 async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # TODO doesn't work, fix before release
     message = clean_command_text(update.message.text, "/announce")
     users = get_users()
     for user in users:
@@ -182,7 +188,8 @@ async def reset_date(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         )
         return
 
-    update_user_dates(user.id)
+    reset_user_buy_post(id=user.id)
+    reset_user_sell_post(id=user.id)
     await update.message.reply_text(
         f"Date di {user.username} resettate!", reply_markup=ReplyKeyboardRemove()
     )
@@ -240,7 +247,7 @@ async def make_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         )
         return
 
-    make_role(user.id, "admin")
+    add_role_to_user(id=user.id, role_name="admin")
     await update.message.reply_text(
         "Utente aggiunto come admin!", reply_markup=ReplyKeyboardRemove()
     )
@@ -260,7 +267,7 @@ async def remove_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         )
         return
 
-    remove_role(user.id, "admin")
+    remove_role_from_user(id=user.id, role_name="admin")
     await update.message.reply_text(
         "L'utente non è più admin!", reply_markup=ReplyKeyboardRemove()
     )

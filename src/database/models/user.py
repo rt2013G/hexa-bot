@@ -126,7 +126,7 @@ def get_users(size=1000000) -> list[User]:
             return users
 
 
-def update_user_info(
+def update_user_info_into_db(
     id: int, username: str | None, first_name: str | None, last_name: str | None
 ) -> None:
     with get_connection() as conn:

@@ -3,9 +3,8 @@ from telegram.ext import CommandHandler, ContextTypes, filters
 
 from src.card_search import CardData, get_card_data
 from src.config import get_market_group_link
-from src.database import has_role
+from src.database import User, get_user, has_role
 from src.database.models.feedback import get_feedbacks
-from src.database.models.user import User, get_user_from_id
 from src.filters import AdminFilter, MainGroupFilter
 from src.utils.logger import with_logging
 from src.utils.utils import clean_command_text, get_user_from_message_command
@@ -155,7 +154,7 @@ async def get_feedback_list(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         reply_markup=ReplyKeyboardRemove(),
     )
     for feedback in feedbacks:
-        buyer: User | None = get_user_from_id(feedback.buyer_id)
+        buyer: User | None = get_user(id=feedback.buyer_id)
         if buyer is None:
             continue
         if buyer.first_name is None:

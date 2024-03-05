@@ -5,7 +5,6 @@ from src.config import get_default_post_datetime
 from .cache import (
     CACHE,
     RolesEntry,
-    UserEntry,
     get_id_from_username_cache,
     get_user_from_cache,
     insert_into_roles_cache,
@@ -53,16 +52,15 @@ def update_user_info(
     first_name: str | None,
     last_name: str | None,
 ) -> None:
-    from .models.user import update_user_info
+    from .models.user import get_user_from_id, update_user_info_into_db
 
-    update_user_info(
+    update_user_info_into_db(
         id=id, username=username, first_name=first_name, last_name=last_name
     )
 
+    user = get_user_from_id(id=id)
+    insert_into_users_cache(id=id, user=user)
     insert_into_username_cache(username=username, id=id)
-    cache_entry: UserEntry = CACHE.cached_users.get(id)
-    if cache_entry is not None:
-        del CACHE.cached_users[id]
 
 
 def update_user_post_dates(

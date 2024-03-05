@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from src.config import get_bot_username, get_max_username_length
-from src.database.models.user import User, get_user_from_id, get_user_from_username
+from src.database import User, get_user
 
 
 def get_user_from_message_command(message_text: str, command_text: str) -> User | None:
@@ -14,9 +14,9 @@ def get_user_from_message_command(message_text: str, command_text: str) -> User 
         if msg.isnumeric():
             return None
         else:
-            return get_user_from_username(username=msg)
+            return get_user(username=msg)
     elif msg.isnumeric():
-        return get_user_from_id(int(msg))
+        return get_user(id=int(msg))
 
     return None
 
@@ -29,7 +29,7 @@ def get_user_from_text(message_text: str) -> User | None:
         if "@" in word:
             username = word.replace("@", "")
             if len(username) > 0:
-                return get_user_from_username(username=username)
+                return get_user(username=username)
 
     return None
 
@@ -84,7 +84,7 @@ def is_feedback_post(text: str) -> bool:
 
 
 def has_sent_sell_post_today(user_id: int) -> bool:
-    user = get_user_from_id(user_id)
+    user = get_user(id=user_id)
     if user is None:
         return False
 
@@ -92,7 +92,7 @@ def has_sent_sell_post_today(user_id: int) -> bool:
 
 
 def has_sent_buy_post_today(user_id: int) -> bool:
-    user = get_user_from_id(user_id)
+    user = get_user(id=user_id)
     if user is None:
         return False
 

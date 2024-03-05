@@ -13,9 +13,8 @@ from telegram.ext import ContextTypes, MessageHandler, filters
 from telegram.helpers import effective_message_type
 
 from src.config import get_feedback_channel_id
-from src.database import has_role
+from src.database import get_user, has_role, update_user_post_dates
 from src.database.models.feedback import insert_feedback
-from src.database.models.user import get_user_from_id, update_user_dates
 from src.filters import AdminFilter, FeedbackFilter, MarketGroupFilter, MediaGroupFilter
 from src.utils.utils import (
     get_user_from_text,
@@ -100,7 +99,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     media_group: list = []
     data: list[MediaGroupMediaData] = context.job.data
     post_type: Literal["buy", "sell", "invalid"]
-    user = get_user_from_id(data[-1].media_msg.from_user.id)
+    user = get_user(id=data[-1].media_msg.from_user.id)
     if user is None:
         for media in data:
             await media.media_msg.delete()
@@ -112,6 +111,8 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
                 post_type = "buy"
             elif is_sell_post(media.caption) and has_role(user.id, "seller"):
                 post_type = "sell"
+            else:
+                post_type = "invalid"
 
         media_group.append(
             MEDIA_GROUP_TYPES[media.media_type](
@@ -127,7 +128,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
                 "Il tuo messaggio è stato eliminato, hai già inviato un post di cerco oggi!",
             )
         else:
-            update_user_dates(user.id, datetime.now(), user.last_sell_post)
+            update_user_post_dates(id=user.id, last_buy_post=datetime.now())
     elif post_type == "sell":
         if has_sent_sell_post_today(user.id):
             post_type = "invalid"
@@ -136,7 +137,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
                 "Il tuo messaggio è stato eliminato, hai già inviato un post di vendo oggi!",
             )
         else:
-            update_user_dates(user.id, user.last_buy_post, datetime.now())
+            update_user_post_dates(id=user.id, last_sell_post=datetime.now())
 
     if post_type == "invalid":
         for media in data:
@@ -155,7 +156,7 @@ async def market_post_handler(
         await update.message.delete()
         return
 
-    user = get_user_from_id(update.message.from_user.id)
+    user = get_user(id=update.message.from_user.id)
     if user is None:
         await update.message.delete()
         return
@@ -167,7 +168,7 @@ async def market_post_handler(
             )
             await update.message.delete()
         else:
-            update_user_dates(user.id, datetime.now(), user.last_sell_post)
+            update_user_post_dates(id=user.id, last_buy_post=datetime.now())
 
     elif (
         is_sell_post(msg)
@@ -181,7 +182,7 @@ async def market_post_handler(
             )
             await update.message.delete()
         else:
-            update_user_dates(user.id, user.last_buy_post, datetime.now())
+            update_user_post_dates(id=user.id, last_sell_post=datetime.now())
     else:
         await update.message.delete()
 
@@ -189,7 +190,7 @@ async def market_post_handler(
 async def feedback_msg_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
-    user = get_user_from_id(update.message.from_user.id)
+    user = get_user(id=update.message.from_user.id)
     if user is None:
         await update.message.delete()
         return
