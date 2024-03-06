@@ -1,11 +1,14 @@
+import logging
+
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
-from src.card_search import CardData, get_card_data
+from src.card_search import CardDataEntry, get_cached_card_name, get_card_data
 from src.config import get_market_group_link
 from src.database import User, get_user, has_role
 from src.database.models.feedback import get_feedbacks
 from src.filters import AdminFilter, MainGroupFilter
+from src.guess_the_card import get_bytes_from_image
 from src.utils.logger import with_logging
 from src.utils.utils import clean_command_text, get_user_from_message_command
 
@@ -46,17 +49,30 @@ Ricorda che in ogni caso, puoi effettuare solo 1 post di vendita e 1 post di acq
 
 @with_logging
 async def get_card_search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    card_text = clean_command_text(update.message.text, "/search")
-    if len(card_text) > 40:
+    search_term = clean_command_text(update.message.text, "/search")
+    if len(search_term) > 40:
         return
-    card_data: CardData | None = get_card_data(card_text)
-    if card_data is None:
+    card_data_entry: CardDataEntry | None = get_card_data(search_term)
+    if card_data_entry is None:
         await context.bot.send_message(
-            update.message.from_user.id, f'La carta "{card_text}" non è stata trovata.'
+            update.message.from_user.id,
+            f'La carta "{search_term}" non è stata trovata.',
         )
         return
-    await context.bot.send_message(
-        update.message.from_user.id, f"{card_data.name}\n\n{card_data.desc}"
+
+    card_name = get_cached_card_name(search_term)
+    if card_name is None:
+        logging.log(
+            logging.ERROR,
+            "An unexpected error has occured while retrieving a cached card name.",
+        )
+        return
+    bytes = get_bytes_from_image(card_data_entry.image)
+
+    await context.bot.send_photo(
+        update.message.from_user.id,
+        photo=bytes,
+        caption=f"{card_name}\n\n{card_data_entry.desc}",
     )
 
 

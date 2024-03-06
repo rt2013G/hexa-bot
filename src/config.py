@@ -54,3 +54,7 @@ def get_market_group_link() -> str:
 
 def get_default_post_datetime() -> datetime:
     return datetime(year=2015, month=1, day=15)
+
+
+def get_max_data_cache_size() -> int:
+    return int(GLOBAL_CONFIGS["global_variables"]["max_card_data_cache_size"])

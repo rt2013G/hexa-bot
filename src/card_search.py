@@ -6,40 +6,117 @@ from datetime import datetime, timedelta
 # trunk-ignore(mypy/import-untyped)
 # trunk-ignore(mypy/note)
 import requests
+from PIL import Image
 from telegram.ext import ContextTypes
+
+from src.config import get_max_data_cache_size
 
 
 @dataclass
-class CardData:
-    name: str
+class CardDataEntry:
     desc: str
+    image: Image
     time: datetime
 
 
+@dataclass
+class CardNameEntry:
+    card_name: str | None
+    time: datetime
+
+
+@dataclass
+class CardDataCache:
+    cached_searched_terms: dict[str, CardNameEntry]
+    cached_card_data: dict[str, CardDataEntry]
+
+
 ENDPOINT_URL = "https://db.ygoprodeck.com/api/v7/cardinfo.php"
-CARD_DATA_CACHE: dict[str, CardData] = {}
+CARD_DATA_CACHE: CardDataCache = CardDataCache(
+    cached_searched_terms={}, cached_card_data={}
+)
 
 
-def get_card_data(card_name: str) -> CardData | None:
-    if card_name in CARD_DATA_CACHE.keys():
-        return CARD_DATA_CACHE[card_name]
+def get_card_data(search_term: str) -> CardDataEntry | None:
+    card_name: str | None = search_term
+    if search_term in CARD_DATA_CACHE.cached_searched_terms.keys():
+        card_name = CARD_DATA_CACHE.cached_searched_terms[search_term].card_name
+        if card_name is None:
+            return None
+        if card_name in CARD_DATA_CACHE.cached_card_data.keys():
+            return CARD_DATA_CACHE.cached_card_data[card_name]
 
-    full_url = ENDPOINT_URL + "?fname=" + card_name
+    full_url = ENDPOINT_URL + "?fname=" + search_term
     response = requests.get(full_url, timeout=10)
     response_json = dict(json.loads(response.content))
 
     err: str | None = response_json.get("error")
     if err is not None:
+        CARD_DATA_CACHE.cached_searched_terms[search_term] = CardNameEntry(
+            card_name=None, time=datetime.now()
+        )
         return None
 
     data = response_json["data"][0]
-    card_data = CardData(name=data["name"], desc=data["desc"], time=datetime.now())
-    CARD_DATA_CACHE[card_name] = card_data
+    card_name = data["name"]
+    if card_name is None:
+        return None
+    image_url = data["card_images"][0]["image_url_cropped"]
+    image = Image.open(requests.get(image_url, stream=True, timeout=10).raw)
+    card_data = CardDataEntry(
+        desc=data["desc"],
+        image=image,
+        time=datetime.now(),
+    )
+    CARD_DATA_CACHE.cached_card_data[card_name] = card_data
+    CARD_DATA_CACHE.cached_searched_terms[search_term] = CardNameEntry(
+        card_name=card_name, time=datetime.now()
+    )
+
+    cache_size = len(CARD_DATA_CACHE.cached_card_data)
+    if cache_size > get_max_data_cache_size():
+        clean_cache()
+    cache_size = len(CARD_DATA_CACHE.cached_card_data)
+    if cache_size > get_max_data_cache_size():
+        halve_cache()
+    logging.log(
+        logging.INFO,
+        f"Current size of card data cache: {cache_size}. Maximum allowed size: {get_max_data_cache_size()}",
+    )
+
     return card_data
 
 
+def get_cached_card_name(searched_term: str) -> str | None:
+    cached_name = CARD_DATA_CACHE.cached_searched_terms.get(searched_term)
+    if cached_name is not None:
+        return cached_name.card_name
+    return None
+
+
+def halve_cache():
+    to_delete = True
+    for key in list(CARD_DATA_CACHE.cached_card_data.keys()):
+        if to_delete:
+            del CARD_DATA_CACHE.cached_card_data[key]
+
+        to_delete = not to_delete
+
+
+def clean_cache():
+    for key in list(CARD_DATA_CACHE.cached_card_data.keys()):
+        if CARD_DATA_CACHE.cached_card_data[key].time < datetime.now() - timedelta(
+            days=1
+        ):
+            del CARD_DATA_CACHE.cached_card_data[key]
+
+    for key in list(CARD_DATA_CACHE.cached_searched_terms.keys()):
+        if CARD_DATA_CACHE.cached_searched_terms[key].time < datetime.now() - timedelta(
+            days=4
+        ):
+            del CARD_DATA_CACHE.cached_searched_terms[key]
+
+
 async def clean_card_data_job(context: ContextTypes.DEFAULT_TYPE) -> None:
-    for key in list(CARD_DATA_CACHE):
-        if CARD_DATA_CACHE[key].time < datetime.now() - timedelta(days=1):
-            del CARD_DATA_CACHE[key]
+    clean_cache()
     logging.log(logging.INFO, "Card data cache cleaned")
