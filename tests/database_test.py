@@ -12,12 +12,7 @@ from src.database import (
     update_user_info,
     update_user_post_dates,
 )
-from tests.test_data import (
-    clean_test_database,
-    compare_mock_to_user,
-    mock_data,
-    start_test_database,
-)
+from tests.test_data import clean_test_database, mock_users, start_test_database
 
 
 class DatabaseTest(unittest.TestCase):
@@ -31,38 +26,38 @@ class DatabaseTest(unittest.TestCase):
 
     def test_get_user(self) -> None:
         user = get_user(id=1)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), True)
+        self.assertEqual(mock_users[0], user)
 
         user = get_user(id=1)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), True)
+        self.assertEqual(mock_users[0], user)
 
         user = get_user(id=1)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), True)
+        self.assertEqual(mock_users[0], user)
 
         user = get_user(id=2)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[1], user=user), True)
+        self.assertEqual(mock_users[1], user)
 
         user = get_user(id=2)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[1], user=user), True)
+        self.assertEqual(mock_users[1], user)
 
-        user = get_user(username=mock_data[1].username)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[1], user=user), True)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[2], user=user), False)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), False)
+        user = get_user(username=mock_users[1].username)
+        self.assertEqual(mock_users[1], user)
+        self.assertNotEqual(mock_users[2], user)
+        self.assertNotEqual(mock_users[0], user)
 
-        user = get_user(username=mock_data[2].username)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[2], user=user), True)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[3], user=user), False)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), False)
+        user = get_user(username=mock_users[2].username)
+        self.assertEqual(mock_users[2], user)
+        self.assertNotEqual(mock_users[3], user)
+        self.assertNotEqual(mock_users[0], user)
 
-        user = get_user(username=mock_data[2].username)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[2], user=user), True)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[3], user=user), False)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[0], user=user), False)
+        user = get_user(username=mock_users[2].username)
+        self.assertEqual(mock_users[2], user)
+        self.assertNotEqual(mock_users[3], user)
+        self.assertNotEqual(mock_users[0], user)
 
     def test_update_user(self) -> None:
-        user = get_user(username=mock_data[2].username)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[2], user=user), True)
+        user = get_user(username=mock_users[2].username)
+        self.assertEqual(mock_users[2], user)
 
         update_user_info(
             id=3,
@@ -71,7 +66,7 @@ class DatabaseTest(unittest.TestCase):
             last_name="testlastname",
         )
         user = get_user(id=3)
-        self.assertEqual(compare_mock_to_user(mock=mock_data[2], user=user), False)
+        self.assertNotEqual(mock_users[2], user)
         self.assertEqual(user.username, "testupdate")
         self.assertEqual(user.first_name, "testfirstname")
         self.assertEqual(user.last_name, "testlastname")

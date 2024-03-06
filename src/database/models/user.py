@@ -22,6 +22,14 @@ class User:
         self.last_buy_post: datetime = user_data[4]
         self.last_sell_post: datetime = user_data[5]
 
+    def __eq__(self, __value: object) -> bool:
+        return (
+            self.id == __value.id
+            and self.username == __value.username
+            and self.first_name == __value.first_name
+            and self.last_name == __value.last_name
+        )
+
 
 def insert_user(
     id: int,

@@ -8,7 +8,7 @@ from src.utils.utils import (
     has_sent_buy_post_today,
     has_sent_sell_post_today,
 )
-from tests.test_data import clean_test_database, mock_data, start_test_database
+from tests.test_data import clean_test_database, mock_users, start_test_database
 
 
 class UtilsTest(unittest.TestCase):
@@ -40,9 +40,9 @@ class UtilsTest(unittest.TestCase):
 
     def test_get_user_from_command_arg(self) -> None:
         messages = [
-            (f"/makeseller @{mock_data[2].username}", "/makeseller"),
-            (f"/makeseller @{mock_data[0].id}", "/makeseller"),
-            (f"/removeseller {mock_data[0].id}", "/removeseller"),
+            (f"/makeseller @{mock_users[2].username}", "/makeseller"),
+            (f"/makeseller @{mock_users[0].id}", "/makeseller"),
+            (f"/removeseller {mock_users[0].id}", "/removeseller"),
             (
                 "/makeadmin bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
                 "/makeadmin",
@@ -52,7 +52,7 @@ class UtilsTest(unittest.TestCase):
                 "/makescammer",
             ),
             ("/resetdate @notlongbutdoesntexist", "/resetdate"),
-            (f"/checkseller {mock_data[2].username}", "/checkseller"),
+            (f"/checkseller {mock_users[2].username}", "/checkseller"),
             ("/checkseller 15", "/checkseller"),
             ("/reject @username", "/reject"),
         ]
@@ -60,21 +60,15 @@ class UtilsTest(unittest.TestCase):
         for message in messages:
             users.append(get_user_from_message_command(message[0], message[1]))
 
-        self.assertEqual(users[0].id, mock_data[2].id)
-        self.assertEqual(users[0].username, mock_data[2].username)
-        self.assertEqual(users[0].first_name, mock_data[2].first_name)
-        self.assertEqual(users[0].last_name, mock_data[2].last_name)
+        self.assertEqual(users[0], mock_users[2])
         self.assertEqual(users[1], None)
-        self.assertEqual(users[2].id, mock_data[0].id)
-        self.assertEqual(users[2].username, mock_data[0].username)
-        self.assertEqual(users[2].first_name, mock_data[0].first_name)
-        self.assertEqual(users[2].last_name, mock_data[0].last_name)
+        self.assertEqual(users[2], mock_users[0])
         self.assertEqual(users[3], None)
         self.assertEqual(users[4], None)
         self.assertEqual(users[5], None)
         self.assertEqual(users[6], None)
         self.assertEqual(users[7], None)
-        self.assertEqual(users[8].id, mock_data[2].id)
+        self.assertEqual(users[8], mock_users[2])
 
     def test_has_sent_posts_today(self) -> None:
         update_user_post_dates(1, datetime.now(), datetime.now() - timedelta(days=5))

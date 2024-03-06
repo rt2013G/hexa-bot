@@ -9,7 +9,7 @@ from src.database.models.user import (
 )
 from tests.test_data import (
     clean_test_database,
-    mock_data,
+    mock_users,
     reset_users,
     start_test_database,
 )
@@ -26,16 +26,12 @@ class DatabaseTest(unittest.TestCase):
 
     def test_user_class(self):
         user = get_user_from_id(1)
-        self.assertEqual(user.username, mock_data[0].username)
-        self.assertEqual(user.first_name, mock_data[0].first_name)
-        self.assertEqual(user.last_name, mock_data[0].last_name)
+        self.assertEqual(mock_users[0], user)
         self.assertEqual(user.last_buy_post, get_default_post_datetime())
         self.assertEqual(user.last_sell_post, get_default_post_datetime())
 
         user = get_user_from_id(2)
-        self.assertEqual(user.username, mock_data[1].username)
-        self.assertEqual(user.first_name, mock_data[1].first_name)
-        self.assertEqual(user.last_name, mock_data[1].last_name)
+        self.assertEqual(mock_users[1], user)
         self.assertEqual(user.last_buy_post, get_default_post_datetime())
         self.assertEqual(user.last_sell_post, get_default_post_datetime())
 
@@ -61,22 +57,22 @@ class DatabaseTest(unittest.TestCase):
         update_user_info_into_db(
             1,
             username="newusername",
-            first_name=mock_data[0].first_name,
-            last_name=mock_data[0].last_name,
+            first_name=mock_users[0].first_name,
+            last_name=mock_users[0].last_name,
         )
         user = get_user_from_id(1)
         self.assertEqual(user.username, "newusername")
-        self.assertEqual(user.first_name, mock_data[0].first_name)
-        self.assertEqual(user.last_name, mock_data[0].last_name)
+        self.assertEqual(user.first_name, mock_users[0].first_name)
+        self.assertEqual(user.last_name, mock_users[0].last_name)
 
         update_user_info_into_db(
             2,
-            username=mock_data[1].username,
+            username=mock_users[1].username,
             first_name="update",
             last_name="updatelastname",
         )
         user = get_user_from_id(2)
-        self.assertEqual(user.username, mock_data[1].username)
+        self.assertEqual(user.username, mock_users[1].username)
         self.assertEqual(user.first_name, "update")
         self.assertEqual(user.last_name, "updatelastname")
 
