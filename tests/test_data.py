@@ -30,6 +30,7 @@ def start_test_database():
 def clean_test_database():
     with get_connection() as conn:
         with conn.cursor() as cur:
+            cur.execute("DELETE FROM users_guess_game WHERE user_id=1;")
             cur.execute("DELETE FROM users_role WHERE user_id=1;")
             cur.execute("DELETE FROM users_role WHERE user_id=2;")
             cur.execute("DELETE FROM users_role WHERE user_id=3;")

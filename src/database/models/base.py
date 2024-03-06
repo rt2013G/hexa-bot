@@ -83,6 +83,31 @@ def create_database(roles: list[str]) -> None:
                 );
                 """
             )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS guess_game(
+                    id SERIAL PRIMARY KEY,
+                    date TIMESTAMP UNIQUE
+                );
+                """
+            )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS users_guess_game(
+                    user_id NUMERIC,
+                    CONSTRAINT users_guess_game_user_fk
+                        FOREIGN KEY(user_id)
+                        REFERENCES users(id),
+                    game_id INTEGER,
+                    CONSTRAINT users_guess_game_game_fk
+                        FOREIGN KEY(game_id)
+                        REFERENCES guess_game(id),
+                    CONSTRAINT users_guess_game_pk
+                        PRIMARY KEY (user_id, game_id),
+                    user_score INTEGER NOT NULL
+                );
+                """
+            )
             for role in roles:
                 cur.execute(
                     """
