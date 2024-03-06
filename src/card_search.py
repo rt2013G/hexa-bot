@@ -34,12 +34,12 @@ class CardDataCache:
     cached_card_data: dict[str, CardDataEntry]
 
 
-ENDPOINT_URL = "https://db.ygoprodeck.com/api/v7/cardinfo.php"
+type CropLevel = Literal[0, 1, 2, 3, 4]
+
 CARD_DATA_CACHE: CardDataCache = CardDataCache(
     cached_searched_terms={}, cached_card_data={}
 )
 
-type CropLevel = Literal[0, 1, 2, 3, 4]
 
 def get_random_card_name() -> str:
     pass
@@ -51,19 +51,21 @@ def get_cropped_image(image: Image, crop_level: CropLevel) -> Image:
 
     width, height = image.size
     crop_level = 2 * crop_level
-    random_top_left_corner = random.randint(0, int(max(
+    random_pos = random.randint(0, int(max(
         (height * (crop_level - 1) / crop_level),
         (width * (crop_level - 1) / crop_level)
     )))
-    crop_area = (random_top_left_corner, random_top_left_corner, height / crop_level, width / crop_level)
+    crop_area = (random_pos, random_pos, random_pos + height / crop_level, random_pos + width / crop_level)
     cropped_image: Image = image.crop(crop_area)
 
     return cropped_image
+
 
 def get_bytes_from_image(image: Image) -> bytes:
     byte_array = BytesIO()
     image.save(byte_array, format='BMP')
     return byte_array.getvalue()
+
 
 def get_card_data(search_term: str) -> CardDataEntry | None:
     card_name: str | None = search_term
@@ -74,6 +76,7 @@ def get_card_data(search_term: str) -> CardDataEntry | None:
         if card_name in CARD_DATA_CACHE.cached_card_data.keys():
             return CARD_DATA_CACHE.cached_card_data[card_name]
 
+    ENDPOINT_URL = "https://db.ygoprodeck.com/api/v7/cardinfo.php"
     full_url = ENDPOINT_URL + "?fname=" + search_term
     response = requests.get(full_url, timeout=10)
     response_json = dict(json.loads(response.content))

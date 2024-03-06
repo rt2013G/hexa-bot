@@ -3,12 +3,16 @@ import logging
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
-from src.card_search import CardDataEntry, get_cached_card_name, get_card_data
+from src.card_search import (
+    CardDataEntry,
+    get_bytes_from_image,
+    get_cached_card_name,
+    get_card_data,
+)
 from src.config import get_market_group_link
 from src.database import User, get_user, has_role
 from src.database.models.feedback import get_feedbacks
 from src.filters import AdminFilter, MainGroupFilter
-from src.guess_the_card import get_bytes_from_image
 from src.utils.logger import with_logging
 from src.utils.utils import clean_command_text, get_user_from_message_command
 
