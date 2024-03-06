@@ -7,7 +7,7 @@ GLOBAL_CONFIGS: dict = {}
 
 
 def load_configs() -> dict:
-    path = "/configs/deploy.json" if sys.argv[1] == "deploy" else "configs/debug.json"
+    path = "configs/deploy.json" if sys.argv[1] == "deploy" else "configs/debug.json"
     with open(os.path.abspath(path)) as f:
         return dict(json.load(f))
 

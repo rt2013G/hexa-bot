@@ -41,10 +41,6 @@ CARD_DATA_CACHE: CardDataCache = CardDataCache(
 )
 
 
-def get_random_card_name() -> str:
-    pass
-
-
 def get_cropped_image(image: Image, crop_level: CropLevel) -> Image:
     if crop_level == 0:
         return image
