@@ -8,11 +8,7 @@ from telegram.ext import Defaults
 from src import config as cfg
 from src.components import Bot, BotParameters
 from src.database.models.base import create_database
-from src.handlers.admin_handlers import get_admin_handlers
-from src.handlers.command_handlers import get_command_handlers
-from src.handlers.market_handlers import get_market_handlers
-from src.handlers.seller_auth import get_auth_conv_handler
-from src.handlers.service_handlers import get_service_handlers
+from src.handlers import handlers
 from src.utils.logger import set_up_logger
 
 
@@ -37,13 +33,7 @@ def main() -> None:
         sys.exit(0)
     params = BotParameters(
         token=bot_token,
-        handlers={
-            0: get_service_handlers(),
-            1: get_admin_handlers(),
-            2: get_command_handlers(),
-            3: get_market_handlers(),
-            4: get_auth_conv_handler(),
-        },
+        handlers=handlers,
         defaults=Defaults(link_preview_options=LinkPreviewOptions(is_disabled=True)),
     )
     bot = Bot(parameters=params)
