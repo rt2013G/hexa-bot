@@ -64,14 +64,14 @@ def get_guess_game_conv_handler() -> list:
 async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> object:
     card_data = get_card_data("Question")
     chat_id = update.message.chat.id
-    message = await context.bot.send_photo(
+    await context.bot.send_photo(
         chat_id=chat_id,
         photo=get_bytes_from_image(card_data.image),
         caption="Venghino signori e signore!\nSta per iniziare il Guess The Card, non mancate mi raccomando!",
     )
-    await context.bot.pin_chat_message(
-        update.message.chat.id, message_id=message.id, disable_notification=False
-    )
+    # await context.bot.pin_chat_message(
+    #    update.message.chat.id, message_id=message.id, disable_notification=False
+    # )
     time = datetime.now()
     card_name = get_random_card_name()
     card_data = get_card_data(card_name)
@@ -106,32 +106,37 @@ async def send_card_handler(context: ContextTypes.DEFAULT_TYPE) -> None:
         data.card_to_guess_data = get_card_data(card_name)
 
     size = data.card_to_guess_data.image.size
-    image_to_send = get_cropped_image(
-        data.card_to_guess_data.image, data.crop_level
-    ).resize(size)
+    crop = data.crop_level if data.crop_level >= 0 else 0
+    image_to_send = get_cropped_image(data.card_to_guess_data.image, crop).resize(size)
+
+    if data.crop_level < 0:
+        await context.bot.send_photo(
+            data.chat_id,
+            photo=get_bytes_from_image(image_to_send),
+            caption=f"La carta era {data.card_to_guess_name}, nessuno ha indovinato!",
+        )
+        data.card_to_guess_name = get_random_card_name()
+        data.card_to_guess_data = get_card_data(data.card_to_guess_name)
+        data.crop_level = 4
+        context.job.data = data
+        return
 
     await context.bot.send_photo(
         data.chat_id,
         photo=get_bytes_from_image(image_to_send),
         caption="Guess the card!",
     )
-    if data.crop_level > 0:
-        data.crop_level -= 1
-    else:
-        await context.bot.send_photo(
-            data.chat_id,
-            photo=get_bytes_from_image(image_to_send),
-            caption=f"La carta era {data.card_to_guess_name}, nessuno ha indovinato!",
-        )
-        data.guessed_cards.append(data.card_to_guess_name)
-        data.card_to_guess_name = get_random_card_name()
-        data.card_to_guess_data = get_card_data(data.card_to_guess_name)
-        data.crop_level = 4
-
+    data.crop_level -= 1
     context.job.data = data
 
 
 async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> object:
+    if not update.message or not (
+        update.message.reply_to_message
+        and update.message.reply_to_message.from_user.is_bot
+    ):
+        return GUESSING
+
     guess_word = update.message.text
     if len(guess_word) > 50:
         return GUESSING
@@ -149,7 +154,11 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         current_game_state: CurrentGameState = job.data
         current_game_state.guessed_cards.append(current_game_state.card_to_guess_name)
 
-        score_gained = current_game_state.crop_level + 1
+        score_gained = (
+            current_game_state.crop_level + 1
+            if current_game_state.crop_level >= 0
+            else 1
+        )
         current_score: int | None = current_game_state.user_scores.get(user_id)
         if current_score is None:
             current_game_state.user_scores[user_id] = score_gained
@@ -160,7 +169,7 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
             text=f'"{guess_word}" è corretto! Ti sei aggiudicato {score_gained} {display}!'
         )
 
-        if len(current_game_state.guessed_cards) > 20:
+        if len(current_game_state.guessed_cards) > 10:
             job.schedule_removal()
             rankings = ""
             for key in sorted(
@@ -182,6 +191,7 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
                     user_to_display = "@" + user.username
 
                 rankings += f"{user_to_display}, punteggio: {value}\n"
+
             await context.bot.send_message(
                 chat_id=chat_id,
                 text=f"Il gioco è terminato! Classifica finale:\n{rankings}",
