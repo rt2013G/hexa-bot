@@ -2,7 +2,8 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime
 
-from telegram import Update
+from telegram import ReactionTypeEmoji, Update
+from telegram.constants import ReactionEmoji
 from telegram.ext import (
     CommandHandler,
     ContextTypes,
@@ -153,8 +154,8 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
     user_id = update.message.from_user.id
     guess_data = get_card_data(guess_word)
     if guess_data is None or guess_data.desc != game_state_data.card_to_guess_data.desc:
-        await update.message.reply_text(
-            text="No!",
+        await update.message.set_reaction(
+            reaction=ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN)
         )
         return GUESSING
 
@@ -192,5 +193,13 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
 
 
 async def stop_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> object:
-    pass
+    jobs = context.job_queue.get_jobs_by_name(str(update.message.chat.id))
+    if jobs is None:
+        logging.log(
+            logging.ERROR,
+            "There was an issue during the guess the card game. The send card job was missing.",
+        )
+        return ConversationHandler.END
+    jobs[0].schedule_removal()
+    await update.message.reply_text(text="Gioco terminato!")
     return ConversationHandler.END
