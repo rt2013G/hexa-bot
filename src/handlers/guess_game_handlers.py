@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -16,16 +17,15 @@ from src.card_search import (
     get_card_data,
     get_cropped_image,
 )
-from src.database import get_user
 from src.filters import AdminFilter, MainGroupFilter
-from src.utils import get_random_card_name
+from src.utils import get_random_card_name, get_rankings_message_from_scores
 
 
 @dataclass
-class CurrentGameState:
+class GameStateData:
     start_time: datetime
     chat_id: int
-    user_scores: dict[int, int]
+    users_scores: dict[int, int]
     guessed_cards: list[str]
     card_to_guess_name: str
     card_to_guess_data: CardDataEntry
@@ -76,10 +76,10 @@ async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> obje
         card_name = get_random_card_name()
         card_data = get_card_data(card_name)
 
-    game_state_data = CurrentGameState(
+    game_state_data = GameStateData(
         start_time=time,
         chat_id=chat_id,
-        user_scores={},
+        users_scores={},
         guessed_cards=[],
         card_to_guess_name=card_name,
         card_to_guess_data=card_data,
@@ -97,7 +97,7 @@ async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> obje
 
 
 async def send_card_handler(context: ContextTypes.DEFAULT_TYPE) -> None:
-    data: CurrentGameState = context.job.data
+    data: GameStateData = context.job.data
     while data.card_to_guess_data is None:
         card_name = get_random_card_name()
         data.card_to_guess_data = get_card_data(card_name)
@@ -128,9 +128,10 @@ async def send_card_handler(context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> object:
-    if not update.message or not (
-        update.message.reply_to_message
-        and update.message.reply_to_message.from_user.is_bot
+    if update.message is None or (
+        update.message.reply_to_message is None
+        or update.message.reply_to_message.from_user.is_bot is False
+        or update.message.reply_to_message.from_user.id != context.bot.id
     ):
         return GUESSING
 
@@ -139,76 +140,57 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         return GUESSING
 
     chat_id = update.message.chat.id
+    jobs = context.job_queue.get_jobs_by_name(str(chat_id))
+    if jobs is None:
+        logging.log(
+            logging.ERROR,
+            "There was an issue during the guess the card game. The send card job was missing.",
+        )
+        return GUESSING
+    job = jobs[0]
+    game_state_data: GameStateData = job.data
+
     user_id = update.message.from_user.id
-    game_state_data: CurrentGameState = context.bot_data[chat_id]
-
     guess_data = get_card_data(guess_word)
-    if (
-        guess_data is not None
-        and guess_data.desc == game_state_data.card_to_guess_data.desc
-    ):
-        job = context.job_queue.get_jobs_by_name(str(chat_id))[0]
-        current_game_state: CurrentGameState = job.data
-        current_game_state.guessed_cards.append(current_game_state.card_to_guess_name)
-
-        score_gained = (
-            current_game_state.crop_level + 1
-            if current_game_state.crop_level >= 0
-            else 1
-        )
-        current_score: int | None = current_game_state.user_scores.get(user_id)
-        if current_score is None:
-            current_game_state.user_scores[user_id] = score_gained
-        else:
-            current_game_state.user_scores[user_id] += score_gained
-        display = "punti" if score_gained > 1 else "punto"
+    if guess_data is None or guess_data.desc != game_state_data.card_to_guess_data.desc:
         await update.message.reply_text(
-            text=f'"{guess_word}" è corretto! Ti sei aggiudicato {score_gained} {display}!'
+            text="No!",
         )
-
-        if len(current_game_state.guessed_cards) > 10:
-            job.schedule_removal()
-            rankings = ""
-            for key in sorted(
-                current_game_state.user_scores,
-                key=current_game_state.user_scores.get,
-                reverse=True,
-            ):
-                value = current_game_state.user_scores[key]
-                user = get_user(key)
-                user_to_display = ""
-                if user.username is None:
-                    if user.first_name is not None and user.last_name is not None:
-                        user_to_display = user.first_name + user.last_name
-                    elif user.first_name is not None:
-                        user_to_display = user.first_name
-                    elif user.last_name is not None:
-                        user_to_display = user.last_name
-                else:
-                    user_to_display = "@" + user.username
-
-                rankings += f"{user_to_display}, punteggio: {value}\n"
-
-            await context.bot.send_message(
-                chat_id=chat_id,
-                text=f"Il gioco è terminato! Classifica finale:\n{rankings}",
-            )
-            return ConversationHandler.END
-
-        current_game_state.card_to_guess_name = get_random_card_name()
-        current_game_state.card_to_guess_data = get_card_data(
-            current_game_state.card_to_guess_name
-        )
-        current_game_state.crop_level = 4
-        job.data = current_game_state
-
         return GUESSING
 
-    await update.message.reply_text(
-        text="No!",
+    game_state_data.guessed_cards.append(game_state_data.card_to_guess_name)
+    score_gained = (
+        game_state_data.crop_level + 1 if game_state_data.crop_level >= 0 else 1
     )
+    current_score: int | None = game_state_data.users_scores.get(user_id)
+    if current_score is None:
+        game_state_data.users_scores[user_id] = score_gained
+    else:
+        game_state_data.users_scores[user_id] += score_gained
+    score_text_display = "punti" if score_gained > 1 else "punto"
+    await update.message.reply_text(
+        text=f'"{guess_word}" è corretto! Ti sei aggiudicato {score_gained} {score_text_display}!'
+    )
+
+    if len(game_state_data.guessed_cards) > 10:
+        job.schedule_removal()
+        rankings = get_rankings_message_from_scores(game_state_data.users_scores)
+
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=f"Il gioco è terminato! Classifica finale:\n{rankings}",
+        )
+        return ConversationHandler.END
+
+    game_state_data.card_to_guess_name = get_random_card_name()
+    game_state_data.card_to_guess_data = get_card_data(
+        game_state_data.card_to_guess_name
+    )
+    game_state_data.crop_level = 4
+    job.data = game_state_data
     return GUESSING
 
 
 async def stop_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> object:
     pass
+    return ConversationHandler.END

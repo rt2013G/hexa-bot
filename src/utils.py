@@ -110,3 +110,37 @@ def get_random_card_name() -> str:
 
     # trunk-ignore(bandit/B311)
     return random.choice(list(card_database.keys()))
+
+
+def get_rankings_message_from_scores(users_scores: dict[int, int]) -> str:
+    scores: list[tuple[str, int]] = []
+    for key in sorted(
+        users_scores,
+        key=users_scores.get,
+        reverse=True,
+    ):
+        value = users_scores[key]
+        user = get_user(key)
+        user_to_display = ""
+        if user.username:
+            user_to_display = "@" + user.username
+        else:
+            if user.first_name and user.last_name:
+                user_to_display = user.first_name + user.last_name
+            elif user.first_name:
+                user_to_display = user.first_name
+            elif user.last_name:
+                user_to_display = user.last_name
+
+        scores.append((user_to_display, value))
+
+    emoji_dict = {0: "🥇", 1: "🥈", 2: "🥉"}
+    rankings = ""
+    for i, score in enumerate(scores):
+        emoji_to_add = emoji_dict.get(i)
+        if emoji_to_add is None:
+            emoji_to_add = ""
+
+        rankings += f"{emoji_to_add} {score[0]}, punteggio: {score[1]}\n"
+
+    return rankings

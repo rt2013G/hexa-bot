@@ -110,9 +110,6 @@ def get_card_data(search_term: str) -> CardDataEntry | None:
 
     cache_size = len(CARD_DATA_CACHE.cached_card_data)
     if cache_size > get_max_data_cache_size():
-        clean_cache()
-    cache_size = len(CARD_DATA_CACHE.cached_card_data)
-    if cache_size > get_max_data_cache_size():
         halve_cache()
     logging.log(
         logging.INFO,
@@ -137,8 +134,7 @@ def halve_cache():
 
         to_delete = not to_delete
 
-
-def clean_cache():
+async def clean_card_data_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     for key in list(CARD_DATA_CACHE.cached_card_data.keys()):
         if CARD_DATA_CACHE.cached_card_data[key].time < datetime.now() - timedelta(
             days=1
@@ -151,7 +147,4 @@ def clean_cache():
         ):
             del CARD_DATA_CACHE.cached_searched_terms[key]
 
-
-async def clean_card_data_job(context: ContextTypes.DEFAULT_TYPE) -> None:
-    clean_cache()
     logging.log(logging.INFO, "Card data cache cleaned")
