@@ -19,6 +19,7 @@ from src.card_search import (
     get_card_data,
     get_cropped_image,
 )
+from src.database import insert_guess_game_scores
 from src.filters import AdminFilter, MainGroupFilter
 from src.utils import get_random_card_name, get_rankings_message_from_scores
 
@@ -176,8 +177,12 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         text=f'"{guess_word}" è corretto! Ti sei aggiudicato {score_gained} {score_text_display}!'
     )
 
-    if len(game_state_data.guessed_cards) > 10:
+    if len(game_state_data.guessed_cards) > 2:
         job.schedule_removal()
+        insert_guess_game_scores(
+            game_time=game_state_data.start_time,
+            users_scores=game_state_data.users_scores,
+        )
         rankings = get_rankings_message_from_scores(game_state_data.users_scores)
 
         await context.bot.send_message(
@@ -206,7 +211,6 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
 async def chat_cleaner_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     data: GameStateData = context.job.data
     for message in list(data.messages_to_delete):
-        print(str(data.messages_to_delete))
         timed_out = False
         try:
             await message.delete()

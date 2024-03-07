@@ -27,13 +27,25 @@ class RolesEntry:
 
 
 @dataclass
+class GuessGameRankingsEntry:
+    rankings: dict[int, int]
+    time: datetime
+
+
+@dataclass
 class Cache:
     cached_users: dict[int, UserEntry]
     cached_usernames_to_id: dict[str, IdEntry]
     cached_roles: dict[int, RolesEntry]
+    cached_guess_game_rankings: dict[int, GuessGameRankingsEntry]
 
 
-CACHE: Cache = Cache(cached_users={}, cached_usernames_to_id={}, cached_roles={})
+CACHE: Cache = Cache(
+    cached_users={},
+    cached_usernames_to_id={},
+    cached_roles={},
+    cached_guess_game_rankings={},
+)
 
 
 def insert_into_users_cache(id: int, user: User) -> None:
@@ -79,6 +91,22 @@ def get_id_from_username_cache(username: str) -> int | None:
         return id_entry.id
 
 
+def insert_into_guess_game_scores_cache(
+    rankings_length: int, users_scores: dict[int, int]
+) -> None:
+    CACHE.cached_guess_game_rankings[rankings_length] = GuessGameRankingsEntry(
+        rankings=users_scores, time=datetime.now()
+    )
+
+
+def get_guess_game_score_from_cache(length: int) -> dict[int, int] | None:
+    score_entry: GuessGameRankingsEntry = CACHE.cached_guess_game_rankings.get(length)
+    if score_entry is None:
+        return None
+    else:
+        return score_entry.rankings
+
+
 async def clean_users_cache_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     for user_id in list(CACHE.cached_users):
         if CACHE.cached_users[user_id].time < datetime.now() - timedelta(hours=1):
@@ -97,5 +125,11 @@ async def clean_roles_cache_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     for user_id in list(CACHE.cached_roles):
         if CACHE.cached_roles[user_id].time < datetime.now() - timedelta(days=1):
             del CACHE.cached_roles[user_id]
+
+    for rankings_length in list(CACHE.cached_guess_game_rankings):
+        if CACHE.cached_guess_game_rankings[
+            rankings_length
+        ].time < datetime.now() - timedelta(days=7):
+            del CACHE.cached_guess_game_rankings[rankings_length]
 
     logging.log(logging.INFO, "Roles and username caches cleaned.")

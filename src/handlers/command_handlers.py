@@ -10,11 +10,15 @@ from src.card_search import (
     get_card_data,
 )
 from src.config import get_market_group_link
-from src.database import User, get_user, has_role
+from src.database import User, get_top_guess_game_users, get_user, has_role
 from src.database.models.feedback import get_feedbacks
-from src.filters import AdminFilter, MainGroupFilter
+from src.filters import AdminFilter, MainGroupFilter, MarketGroupFilter
 from src.logger import with_logging
-from src.utils import clean_command_text, get_user_from_message_command
+from src.utils import (
+    clean_command_text,
+    get_rankings_message_from_scores,
+    get_user_from_message_command,
+)
 
 
 def get_command_handlers() -> list:
@@ -35,6 +39,7 @@ def get_command_handlers() -> list:
         ),
         CommandHandler("gdpr", gdpr, filters.ChatType.PRIVATE),
         CommandHandler("feedback", get_feedback_list, filters.ChatType.PRIVATE),
+        CommandHandler("rankings", get_guess_game_rankings, ~MarketGroupFilter()),
     ]
 
 
@@ -195,3 +200,24 @@ async def get_feedback_list(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             f'"{feedback.contents}"',
             reply_markup=ReplyKeyboardRemove(),
         )
+
+
+async def get_guess_game_rankings(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    length_text = clean_command_text(update.message.text, "/rankings")
+    length = 10
+    if len(length_text) > 0:
+        try:
+            length = int(length_text)
+        except ValueError:
+            return
+    if length < 2:
+        length = 10
+
+    rankings = get_top_guess_game_users(length=length)
+    rankings_message = get_rankings_message_from_scores(rankings)
+    await context.bot.send_message(
+        chat_id=update.message.chat.id,
+        text=f"Classifica dei primi {length} giocatori:\n{rankings_message}",
+    )

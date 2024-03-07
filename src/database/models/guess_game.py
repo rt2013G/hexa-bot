@@ -42,6 +42,30 @@ def insert_user_score_into_game(user_id: int, score: int, game_date: datetime) -
             conn.close()
 
 
+def get_guess_game_rankings(length: int) -> dict[int, int]:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute(
+                    """
+                SELECT users_guess_game.user_id, SUM(users_guess_game.user_score) as score
+                FROM users_guess_game
+                GROUP BY users_guess_game.user_id
+                ORDER BY score DESC
+                LIMIT %s;
+                """,
+                    (length,),
+                )
+            except psycopg.Error as err:
+                print(err)
+            scores = {}
+            records = cur.fetchall()
+            for record in records:
+                scores[record[0]] = record[1]
+            conn.close()
+            return scores
+
+
 def get_total_score_for_user(user_id: int) -> int | None:
     with get_connection() as conn:
         with conn.cursor() as cur:
