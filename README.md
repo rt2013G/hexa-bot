@@ -30,7 +30,6 @@ Also please keep in mind that this bot works to serve a specific community on Te
 The bot is currently running on [an older version](https://github.com/rt2013G/YugiohHelper) that I've written almost a year ago. \
 This version is not 100% working yet, here is a list of things that needs to be done before the first deployment:
 
-- Implement the _guess the card_ minigame and possibly track games and scores in the database
 - Set up CI/CD
 - Fix the announce command to send announces in batches, the same way as the logging works
 - Create an API to retrieve community analytics (and display them on this repo)

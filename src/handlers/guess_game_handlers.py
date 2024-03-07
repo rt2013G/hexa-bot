@@ -112,16 +112,24 @@ async def send_card_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     image_to_send = get_cropped_image(data.card_to_guess_data.image, crop).resize(size)
 
     if data.crop_level < 0:
-        await context.bot.send_photo(
+        message_to_delete = await context.bot.send_photo(
             data.chat_id,
             photo=get_bytes_from_image(image_to_send),
             caption=f"La carta era {data.card_to_guess_name}, nessuno ha indovinato!",
         )
 
+        data.messages_to_delete.append(message_to_delete)
         data.card_to_guess_name = get_random_card_name()
         data.card_to_guess_data = get_card_data(data.card_to_guess_name)
         data.crop_level = 4
-        context.job.data = data
+        context.job.schedule_removal()
+        context.job_queue.run_repeating(
+            callback=send_card_job,
+            interval=15,
+            first=10,
+            data=data,
+            name=str(data.chat_id),
+        )
         return
 
     message_to_delete = await context.bot.send_photo(
@@ -177,7 +185,7 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         text=f'"{guess_word}" è corretto! Ti sei aggiudicato {score_gained} {score_text_display}!'
     )
 
-    if len(game_state_data.guessed_cards) > 2:
+    if len(game_state_data.guessed_cards) >= 10:
         job.schedule_removal()
         insert_guess_game_scores(
             game_time=game_state_data.start_time,
@@ -204,7 +212,14 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         game_state_data.card_to_guess_name
     )
     game_state_data.crop_level = 4
-    job.data = game_state_data
+    job.schedule_removal()
+    context.job_queue.run_repeating(
+        callback=send_card_job,
+        interval=15,
+        first=10,
+        data=game_state_data,
+        name=str(game_state_data.chat_id),
+    )
     return GUESSING
 
 
