@@ -9,7 +9,7 @@ from typing import Literal
 # trunk-ignore(mypy/import-untyped)
 # trunk-ignore(mypy/note)
 import requests
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from telegram.ext import ContextTypes
 
 from src.config import get_max_data_cache_size
@@ -89,7 +89,15 @@ def get_card_data(search_term: str) -> CardDataEntry | None:
     if card_name is None:
         return None
     image_url = data["card_images"][0]["image_url_cropped"]
-    image = Image.open(requests.get(image_url, stream=True, timeout=10).raw)
+
+    try:
+        image = Image.open(requests.get(image_url, stream=True, timeout=10).raw)
+    except UnidentifiedImageError:
+        return None
+    except Exception as err:
+        logging.log(logging.ERROR, err)
+        return None
+
     card_data = CardDataEntry(
         desc=data["desc"],
         image=image,

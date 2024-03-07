@@ -15,7 +15,7 @@ from tests.test_data import (
 )
 
 
-class DatabaseTest(unittest.TestCase):
+class UserTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         start_test_database()

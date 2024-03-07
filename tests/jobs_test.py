@@ -12,7 +12,7 @@ from src.database.cache import (
 from tests.test_data import mock_users
 
 
-class DatabaseTest(unittest.IsolatedAsyncioTestCase):
+class JobsTest(unittest.IsolatedAsyncioTestCase):
     async def test_clean_cache_job(self) -> None:
         insert_into_users_cache(id=mock_users[0].id, user=mock_users[0])
         user = get_user_from_cache(mock_users[0].id)

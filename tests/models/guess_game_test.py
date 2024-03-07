@@ -9,7 +9,7 @@ from src.database.models.guess_game import (
 from tests.test_data import clean_test_database, start_test_database
 
 
-class DatabaseTest(unittest.TestCase):
+class GuessGameTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         start_test_database()

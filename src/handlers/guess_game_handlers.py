@@ -69,9 +69,6 @@ async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> obje
         photo=get_bytes_from_image(card_data.image),
         caption="Venghino signori e signore!\nSta per iniziare il Guess The Card, non mancate mi raccomando!",
     )
-    # await context.bot.pin_chat_message(
-    #    update.message.chat.id, message_id=message.id, disable_notification=False
-    # )
     time = datetime.now()
     card_name = get_random_card_name()
     card_data = get_card_data(card_name)

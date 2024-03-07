@@ -9,7 +9,7 @@ from src.database.models.role import (
 from tests.test_data import clean_test_database, start_test_database
 
 
-class DatabaseTest(unittest.TestCase):
+class RoleTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         start_test_database()

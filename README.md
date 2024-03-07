@@ -17,6 +17,7 @@ hexa-bot is currently focused on admin-side utilities, but there are also some n
 - Leave feedbacks to other users marking your feedback messages with `#feedback`
 - Get all the feedbacks related to a user via the `/feedback @username` command
 - Obtain the description of any card using the `/search` command
+- Play the "Guess the card game" in our public group, directly on Telegram, with `/guessthecard`
 
 ## Contributing
 
