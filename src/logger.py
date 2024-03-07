@@ -1,8 +1,8 @@
 import logging
 from datetime import datetime
 
-import telegram.error
 from telegram import Update
+from telegram.error import Forbidden, TimedOut
 from telegram.ext import ContextTypes
 
 from src.config import get_logging_channel_id
@@ -48,7 +48,7 @@ async def post_logs_job(context: ContextTypes.DEFAULT_TYPE) -> None:
             await context.bot.send_message(
                 chat_id=get_logging_channel_id(), text=message
             )
-        except (telegram.error.TimedOut, telegram.error.Forbidden):
+        except (TimedOut, Forbidden):
             timed_out = True
 
         if timed_out:

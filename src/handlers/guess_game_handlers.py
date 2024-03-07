@@ -2,8 +2,9 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime
 
-from telegram import ReactionTypeEmoji, Update
+from telegram import Message, ReactionTypeEmoji, Update
 from telegram.constants import ReactionEmoji
+from telegram.error import Forbidden, TimedOut
 from telegram.ext import (
     CommandHandler,
     ContextTypes,
@@ -28,6 +29,7 @@ class GameStateData:
     chat_id: int
     users_scores: dict[int, int]
     guessed_cards: list[str]
+    messages_to_delete: list[Message]
     card_to_guess_name: str
     card_to_guess_data: CardDataEntry
     crop_level: int
@@ -82,12 +84,13 @@ async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> obje
         chat_id=chat_id,
         users_scores={},
         guessed_cards=[],
+        messages_to_delete=[],
         card_to_guess_name=card_name,
         card_to_guess_data=card_data,
         crop_level=4,
     )
     context.job_queue.run_repeating(
-        callback=send_card_handler,
+        callback=send_card_job,
         interval=15,
         first=1,
         data=game_state_data,
@@ -97,7 +100,7 @@ async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> obje
     return GUESSING
 
 
-async def send_card_handler(context: ContextTypes.DEFAULT_TYPE) -> None:
+async def send_card_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     data: GameStateData = context.job.data
     while data.card_to_guess_data is None:
         card_name = get_random_card_name()
@@ -113,18 +116,20 @@ async def send_card_handler(context: ContextTypes.DEFAULT_TYPE) -> None:
             photo=get_bytes_from_image(image_to_send),
             caption=f"La carta era {data.card_to_guess_name}, nessuno ha indovinato!",
         )
+
         data.card_to_guess_name = get_random_card_name()
         data.card_to_guess_data = get_card_data(data.card_to_guess_name)
         data.crop_level = 4
         context.job.data = data
         return
 
-    await context.bot.send_photo(
+    message_to_delete = await context.bot.send_photo(
         data.chat_id,
         photo=get_bytes_from_image(image_to_send),
         caption="Guess the card!",
     )
     data.crop_level -= 1
+    data.messages_to_delete.append(message_to_delete)
     context.job.data = data
 
 
@@ -160,9 +165,7 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         return GUESSING
 
     game_state_data.guessed_cards.append(game_state_data.card_to_guess_name)
-    score_gained = (
-        game_state_data.crop_level + 1 if game_state_data.crop_level >= 0 else 1
-    )
+    score_gained = game_state_data.crop_level + 2
     current_score: int | None = game_state_data.users_scores.get(user_id)
     if current_score is None:
         game_state_data.users_scores[user_id] = score_gained
@@ -181,6 +184,14 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
             chat_id=chat_id,
             text=f"Il gioco è terminato! Classifica finale:\n{rankings}",
         )
+        context.job_queue.run_repeating(
+            callback=chat_cleaner_job,
+            interval=5,
+            first=1,
+            data=game_state_data,
+            name=str(chat_id) + "cleaner",
+        )
+
         return ConversationHandler.END
 
     game_state_data.card_to_guess_name = get_random_card_name()
@@ -192,14 +203,40 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
     return GUESSING
 
 
+async def chat_cleaner_job(context: ContextTypes.DEFAULT_TYPE) -> None:
+    data: GameStateData = context.job.data
+    for message in list(data.messages_to_delete):
+        print(str(data.messages_to_delete))
+        timed_out = False
+        try:
+            await message.delete()
+        except (TimedOut, Forbidden):
+            timed_out = True
+
+        if not timed_out:
+            data.messages_to_delete.remove(message)
+    if len(data.messages_to_delete) <= 0:
+        context.job.schedule_removal()
+    context.job.data = data
+
+
 async def stop_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> object:
-    jobs = context.job_queue.get_jobs_by_name(str(update.message.chat.id))
+    chat_id = update.message.chat.id
+    jobs = context.job_queue.get_jobs_by_name(str(chat_id))
     if jobs is None:
         logging.log(
             logging.ERROR,
             "There was an issue during the guess the card game. The send card job was missing.",
         )
         return ConversationHandler.END
-    jobs[0].schedule_removal()
+    job = jobs[0]
+    context.job_queue.run_repeating(
+        callback=chat_cleaner_job,
+        interval=5,
+        first=1,
+        data=job.data,
+        name=str(chat_id) + "cleaner",
+    )
+    job.schedule_removal()
     await update.message.reply_text(text="Gioco terminato!")
     return ConversationHandler.END
