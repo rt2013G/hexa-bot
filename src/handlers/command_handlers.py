@@ -13,8 +13,8 @@ from src.config import get_market_group_link
 from src.database import User, get_user, has_role
 from src.database.models.feedback import get_feedbacks
 from src.filters import AdminFilter, MainGroupFilter
-from src.utils.logger import with_logging
-from src.utils.utils import clean_command_text, get_user_from_message_command
+from src.logger import with_logging
+from src.utils import clean_command_text, get_user_from_message_command
 
 
 def get_command_handlers() -> list:

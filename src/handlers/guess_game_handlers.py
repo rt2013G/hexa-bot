@@ -18,7 +18,7 @@ from src.card_search import (
 )
 from src.database import get_user
 from src.filters import AdminFilter, MainGroupFilter
-from src.utils.utils import get_random_card_name
+from src.utils import get_random_card_name
 
 
 @dataclass

@@ -4,7 +4,7 @@ from telegram.ext import Application, Defaults
 
 from src.card_search import clean_card_data_job
 from src.database.cache import clean_roles_cache_job, clean_users_cache_job
-from src.utils.logger import post_logs_job
+from src.logger import post_logs_job
 
 
 @dataclass

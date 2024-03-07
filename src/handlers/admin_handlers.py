@@ -12,8 +12,8 @@ from src.database import (
 )
 from src.database.models.user import get_users
 from src.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
-from src.utils.logger import with_logging
-from src.utils.utils import clean_command_text, get_user_from_message_command
+from src.logger import with_logging
+from src.utils import clean_command_text, get_user_from_message_command
 
 
 def get_admin_handlers() -> list:

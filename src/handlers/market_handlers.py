@@ -16,7 +16,7 @@ from src.config import get_feedback_channel_id
 from src.database import get_user, has_role, update_user_post_dates
 from src.database.models.feedback import insert_feedback
 from src.filters import AdminFilter, FeedbackFilter, MarketGroupFilter, MediaGroupFilter
-from src.utils.utils import (
+from src.utils import (
     get_user_from_text,
     has_sent_buy_post_today,
     has_sent_sell_post_today,

@@ -9,7 +9,7 @@ from src import config as cfg
 from src.components import Bot, BotParameters
 from src.database.models.base import create_database
 from src.handlers import handlers
-from src.utils.logger import set_up_logger
+from src.logger import set_up_logger
 
 
 def main() -> None:
