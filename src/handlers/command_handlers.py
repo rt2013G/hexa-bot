@@ -23,27 +23,27 @@ from src.utils import (
 
 def get_command_handlers() -> list:
     return [
-        CommandHandler("start", start, filters.ChatType.PRIVATE),
+        CommandHandler("start", start_handler, filters.ChatType.PRIVATE),
         CommandHandler(
-            "search", get_card_search, filters.ChatType.PRIVATE | MainGroupFilter()
+            "search", card_search_handler, filters.ChatType.PRIVATE | MainGroupFilter()
         ),
         CommandHandler(
             "checkseller",
-            check_seller,
+            check_seller_handler,
             filters.ChatType.PRIVATE | MainGroupFilter() | AdminFilter(),
         ),
         CommandHandler(
             "checkscammer",
-            check_scammer,
+            check_scammer_handler,
             filters.ChatType.PRIVATE | MainGroupFilter() | AdminFilter(),
         ),
-        CommandHandler("gdpr", gdpr, filters.ChatType.PRIVATE),
-        CommandHandler("feedback", get_feedback_list, filters.ChatType.PRIVATE),
-        CommandHandler("rankings", get_guess_game_rankings, ~MarketGroupFilter()),
+        CommandHandler("gdpr", gdpr_handler, filters.ChatType.PRIVATE),
+        CommandHandler("feedback", feedback_list_handler, filters.ChatType.PRIVATE),
+        CommandHandler("rankings", guess_game_rankings_handler, ~MarketGroupFilter()),
     ]
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     msg = f"""Benvenuto sul gruppo Yu-Gi-Oh ITA Main.
 Per entrare nel gruppo market segui questo link: {get_market_group_link()}.\n
 Ricorda di leggere le regole! Solo i venditori approvati possono vendere sul gruppo.
@@ -57,7 +57,9 @@ Ricorda che in ogni caso, puoi effettuare solo 1 post di vendita e 1 post di acq
 
 
 @with_logging
-async def get_card_search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def card_search_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     search_term = clean_command_text(update.message.text, "/search")
     if len(search_term) > 40:
         return
@@ -86,7 +88,9 @@ async def get_card_search(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 
 @with_logging
-async def check_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def check_seller_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     user = get_user_from_message_command(update.message.text, "/checkseller")
     if user is None:
         await context.bot.send_message(
@@ -110,7 +114,9 @@ async def check_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 
 @with_logging
-async def check_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def check_scammer_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     user = get_user_from_message_command(update.message.text, "/checkscammer")
     if user is None:
         await context.bot.send_message(
@@ -133,7 +139,7 @@ async def check_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         )
 
 
-async def gdpr(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def gdpr_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     gdpr_msg = """Al fine di limitare il numero di truffatori, per autenticarsi come seller è necessario fornire un identificativo.
 Se non si vuole vendere sul gruppo, NON è ovviamente obbligatorio autenticarsi.
 Il video inviatoci è visibile soltanto agli amministratori del gruppo market, e non viene salvato dal bot. Non è condiviso con nessun altro.
@@ -147,7 +153,9 @@ Il video non viene utilizzato per nessuno scopo ECCETTO in caso di truffa da par
 
 
 @with_logging
-async def get_feedback_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def feedback_list_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     seller = get_user_from_message_command(update.message.text, "/feedback")
     if seller is None:
         await context.bot.send_message(
@@ -202,7 +210,7 @@ async def get_feedback_list(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         )
 
 
-async def get_guess_game_rankings(
+async def guess_game_rankings_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
     length_text = clean_command_text(update.message.text, "/rankings")

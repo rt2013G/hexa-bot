@@ -19,28 +19,32 @@ from src.utils import clean_command_text, get_user_from_message_command
 def get_admin_handlers() -> list:
     return [
         CommandHandler(
-            "makeseller", make_seller, AdminFilter() & ApprovalGroupFilter()
+            "makeseller", make_seller_handler, AdminFilter() & ApprovalGroupFilter()
         ),
         CommandHandler(
-            "removeseller", remove_seller, AdminFilter() & ApprovalGroupFilter()
+            "removeseller", remove_seller_handler, AdminFilter() & ApprovalGroupFilter()
         ),
-        CommandHandler("reject", reject_seller, AdminFilter() & ApprovalGroupFilter()),
-        CommandHandler("makescammer", make_scammer, AdminFilter()),
-        CommandHandler("removescammer", remove_scammer, AdminFilter()),
-        CommandHandler("announce", announce, DebugUserFilter()),
-        CommandHandler("resetdate", reset_date, AdminFilter()),
-        CommandHandler("getid", get_id_by_username, AdminFilter()),
-        CommandHandler("getusername", get_username_by_id, AdminFilter()),
-        CommandHandler("makeadmin", make_admin, DebugUserFilter()),
-        CommandHandler("removeadmin", remove_admin, DebugUserFilter()),
         CommandHandler(
-            "shutdown", shutdown, DebugUserFilter() & filters.ChatType.PRIVATE
+            "reject", reject_seller_handler, AdminFilter() & ApprovalGroupFilter()
+        ),
+        CommandHandler("makescammer", make_scammer_handler, AdminFilter()),
+        CommandHandler("removescammer", remove_scammer_handler, AdminFilter()),
+        CommandHandler("announce", announce_handler, DebugUserFilter()),
+        CommandHandler("resetdate", reset_date_handler, AdminFilter()),
+        CommandHandler("getid", get_id_by_username_handler, AdminFilter()),
+        CommandHandler("getusername", get_username_by_id_handler, AdminFilter()),
+        CommandHandler("makeadmin", make_admin_handler, DebugUserFilter()),
+        CommandHandler("removeadmin", remove_admin_handler, DebugUserFilter()),
+        CommandHandler(
+            "shutdown", shutdown_handler, DebugUserFilter() & filters.ChatType.PRIVATE
         ),
     ]
 
 
 @with_logging
-async def make_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def make_seller_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     user = get_user_from_message_command(update.message.text, "/makeseller")
     if user is None:
         await update.message.reply_text(
@@ -65,7 +69,9 @@ async def make_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 
 @with_logging
-async def remove_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def remove_seller_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     user = get_user_from_message_command(update.message.text, "/removeseller")
     if user is None:
         await update.message.reply_text(
@@ -89,7 +95,9 @@ async def remove_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     )
 
 
-async def reject_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def reject_seller_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     user = get_user_from_message_command(update.message.text, "/reject")
 
     if user is None:
@@ -118,7 +126,9 @@ async def reject_seller(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 
 @with_logging
-async def make_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def make_scammer_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     user = get_user_from_message_command(update.message.text, "/makescammer")
     if user is None:
         await update.message.reply_text(
@@ -138,7 +148,9 @@ async def make_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 
 @with_logging
-async def remove_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def remove_scammer_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     user = get_user_from_message_command(update.message.text, "/removescammer")
     if user is None:
         await update.message.reply_text(
@@ -163,7 +175,7 @@ async def remove_scammer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 
 @with_logging
-async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def announce_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # TODO doesn't work, fix before release
     message = clean_command_text(update.message.text, "/announce")
     users = get_users()
@@ -174,7 +186,9 @@ async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 @with_logging
-async def reset_date(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def reset_date_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     user = get_user_from_message_command(update.message.text, "/resetdate")
     if user is None:
         await update.message.reply_text(
@@ -200,7 +214,7 @@ async def reset_date(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     )
 
 
-async def get_id_by_username(
+async def get_id_by_username_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
     user = get_user_from_message_command(update.message.text, "/getid")
@@ -214,7 +228,7 @@ async def get_id_by_username(
     )
 
 
-async def get_username_by_id(
+async def get_username_by_id_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
     user = get_user_from_message_command(update.message.text, "/getusername")
@@ -234,7 +248,9 @@ async def get_username_by_id(
 
 
 @with_logging
-async def make_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def make_admin_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     user = get_user_from_message_command(update.message.text, "/makeadmin")
     if user is None:
         await update.message.reply_text(
@@ -254,7 +270,9 @@ async def make_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 @with_logging
-async def remove_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def remove_admin_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     user = get_user_from_message_command(update.message.text, "/removeadmin")
     if user is None:
         await update.message.reply_text(
@@ -273,7 +291,7 @@ async def remove_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     )
 
 
-async def shutdown(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def shutdown_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "Shutting down...", reply_markup=ReplyKeyboardRemove()
     )

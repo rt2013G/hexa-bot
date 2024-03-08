@@ -36,14 +36,16 @@ class GameStateData:
     crop_level: int
 
 
-GUESSING, SEND_CARD = range(2)
+GUESSING = range(1)
 
 
 def get_guess_game_conv_handler() -> list:
     return [
         ConversationHandler(
             entry_points=[
-                CommandHandler("guessthecard", start_game, MainGroupFilter())
+                CommandHandler(
+                    "guessthecard", guess_the_card_handler, MainGroupFilter()
+                )
             ],
             states={
                 GUESSING: [
@@ -52,11 +54,10 @@ def get_guess_game_conv_handler() -> list:
                         guess_handler,
                     )
                 ],
-                SEND_CARD: [],
             },
             fallbacks=[
                 CommandHandler(
-                    "stopgame", stop_game, MainGroupFilter() & AdminFilter()
+                    "stopgame", stop_game_handler, MainGroupFilter() & AdminFilter()
                 ),
             ],
             per_chat=True,
@@ -65,7 +66,9 @@ def get_guess_game_conv_handler() -> list:
     ]
 
 
-async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> object:
+async def guess_the_card_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> object:
     card_data = get_card_data("Question")
     chat_id = update.message.chat.id
     await context.bot.send_photo(
@@ -239,7 +242,9 @@ async def chat_cleaner_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     context.job.data = data
 
 
-async def stop_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> object:
+async def stop_game_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> object:
     chat_id = update.message.chat.id
     jobs = context.job_queue.get_jobs_by_name(str(chat_id))
     if jobs is None:
