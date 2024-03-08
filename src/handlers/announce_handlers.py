@@ -118,7 +118,7 @@ async def send_message_with_bot(
         try:
             await context.bot.send_photo(
                 chat_id=recipient_id,
-                photo=message_to_send.photo,
+                photo=message_to_send.photo[0],
                 caption=message_to_send.caption,
                 reply_markup=ReplyKeyboardRemove(),
             )

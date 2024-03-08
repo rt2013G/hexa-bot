@@ -156,6 +156,9 @@ async def market_post_handler(
         await update.message.delete()
         return
 
+    if "admin" in msg and "cerco" in msg:
+        return
+
     user = get_user(id=update.message.from_user.id)
     if user is None:
         await update.message.delete()
