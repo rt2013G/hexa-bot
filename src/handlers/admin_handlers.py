@@ -10,10 +10,9 @@ from src.database import (
     reset_user_buy_post,
     reset_user_sell_post,
 )
-from src.database.models.user import get_users
 from src.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
 from src.logger import with_logging
-from src.utils import clean_command_text, get_user_from_message_command
+from src.utils import get_user_from_message_command
 
 
 def get_admin_handlers() -> list:
@@ -29,7 +28,6 @@ def get_admin_handlers() -> list:
         ),
         CommandHandler("makescammer", make_scammer_handler, AdminFilter()),
         CommandHandler("removescammer", remove_scammer_handler, AdminFilter()),
-        CommandHandler("announce", announce_handler, DebugUserFilter()),
         CommandHandler("resetdate", reset_date_handler, AdminFilter()),
         CommandHandler("getid", get_id_by_username_handler, AdminFilter()),
         CommandHandler("getusername", get_username_by_id_handler, AdminFilter()),
@@ -172,17 +170,6 @@ async def remove_scammer_handler(
         "Sei stato rimosso dalla lista scammer, ora puoi tornare a vendere nel gruppo market!",
         reply_markup=ReplyKeyboardRemove(),
     )
-
-
-@with_logging
-async def announce_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # TODO doesn't work, fix before release
-    message = clean_command_text(update.message.text, "/announce")
-    users = get_users()
-    for user in users:
-        await context.bot.send_message(
-            user.id, message, reply_markup=ReplyKeyboardRemove()
-        )
 
 
 @with_logging
