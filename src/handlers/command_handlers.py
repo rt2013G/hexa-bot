@@ -18,6 +18,8 @@ from src.utils import (
     clean_command_text,
     get_rankings_message_from_scores,
     get_user_from_message_command,
+    has_sent_buy_post_today,
+    has_sent_sell_post_today,
 )
 
 
@@ -35,6 +37,11 @@ def get_command_handlers() -> list:
         CommandHandler(
             "checkscammer",
             check_scammer_handler,
+            filters.ChatType.PRIVATE | MainGroupFilter() | AdminFilter(),
+        ),
+        CommandHandler(
+            "checkposts",
+            check_posts_handler,
             filters.ChatType.PRIVATE | MainGroupFilter() | AdminFilter(),
         ),
         CommandHandler("gdpr", gdpr_handler, filters.ChatType.PRIVATE),
@@ -137,6 +144,43 @@ async def check_scammer_handler(
             "L'utente NON è uno scammer!",
             reply_markup=ReplyKeyboardRemove(),
         )
+
+
+@with_logging
+async def check_posts_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    user = get_user_from_message_command(update.message.text, "/checkposts")
+    if user is None:
+        await context.bot.send_message(
+            update.message.chat.id,
+            "Utente non trovato! Assicurati di aver scritto correttamente lo @username.",
+            reply_markup=ReplyKeyboardRemove(),
+        )
+        return
+    if not has_role(user.id, "seller"):
+        await context.bot.send_message(
+            update.message.chat.id,
+            "L'utente NON è un venditore!",
+            reply_markup=ReplyKeyboardRemove(),
+        )
+        return
+
+    buy_post_display = (
+        "L'utente ha inviato un post di cerco oggi!"
+        if has_sent_buy_post_today(user_id=user.id)
+        else "L'utente NON ha inviato un post di cerco oggi!"
+    )
+    sell_post_display = (
+        "L'utente ha inviato un post di vendo oggi!"
+        if has_sent_sell_post_today(user_id=user.id)
+        else "L'utente NON ha inviato un post di vendo oggi!"
+    )
+    await context.bot.send_message(
+        update.message.chat.id,
+        f"{buy_post_display}\n{sell_post_display}",
+        reply_markup=ReplyKeyboardRemove(),
+    )
 
 
 async def gdpr_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

@@ -114,7 +114,6 @@ async def send_message_with_bot(
             )
         except (TimedOut, Forbidden, BadRequest) as err:
             raise err
-        return
     elif message_type == "photo":
         try:
             await context.bot.send_photo(
@@ -125,7 +124,6 @@ async def send_message_with_bot(
             )
         except (TimedOut, Forbidden, BadRequest) as err:
             raise err
-        return
     elif message_type == "video":
         try:
             await context.bot.send_video(
@@ -136,7 +134,6 @@ async def send_message_with_bot(
             )
         except (TimedOut, Forbidden, BadRequest) as err:
             raise err
-        return
     elif message_type == "document":
         try:
             await context.bot.send_document(
@@ -147,7 +144,6 @@ async def send_message_with_bot(
             )
         except (TimedOut, Forbidden, BadRequest) as err:
             raise err
-        return
     else:
         raise Forbidden
 
