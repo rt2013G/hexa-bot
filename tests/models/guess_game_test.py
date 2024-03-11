@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
 
-from src.database.models.guess_game import (
+from app.database.models.guess_game import (
     get_guess_game_rankings,
     get_total_score_for_user,
     insert_game,

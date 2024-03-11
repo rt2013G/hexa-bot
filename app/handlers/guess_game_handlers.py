@@ -13,15 +13,15 @@ from telegram.ext import (
     filters,
 )
 
-from src.card_search import (
+from app.card_search import (
     CardDataEntry,
     get_bytes_from_image,
     get_card_data,
     get_cropped_image,
 )
-from src.database import insert_guess_game_scores
-from src.filters import AdminFilter, MainGroupFilter
-from src.utils import get_random_card_name, get_rankings_message_from_scores
+from app.database import insert_guess_game_scores
+from app.filters import AdminFilter, MainGroupFilter
+from app.utils import get_random_card_name, get_rankings_message_from_scores
 
 
 @dataclass

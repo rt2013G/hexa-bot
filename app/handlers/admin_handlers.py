@@ -3,16 +3,16 @@ import sys
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
-from src.database import (
+from app.database import (
     add_role_to_user,
     has_role,
     remove_role_from_user,
     reset_user_buy_post,
     reset_user_sell_post,
 )
-from src.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
-from src.logger import with_logging
-from src.utils import get_user_from_message_command
+from app.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
+from app.logger import with_logging
+from app.utils import get_user_from_message_command
 
 
 def get_admin_handlers() -> list:

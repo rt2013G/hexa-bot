@@ -6,10 +6,10 @@ from telegram.error import BadRequest, Forbidden, TimedOut
 from telegram.ext import CommandHandler, ContextTypes
 from telegram.helpers import effective_message_type
 
-from src.database.models.user import get_users
-from src.filters import AdminFilter, DebugUserFilter
-from src.logger import with_logging
-from src.utils import get_user_from_message_command
+from app.database.models.user import get_users
+from app.filters import AdminFilter, DebugUserFilter
+from app.logger import with_logging
+from app.utils import get_user_from_message_command
 
 
 def get_announce_handlers() -> list:

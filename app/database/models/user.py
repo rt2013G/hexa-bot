@@ -2,7 +2,7 @@ from datetime import datetime
 
 import psycopg
 
-from src.config import get_default_post_datetime
+from app.config import get_default_post_datetime
 
 from .base import get_connection
 

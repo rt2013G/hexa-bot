@@ -2,8 +2,8 @@ import unittest
 
 from telegram.ext import ContextTypes
 
-from src.config import get_default_post_datetime
-from src.database.cache import (
+from app.config import get_default_post_datetime
+from app.database.cache import (
     CACHE,
     clean_users_cache_job,
     get_user_from_cache,

@@ -1,9 +1,9 @@
 from dotenv import load_dotenv
 
-from src import config as cfg
-from src.database import User, update_user_info, update_user_post_dates
-from src.database.models.base import create_database, get_connection
-from src.database.models.user import insert_user
+from app import config as cfg
+from app.database import User, update_user_info, update_user_post_dates
+from app.database.models.base import create_database, get_connection
+from app.database.models.user import insert_user
 
 default_time = cfg.get_default_post_datetime()
 mock_users = [

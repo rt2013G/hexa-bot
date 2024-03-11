@@ -7,9 +7,9 @@ from telegram.ext import (
     filters,
 )
 
-from src.config import get_approval_id
-from src.database import has_role
-from src.utils import get_auth_code_from_id
+from app.config import get_approval_id
+from app.database import has_role
+from app.utils import get_auth_code_from_id
 
 CODE, VIDEO = range(2)
 

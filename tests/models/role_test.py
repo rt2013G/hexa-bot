@@ -1,6 +1,6 @@
 import unittest
 
-from src.database.models.role import (
+from app.database.models.role import (
     get_role_list,
     get_roles_for_user,
     make_role,

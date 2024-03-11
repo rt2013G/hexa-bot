@@ -1,8 +1,8 @@
 import unittest
 from datetime import datetime
 
-from src.config import get_default_post_datetime
-from src.database.models.user import (
+from app.config import get_default_post_datetime
+from app.database.models.user import (
     get_user_from_id,
     update_user_dates,
     update_user_info_into_db,

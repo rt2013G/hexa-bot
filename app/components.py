@@ -2,9 +2,9 @@ from dataclasses import dataclass
 
 from telegram.ext import Application, Defaults
 
-from src.card_search import clean_card_data_job
-from src.database.cache import clean_roles_cache_job, clean_users_cache_job
-from src.logger import post_logs_job
+from app.card_search import clean_card_data_job
+from app.database.cache import clean_roles_cache_job, clean_users_cache_job
+from app.logger import post_logs_job
 
 
 @dataclass

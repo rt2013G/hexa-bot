@@ -12,7 +12,7 @@ import requests
 from PIL import Image, UnidentifiedImageError
 from telegram.ext import ContextTypes
 
-from src.config import get_max_data_cache_size
+from app.config import get_max_data_cache_size
 
 
 @dataclass

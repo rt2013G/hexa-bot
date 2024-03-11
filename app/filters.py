@@ -1,9 +1,9 @@
 from telegram import Message
 from telegram.ext.filters import MessageFilter
 
-from src.config import get_approval_id, get_debug_user_id, get_main_id, get_market_id
-from src.database import has_role
-from src.utils import is_feedback_post
+from app.config import get_approval_id, get_debug_user_id, get_main_id, get_market_id
+from app.database import has_role
+from app.utils import is_feedback_post
 
 
 class AdminFilter(MessageFilter):

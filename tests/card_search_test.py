@@ -1,7 +1,7 @@
 import unittest
 
-from src import config as cfg
-from src.card_search import get_card_data
+from app import config as cfg
+from app.card_search import get_card_data
 
 
 class CardSearchTest(unittest.TestCase):

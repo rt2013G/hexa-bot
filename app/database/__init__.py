@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.config import get_default_post_datetime
+from app.config import get_default_post_datetime
 
 from .cache import (
     CACHE,

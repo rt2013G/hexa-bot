@@ -1,8 +1,8 @@
 from telegram import Update
 from telegram.ext import ContextTypes, TypeHandler
 
-from src.database import User, get_user, update_user_info
-from src.database.models.user import insert_user
+from app.database import User, get_user, update_user_info
+from app.database.models.user import insert_user
 
 
 def get_service_handlers() -> list:

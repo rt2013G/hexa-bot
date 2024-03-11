@@ -1,8 +1,8 @@
 import unittest
 from datetime import datetime
 
-from src.config import get_default_post_datetime
-from src.database import (
+from app.config import get_default_post_datetime
+from app.database import (
     add_role_to_user,
     get_user,
     has_role,

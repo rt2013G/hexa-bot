@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.error import Forbidden, TimedOut
 from telegram.ext import ContextTypes
 
-from src.config import get_logging_channel_id
+from app.config import get_logging_channel_id
 
 LOGS: list[str]
 

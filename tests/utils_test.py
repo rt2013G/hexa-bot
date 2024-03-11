@@ -1,8 +1,8 @@
 import unittest
 from datetime import datetime, timedelta
 
-from src.database import User, update_user_post_dates
-from src.utils import (
+from app.database import User, update_user_post_dates
+from app.utils import (
     clean_command_text,
     get_user_from_message_command,
     has_sent_buy_post_today,
