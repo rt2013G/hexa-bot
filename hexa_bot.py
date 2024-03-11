@@ -34,7 +34,11 @@ def main() -> None:
     )
     bot = Bot(parameters=params)
     mode = "webhook" if len(sys.argv) == 2 and sys.argv[1] == "webhook" else "polling"
-    bot.run(mode=mode)
+    bot.run(
+        mode=mode,
+        webhook_secret=os.getenv("WEBHOOK_SECRET"),
+        webhook_url=os.getenv("WEBHOOK_URL"),
+    )
 
 
 if __name__ == "__main__":
