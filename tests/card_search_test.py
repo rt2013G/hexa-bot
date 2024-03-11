@@ -1,13 +1,9 @@
 import unittest
 
-from app import config as cfg
 from app.card_search import get_card_data
 
 
 class CardSearchTest(unittest.TestCase):
-    def setUp(self) -> None:
-        cfg.GLOBAL_CONFIGS = cfg.load_configs()
-
     def test_search_card_data(self) -> None:
         card_data = get_card_data("thisisnotarealcard")
         self.assertEqual(card_data, None)

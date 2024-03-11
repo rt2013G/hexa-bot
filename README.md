@@ -21,8 +21,9 @@ hexa-bot is currently focused on admin-side utilities, but there are also some n
 
 ## Contributing
 
-If you have experience with Python and the [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) library, you are free to clone the repo and submit a pull request. \
-Please note that for linting and formatting I'm using _trunk_, you can find the configuration files in this repo.
+If you have experience with Python and the [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) library, you are free to clone the repo and submit a pull request. The only things you need are a bot token obtained via @botfather, a debug_config.json file in app/static folder, which should contain various informations about the testing environment (bot username, groups, etc..) and a Postgres database.
+
+Please note that for linting and formatting I'm using \_trunk\*, you can find the configuration files in this repo.
 Also please keep in mind that this bot works to serve a specific community on Telegram, if you are unsure of what needs to be done you can [join the group](#title) or read the [todo section](#todo).
 
 ## Todo <a id="todo"></a>
@@ -30,8 +31,6 @@ Also please keep in mind that this bot works to serve a specific community on Te
 The bot is currently running on [an older version](https://github.com/rt2013G/YugiohHelper) that I've written almost a year ago. \
 This version is not 100% working yet, here is a list of things that needs to be done before the first deployment:
 
-- Set up CI/CD
-- Fix the announce command to send announces in batches, the same way as the logging works
 - Create an API to retrieve community analytics (and display them on this repo)
 - Add support for auctions, claims and other important group features
 - A plethora of other minor tweaks and fixes that I've written down in my personal todo list

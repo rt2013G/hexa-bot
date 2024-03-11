@@ -4,7 +4,9 @@ from datetime import datetime
 
 
 def load_configs() -> dict:
-    path = "app/static/config.json"
+    path = "app/static/deployment_config.json"
+    if not os.path.exists(os.path.abspath(path)):
+        path = "app/static/debug_config.json"
     with open(os.path.abspath(path), "r") as f:
         return dict(json.load(f))
 
