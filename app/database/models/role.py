@@ -89,6 +89,11 @@ def get_roles_for_user(user_id: int) -> list[Role]:
                 print(err)
             roles = []
             for record in cur.fetchall():
-                roles.append(record[0].decode("utf-8"))
+                value: str = record[0]
+                try:
+                    value = record[0].decode("utf-8")
+                except AttributeError:
+                    pass
+                roles.append(value)
             conn.close()
             return roles

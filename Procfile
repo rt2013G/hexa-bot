@@ -1,0 +1,1 @@
+web: python3 hexa_bot.py debug

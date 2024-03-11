@@ -5,15 +5,15 @@ from dotenv import load_dotenv
 from telegram import LinkPreviewOptions
 from telegram.ext import Defaults
 
-from src import config as cfg
-from src.components import Bot, BotParameters
-from src.database.models.base import create_database
-from src.handlers import handlers
-from src.logger import set_up_logger
+from app import Bot, BotParameters
+from app import config as cfg
+from app.database.models.base import create_database
+from app.handlers import handlers
+from app.logger import set_up_logger
 
 
 def main() -> None:
-    if not len(sys.argv) == 2:
+    if len(sys.argv) != 2:
         print("error. usage: python hexa_bot.py <mode>")
         sys.exit(0)
 
@@ -37,7 +37,7 @@ def main() -> None:
         defaults=Defaults(link_preview_options=LinkPreviewOptions(is_disabled=True)),
     )
     bot = Bot(parameters=params)
-    bot.run()
+    bot.run("polling")
 
 
 if __name__ == "__main__":

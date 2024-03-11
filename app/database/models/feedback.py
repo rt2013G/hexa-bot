@@ -10,7 +10,10 @@ class Feedback:
         self.id: int = feedback_data[0]
         self.seller_id: int = feedback_data[1]
         self.buyer_id: int = feedback_data[2]
-        self.contents: str = feedback_data[3].decode("utf-8")
+        try:
+            self.contents: str = feedback_data[3].decode("utf-8")
+        except AttributeError:
+            self.contents: str = feedback_data[3]
         self.date: datetime = feedback_data[4]
 
 
