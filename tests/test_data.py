@@ -1,11 +1,11 @@
 from dotenv import load_dotenv
 
-from app import config as cfg
+from app.config import get_default_post_datetime
 from app.database import User, update_user_info, update_user_post_dates
 from app.database.models.base import create_database, get_connection
 from app.database.models.user import insert_user
 
-default_time = cfg.get_default_post_datetime()
+default_time = get_default_post_datetime()
 mock_users = [
     User((1, None, None, b"test11", default_time, default_time)),
     User((2, b"test2", None, None, default_time, default_time)),
@@ -16,8 +16,7 @@ mock_users = [
 
 def start_test_database():
     load_dotenv()
-    cfg.GLOBAL_CONFIGS = cfg.load_configs()
-    create_database(cfg.get_roles())
+    create_database()
     for mock_user in mock_users:
         insert_user(
             mock_user.id,
@@ -53,6 +52,6 @@ def reset_users() -> None:
         )
         update_user_post_dates(
             mock_user.id,
-            cfg.get_default_post_datetime(),
-            cfg.get_default_post_datetime(),
+            get_default_post_datetime(),
+            get_default_post_datetime(),
         )

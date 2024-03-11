@@ -2,6 +2,8 @@ import os
 
 import psycopg
 
+from app.constants import Roles
+
 
 def get_connection(
     host: str | None = None,
@@ -25,7 +27,7 @@ def get_connection(
     )
 
 
-def create_database(roles: list[str]) -> None:
+def create_database() -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -108,6 +110,7 @@ def create_database(roles: list[str]) -> None:
                 );
                 """
             )
+            roles = {Roles.ADMIN, Roles.SELLER, Roles.SCAMMER, Roles.JUDGE}
             for role in roles:
                 cur.execute(
                     """

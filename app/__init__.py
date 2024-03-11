@@ -45,7 +45,7 @@ class Bot:
     ) -> None:
         if mode == "polling":
             self.application.run_polling(drop_pending_updates=True)
-        elif mode == "webhook":
+        if mode == "webhook":
             self.application.run_webhook(
                 # trunk-ignore(bandit/B104)
                 listen="0.0.0.0",

@@ -5,20 +5,11 @@ from datetime import datetime
 from telegram import Message, ReactionTypeEmoji, Update
 from telegram.constants import ReactionEmoji
 from telegram.error import Forbidden, TimedOut
-from telegram.ext import (
-    CommandHandler,
-    ContextTypes,
-    ConversationHandler,
-    MessageHandler,
-    filters,
-)
+from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
+                          MessageHandler, filters)
 
-from app.card_search import (
-    CardDataEntry,
-    get_bytes_from_image,
-    get_card_data,
-    get_cropped_image,
-)
+from app.card_search import (CardDataEntry, get_bytes_from_image,
+                             get_card_data, get_cropped_image)
 from app.database import insert_guess_game_scores
 from app.filters import AdminFilter, MainGroupFilter
 from app.utils import get_random_card_name, get_rankings_message_from_scores
@@ -185,7 +176,7 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         game_state_data.users_scores[user_id] += score_gained
     score_text_display = "punti" if score_gained > 1 else "punto"
     await update.message.reply_text(
-        text=f'"{guess_word}" è corretto! Ti sei aggiudicato {score_gained} {score_text_display}!'
+        text=f'"{game_state_data.card_to_guess_name}" è corretto! Ti sei aggiudicato {score_gained} {score_text_display}!'
     )
 
     if len(game_state_data.guessed_cards) >= 10:

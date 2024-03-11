@@ -3,13 +3,16 @@ import os
 import random
 from datetime import datetime
 
-from app.config import get_bot_username, get_max_username_length
+import requests
+
+from app.config import get_bot_username
 from app.database import User, get_user
 
 
 def get_user_from_message_command(message_text: str, command_text: str) -> User | None:
     msg = clean_command_text(message_text, command_text)
-    if len(msg) > 1 + get_max_username_length():
+    MAX_USERNAME_LENGTH = 32
+    if len(msg) > 1 + MAX_USERNAME_LENGTH:
         return None
 
     if "@" in msg:
@@ -102,10 +105,20 @@ def has_sent_buy_post_today(user_id: int) -> bool:
     return True if user.last_buy_post.date() == datetime.today().date() else False
 
 
+def load_card_name_db() -> None:
+    path = "app/static/card_names.json"
+    if not os.path.exists(os.path.abspath(path)):
+        CARD_NAME_URL = "https://db.ygorganization.com/data/idx/card/name/en"
+        response = requests.get(CARD_NAME_URL, timeout=10)
+        response_json = json.loads(response.content)
+        with open(os.path.abspath(path), "w") as f:
+            json.dump(response_json, f)
+
+
 def get_random_card_name() -> str:
-    path = "configs/card_names.json"
+    path = "app/static/card_names.json"
     card_database: dict[str, list[int]]
-    with open(os.path.abspath(path)) as f:
+    with open(os.path.abspath(path), "r") as f:
         card_database = dict(json.load(f))
 
     # trunk-ignore(bandit/B311)

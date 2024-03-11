@@ -1,13 +1,9 @@
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
-from telegram.ext import (
-    CommandHandler,
-    ContextTypes,
-    ConversationHandler,
-    MessageHandler,
-    filters,
-)
+from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
+                          MessageHandler, filters)
 
 from app.config import get_approval_id
+from app.constants import Roles
 from app.database import has_role
 from app.utils import get_auth_code_from_id
 
@@ -59,7 +55,7 @@ async def auth_seller_handler(
         return ConversationHandler.END
 
     user_id = update.message.from_user.id
-    if has_role(user_id, "seller"):
+    if has_role(user_id, Roles.SELLER):
         await update.message.reply_text(
             "Sei già un venditore.", reply_markup=ReplyKeyboardRemove()
         )

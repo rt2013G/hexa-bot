@@ -1,7 +1,7 @@
 run:
-	@python hexa_bot.py deploy
-debug:
-	@python hexa_bot.py debug
+	@python hexa_bot.py
+webhook:
+	@python hexa_bot.py webhook
 req:
 	@pip freeze > requirements.txt
 test:

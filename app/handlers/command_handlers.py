@@ -3,24 +3,17 @@ import logging
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
-from app.card_search import (
-    CardDataEntry,
-    get_bytes_from_image,
-    get_cached_card_name,
-    get_card_data,
-)
+from app.card_search import (CardDataEntry, get_bytes_from_image,
+                             get_cached_card_name, get_card_data)
 from app.config import get_market_group_link
+from app.constants import Roles
 from app.database import User, get_top_guess_game_users, get_user, has_role
 from app.database.models.feedback import get_feedbacks
 from app.filters import AdminFilter, MainGroupFilter, MarketGroupFilter
 from app.logger import with_logging
-from app.utils import (
-    clean_command_text,
-    get_rankings_message_from_scores,
-    get_user_from_message_command,
-    has_sent_buy_post_today,
-    has_sent_sell_post_today,
-)
+from app.utils import (clean_command_text, get_rankings_message_from_scores,
+                       get_user_from_message_command, has_sent_buy_post_today,
+                       has_sent_sell_post_today)
 
 
 def get_command_handlers() -> list:
@@ -106,7 +99,7 @@ async def check_seller_handler(
             reply_markup=ReplyKeyboardRemove(),
         )
         return
-    if has_role(user.id, "seller"):
+    if has_role(user.id, Roles.SELLER):
         await context.bot.send_message(
             update.message.chat.id,
             "L'utente è un venditore!",
@@ -158,7 +151,7 @@ async def check_posts_handler(
             reply_markup=ReplyKeyboardRemove(),
         )
         return
-    if not has_role(user.id, "seller"):
+    if not has_role(user.id, Roles.SELLER):
         await context.bot.send_message(
             update.message.chat.id,
             "L'utente NON è un venditore!",
@@ -208,7 +201,7 @@ async def feedback_list_handler(
             reply_markup=ReplyKeyboardRemove(),
         )
         return
-    if not has_role(seller.id, "seller"):
+    if not has_role(seller.id, Roles.SELLER):
         await context.bot.send_message(
             update.message.from_user.id,
             "L'utente non è un venditore!",

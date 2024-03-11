@@ -22,7 +22,7 @@ class IdEntry:
 
 @dataclass
 class RolesEntry:
-    roles: list[Role]
+    roles: set[Role]
     time: datetime
 
 
@@ -59,9 +59,9 @@ def insert_into_username_cache(username: str, id: int) -> None:
 def insert_into_roles_cache(id: int, role_name: Role) -> None:
     value: RolesEntry = CACHE.cached_roles.get(id)
     if value is None:
-        CACHE.cached_roles[id] = RolesEntry(roles=[role_name], time=datetime.now())
-    elif role_name not in CACHE.cached_roles[id].roles:
-        CACHE.cached_roles[id].roles.append(role_name)
+        CACHE.cached_roles[id] = RolesEntry(roles={role_name}, time=datetime.now())
+    else:
+        CACHE.cached_roles[id].roles.add(role_name)
         CACHE.cached_roles[id].time = datetime.now()
 
 

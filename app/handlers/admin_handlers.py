@@ -3,13 +3,9 @@ import sys
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
-from app.database import (
-    add_role_to_user,
-    has_role,
-    remove_role_from_user,
-    reset_user_buy_post,
-    reset_user_sell_post,
-)
+from app.constants import Roles
+from app.database import (add_role_to_user, has_role, remove_role_from_user,
+                          reset_user_buy_post, reset_user_sell_post)
 from app.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
 from app.logger import with_logging
 from app.utils import get_user_from_message_command
@@ -49,13 +45,13 @@ async def make_seller_handler(
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if has_role(user.id, "seller"):
+    if has_role(user.id, Roles.SELLER):
         await update.message.reply_text(
             "Utente già venditore!", reply_markup=ReplyKeyboardRemove()
         )
         return
 
-    add_role_to_user(id=user.id, role_name="seller")
+    add_role_to_user(id=user.id, role_name=Roles.SELLER)
     await update.message.reply_text(
         "Utente approvato come venditore!", reply_markup=ReplyKeyboardRemove()
     )
@@ -76,13 +72,13 @@ async def remove_seller_handler(
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if not has_role(user.id, "seller"):
+    if not has_role(user.id, Roles.SELLER):
         await update.message.reply_text(
             "L'utente non è un venditore!", reply_markup=ReplyKeyboardRemove()
         )
         return
 
-    remove_role_from_user(id=user.id, role_name="seller")
+    remove_role_from_user(id=user.id, role_name=Roles.SELLER)
     await update.message.reply_text(
         "L'utente non è più un venditore!", reply_markup=ReplyKeyboardRemove()
     )
@@ -104,7 +100,7 @@ async def reject_seller_handler(
         )
         return
 
-    if has_role(user.id, "seller"):
+    if has_role(user.id, Roles.SELLER):
         await update.message.reply_text(
             "L'utente è già un venditore! Per rimuoverlo usa il comando /removeseller",
             reply_markup=ReplyKeyboardRemove(),
@@ -133,13 +129,13 @@ async def make_scammer_handler(
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if has_role(user.id, "scammer"):
+    if has_role(user.id, Roles.SCAMMER):
         await update.message.reply_text(
             "Utente già nella lista scammer!", reply_markup=ReplyKeyboardRemove()
         )
         return
 
-    add_role_to_user(id=user.id, role_name="scammer")
+    add_role_to_user(id=user.id, role_name=Roles.SCAMMER)
     await update.message.reply_text(
         "Utente inserito nella lista scammer!", reply_markup=ReplyKeyboardRemove()
     )
@@ -155,13 +151,13 @@ async def remove_scammer_handler(
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if not has_role(user.id, "scammer"):
+    if not has_role(user.id, Roles.SCAMMER):
         await update.message.reply_text(
             "L'utente non è nella lista scammer!", reply_markup=ReplyKeyboardRemove()
         )
         return
 
-    remove_role_from_user(id=user.id, role_name="scammer")
+    remove_role_from_user(id=user.id, role_name=Roles.SCAMMER)
     await update.message.reply_text(
         "L'utente non è più nella lista scammer!", reply_markup=ReplyKeyboardRemove()
     )
@@ -183,7 +179,7 @@ async def reset_date_handler(
         )
         return
 
-    if not has_role(user.id, "seller"):
+    if not has_role(user.id, Roles.SELLER):
         await update.message.reply_text(
             "L'utente non è un venditore!", reply_markup=ReplyKeyboardRemove()
         )
@@ -244,13 +240,13 @@ async def make_admin_handler(
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if has_role(user.id, "admin"):
+    if has_role(user.id, Roles.ADMIN):
         await update.message.reply_text(
             "Utente già admin!", reply_markup=ReplyKeyboardRemove()
         )
         return
 
-    add_role_to_user(id=user.id, role_name="admin")
+    add_role_to_user(id=user.id, role_name=Roles.ADMIN)
     await update.message.reply_text(
         "Utente aggiunto come admin!", reply_markup=ReplyKeyboardRemove()
     )
@@ -266,13 +262,13 @@ async def remove_admin_handler(
             "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
         )
         return
-    if not has_role(user.id, "admin"):
+    if not has_role(user.id, Roles.ADMIN):
         await update.message.reply_text(
             "L'utente non è admin!", reply_markup=ReplyKeyboardRemove()
         )
         return
 
-    remove_role_from_user(id=user.id, role_name="admin")
+    remove_role_from_user(id=user.id, role_name=Roles.ADMIN)
     await update.message.reply_text(
         "L'utente non è più admin!", reply_markup=ReplyKeyboardRemove()
     )
