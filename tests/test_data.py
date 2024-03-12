@@ -15,7 +15,7 @@ mock_users = [
 
 
 def start_test_database():
-    load_dotenv()
+    load_dotenv(override=True)
     create_database()
     for mock_user in mock_users:
         insert_user(

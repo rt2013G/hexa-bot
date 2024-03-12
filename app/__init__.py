@@ -1,3 +1,4 @@
+import logging
 import os
 from dataclasses import dataclass
 from typing import Literal
@@ -44,8 +45,10 @@ class Bot:
         webhook_url: str | None = None,
     ) -> None:
         if mode == "polling":
+            logging.log(logging.INFO, "Application started in polling mode...")
             self.application.run_polling(drop_pending_updates=True)
-        if mode == "webhook":
+        elif mode == "webhook":
+            logging.log(logging.INFO, "Application started in webhook mode...")
             self.application.run_webhook(
                 # trunk-ignore(bandit/B104)
                 listen="0.0.0.0",

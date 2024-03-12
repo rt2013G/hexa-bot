@@ -1,12 +1,19 @@
 import json
+import logging
 import os
+import sys
 from datetime import datetime
 
 
 def load_configs() -> dict:
-    path = "app/static/deployment_config.json"
+    debug = True if len(sys.argv) >= 3 and sys.argv[2] == "debug" else False
+    path = (
+        "app/static/debug_config.json" if debug else "app/static/deployment_config.json"
+    )
     if not os.path.exists(os.path.abspath(path)):
-        path = "app/static/debug_config.json"
+        logging.log(
+            logging.ERROR, "Error. Configuration file not present in app/static."
+        )
     with open(os.path.abspath(path), "r") as f:
         return dict(json.load(f))
 

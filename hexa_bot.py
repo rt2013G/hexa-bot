@@ -13,11 +13,11 @@ from app.utils import load_card_name_db
 
 
 def main() -> None:
-    if len(sys.argv) > 2:
-        print("error. usage: python hexa_bot.py <mode>")
+    if len(sys.argv) > 3:
+        print("error. usage: python hexa_bot.py [webhook] [debug]")
         sys.exit(0)
 
-    load_dotenv()
+    load_dotenv(override=True)
     set_up_logger()
     create_database()
     load_card_name_db()
@@ -33,7 +33,7 @@ def main() -> None:
         defaults=Defaults(link_preview_options=LinkPreviewOptions(is_disabled=True)),
     )
     bot = Bot(parameters=params)
-    mode = "webhook" if len(sys.argv) == 2 and sys.argv[1] == "webhook" else "polling"
+    mode = "webhook" if len(sys.argv) >= 2 and sys.argv[1] == "webhook" else "polling"
     bot.run(
         mode=mode,
         webhook_secret=os.getenv("WEBHOOK_SECRET"),

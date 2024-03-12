@@ -1,5 +1,5 @@
-run:
-	@python hexa_bot.py
+debug:
+	@python hexa_bot.py polling debug
 webhook:
 	@python hexa_bot.py webhook
 req:

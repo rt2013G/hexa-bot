@@ -265,4 +265,5 @@ async def guess_game_rankings_handler(
     await context.bot.send_message(
         chat_id=update.message.chat.id,
         text=f"Classifica dei primi {length} giocatori:\n{rankings_message}",
+        disable_notification=True,
     )
