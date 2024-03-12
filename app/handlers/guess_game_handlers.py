@@ -5,13 +5,22 @@ from datetime import datetime
 from telegram import Message, ReactionTypeEmoji, Update
 from telegram.constants import ReactionEmoji
 from telegram.error import Forbidden, TimedOut
-from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
-                          MessageHandler, filters)
+from telegram.ext import (
+    CommandHandler,
+    ContextTypes,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
 
-from app.card_search import (CardDataEntry, get_bytes_from_image,
-                             get_card_data, get_cropped_image)
+from app.card_search import (
+    CardDataEntry,
+    get_bytes_from_image,
+    get_card_data,
+    get_cropped_image,
+)
 from app.database import insert_guess_game_scores
-from app.filters import AdminFilter, MainGroupFilter
+from app.filters import AdminFilter
 from app.utils import get_random_card_name, get_rankings_message_from_scores
 
 
@@ -35,20 +44,24 @@ def get_guess_game_conv_handler() -> list:
         ConversationHandler(
             entry_points=[
                 CommandHandler(
-                    "guessthecard", guess_the_card_handler, MainGroupFilter()
+                    "guessthecard",
+                    guess_the_card_handler,
+                    filters.ChatType.GROUPS & AdminFilter(),
                 )
             ],
             states={
                 GUESSING: [
                     MessageHandler(
-                        ~filters.COMMAND & filters.TEXT & MainGroupFilter(),
+                        ~filters.COMMAND & filters.TEXT & filters.ChatType.GROUPS,
                         guess_handler,
                     )
                 ],
             },
             fallbacks=[
                 CommandHandler(
-                    "stopgame", stop_game_handler, MainGroupFilter() & AdminFilter()
+                    "stopgame",
+                    stop_game_handler,
+                    filters.ChatType.GROUPS & AdminFilter(),
                 ),
             ],
             per_chat=True,
@@ -87,7 +100,7 @@ async def guess_the_card_handler(
     context.job_queue.run_repeating(
         callback=send_card_job,
         interval=15,
-        first=1,
+        first=15,
         data=game_state_data,
         name=str(chat_id),
     )

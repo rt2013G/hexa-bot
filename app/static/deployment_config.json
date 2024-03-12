@@ -1,0 +1,19 @@
+{
+    "bot_username": "@yugiohmainbot",
+    "debug_user_id": "136539798",
+    "global_variables": {
+        "max_card_data_cache_size": 100
+    },
+    "links": {
+        "market_group_link": "https://t.me/joinchat/CCNulkgtmbNoWoKtKEqd0A"
+    },
+    "group_info": {
+        "main_id": "-1001377358001",
+        "market_id": "-1001210948019",
+        "approval_id": "-1001815402035"
+    },
+    "channel_info": {
+        "feedback_id": "-1001239472981",
+        "logging_id": "-1001927891036"
+    }
+}

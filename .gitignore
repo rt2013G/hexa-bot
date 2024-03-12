@@ -1,5 +1,6 @@
 todo
 app/static/card_names.json
+migrations/data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
