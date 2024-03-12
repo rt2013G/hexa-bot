@@ -21,9 +21,9 @@ hexa-bot is currently focused on admin-side utilities, but there are also some n
 
 ## Contributing
 
-If you have experience with Python and the [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) library, you are free to clone the repo and submit a pull request. The only things you need are a bot token obtained via @botfather, a debug_config.json file in app/static folder, which should contain various informations about the testing environment (bot username, groups, etc..) and a Postgres database.
+If you have experience with Python and the [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) library, you are free to clone the repo and submit a pull request. The only things you need are a bot token obtained via @botfather, a debug_config.json file in the app/static folder, which should contain various informations about the testing environment (bot username, groups, etc..) and a Postgres database.
 
-Please note that for linting and formatting I'm using \_trunk\*, you can find the configuration files in this repo.
+Please note that for linting and formatting I'm using _trunk_, you can find the configuration files in this repo.
 Also please keep in mind that this bot works to serve a specific community on Telegram, if you are unsure of what needs to be done you can [join the group](#title) or read the [todo section](#todo).
 
 ## Todo <a id="todo"></a>

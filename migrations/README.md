@@ -4,4 +4,4 @@ This folder contains the migrations script used to migrate the database, the nam
 
 ## Version 1.0
 
-Shifted from a json database to a postgres database.
+Shifted from an old json database to a postgres database, inserted all users with their roles and feedbacks.

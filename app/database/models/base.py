@@ -34,7 +34,7 @@ def create_database() -> None:
                 """
                 CREATE TABLE IF NOT EXISTS users(
                     id NUMERIC PRIMARY KEY,
-                    username VARCHAR(33),
+                    username VARCHAR(32),
                     first_name TEXT,
                     last_name TEXT,
                     last_buy_post TIMESTAMP,

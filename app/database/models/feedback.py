@@ -60,3 +60,22 @@ def get_feedbacks(seller_id: int, size=10) -> list[Feedback]:
                 feedbacks.append(Feedback(record))
             conn.close()
             return feedbacks
+
+
+def get_feedback_count(seller_id: int) -> int:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM feedback
+                    WHERE seller_id=%s;
+                """,
+                    (seller_id,),
+                )
+            except psycopg.Error as err:
+                print(err)
+            record = cur.fetchone()
+            conn.close()
+            return int(record[0])

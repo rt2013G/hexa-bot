@@ -18,6 +18,14 @@ def main() -> None:
         sys.exit(0)
 
     load_dotenv(override=True)
+
+    if len(sys.argv) == 2 and sys.argv[1] == "migrate":
+        from migrations import upgrade
+
+        upgrade()
+        print("Migration completed.")
+        sys.exit(0)
+
     set_up_logger()
     create_database()
     load_card_name_db()

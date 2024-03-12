@@ -8,7 +8,7 @@ from app.card_search import (CardDataEntry, get_bytes_from_image,
 from app.config import get_market_group_link
 from app.constants import Roles
 from app.database import User, get_top_guess_game_users, get_user, has_role
-from app.database.models.feedback import get_feedbacks
+from app.database.models.feedback import get_feedback_count, get_feedbacks
 from app.filters import AdminFilter, MainGroupFilter, MarketGroupFilter
 from app.logger import with_logging
 from app.utils import (clean_command_text, get_rankings_message_from_scores,
@@ -217,12 +217,6 @@ async def feedback_list_handler(
             reply_markup=ReplyKeyboardRemove(),
         )
         return
-
-    await context.bot.send_message(
-        update.message.from_user.id,
-        f"L'utente @{seller.username} ha {len(feedbacks)} feedback, eccone alcuni:",
-        reply_markup=ReplyKeyboardRemove(),
-    )
     for feedback in feedbacks:
         buyer: User | None = get_user(id=feedback.buyer_id)
         if buyer is None:
@@ -245,6 +239,13 @@ async def feedback_list_handler(
             f'"{feedback.contents}"',
             reply_markup=ReplyKeyboardRemove(),
         )
+
+    total_feedback_count = get_feedback_count(seller_id=seller.id)
+    await context.bot.send_message(
+        update.message.from_user.id,
+        f"L'utente @{seller.username} ha {total_feedback_count} feedback in totale, eccone alcuni 👆👆",
+        reply_markup=ReplyKeyboardRemove(),
+    )
 
 
 async def guess_game_rankings_handler(

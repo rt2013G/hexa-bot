@@ -2,6 +2,8 @@ debug:
 	@python hexa_bot.py polling debug
 webhook:
 	@python hexa_bot.py webhook
+migrate:
+	@python hexa_bot.py migrate
 req:
 	@pip freeze > requirements.txt
 test:
