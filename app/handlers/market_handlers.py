@@ -63,6 +63,8 @@ async def market_media_group_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
     message = update.message
+    if message is None:
+        return
     media_type = effective_message_type(message)
     media_id = (
         message.photo[-1].file_id
@@ -90,7 +92,7 @@ async def market_media_group_handler(
 async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     media_group: list = []
     data: list[MediaGroupMediaData] = context.job.data
-    post_type: Literal["buy", "sell", "invalid"]
+    post_type: Literal["buy", "sell", "invalid"] = "invalid"
     user = get_user(id=data[-1].media_msg.from_user.id)
     if user is None:
         for media in data:

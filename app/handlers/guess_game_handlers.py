@@ -150,9 +150,9 @@ async def send_card_job(context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> object:
-    if update.message is None or (
-        update.message.reply_to_message is None
-        or update.message.reply_to_message.from_user.is_bot is False
+    if (
+        update.message is None
+        or update.message.reply_to_message is None
         or update.message.reply_to_message.from_user.id != context.bot.id
     ):
         return GUESSING
@@ -189,6 +189,7 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
     else:
         game_state_data.users_scores[user_id] += score_gained
     score_text_display = "punti" if score_gained > 1 else "punto"
+    await update.message.set_reaction(reaction=ReactionTypeEmoji(ReactionEmoji.FIRE))
     await update.message.reply_text(
         text=f'"{game_state_data.card_to_guess_name}" è corretto! Ti sei aggiudicato {score_gained} {score_text_display}!'
     )
