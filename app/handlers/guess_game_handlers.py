@@ -5,21 +5,12 @@ from datetime import datetime
 from telegram import Message, ReactionTypeEmoji, Update
 from telegram.constants import ReactionEmoji
 from telegram.error import BadRequest, Forbidden, TimedOut
-from telegram.ext import (
-    CommandHandler,
-    ContextTypes,
-    ConversationHandler,
-    MessageHandler,
-    filters,
-)
+from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
+                          MessageHandler, filters)
 
-from app.card_search import (
-    CardDataEntry,
-    get_bytes_from_image,
-    get_cached_card_name,
-    get_card_data,
-    get_cropped_image,
-)
+from app.card_search import (CardDataEntry, get_bytes_from_image,
+                             get_cached_card_name, get_card_data,
+                             get_cropped_image)
 from app.database import insert_guess_game_scores
 from app.filters import ModeratorFilter
 from app.utils import get_random_card_name, get_rankings_message_from_scores
@@ -105,7 +96,11 @@ async def guess_the_card_handler(
 
 async def send_card_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     data: GameStateData = context.job.data
-    while data.card_to_guess_data is None or len(data.card_to_guess_name) == 0:
+    while (
+        data.card_to_guess_data is None
+        or data.card_to_guess_name is None
+        or len(data.card_to_guess_name) == 0
+    ):
         data.card_to_guess_name = get_random_card_name()
         data.card_to_guess_data = get_card_data(data.card_to_guess_name)
     data.card_to_guess_name = get_cached_card_name(data.card_to_guess_name)
