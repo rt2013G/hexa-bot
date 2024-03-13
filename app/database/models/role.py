@@ -5,7 +5,7 @@ import psycopg
 from .base import get_connection
 from .user import User
 
-type Role = Literal["admin", "seller", "scammer", "judge"]
+type Role = Literal["admin", "seller", "scammer", "judge", "moderator"]
 
 def make_role(user_id: int, role_name: Role) -> None:
     with get_connection() as conn:

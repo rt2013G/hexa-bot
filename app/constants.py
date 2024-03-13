@@ -3,3 +3,4 @@ class Roles:
     SELLER = "seller"
     SCAMMER = "scammer"
     JUDGE = "judge"
+    MODERATOR = "moderator"

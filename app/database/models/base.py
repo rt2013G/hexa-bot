@@ -110,7 +110,13 @@ def create_database() -> None:
                 );
                 """
             )
-            roles = {Roles.ADMIN, Roles.SELLER, Roles.SCAMMER, Roles.JUDGE}
+            roles = {
+                Roles.ADMIN,
+                Roles.SELLER,
+                Roles.SCAMMER,
+                Roles.JUDGE,
+                Roles.MODERATOR,
+            }
             for role in roles:
                 cur.execute(
                     """

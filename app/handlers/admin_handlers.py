@@ -30,6 +30,12 @@ def get_admin_handlers() -> list:
         CommandHandler("makeadmin", make_admin_handler, DebugUserFilter()),
         CommandHandler("removeadmin", remove_admin_handler, DebugUserFilter()),
         CommandHandler(
+            "makemod", make_moderator_handler, DebugUserFilter() | AdminFilter()
+        ),
+        CommandHandler(
+            "removemod", remove_moderator_handler, DebugUserFilter() | AdminFilter()
+        ),
+        CommandHandler(
             "shutdown", shutdown_handler, DebugUserFilter() & filters.ChatType.PRIVATE
         ),
     ]
@@ -271,6 +277,50 @@ async def remove_admin_handler(
     remove_role_from_user(id=user.id, role_name=Roles.ADMIN)
     await update.message.reply_text(
         "L'utente non è più admin!", reply_markup=ReplyKeyboardRemove()
+    )
+
+
+@with_logging
+async def make_moderator_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    user = get_user_from_message_command(update.message.text, "/makemod")
+    if user is None:
+        await update.message.reply_text(
+            "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
+        )
+        return
+    if has_role(user.id, Roles.MODERATOR):
+        await update.message.reply_text(
+            "Utente già moderator!", reply_markup=ReplyKeyboardRemove()
+        )
+        return
+
+    add_role_to_user(id=user.id, role_name=Roles.MODERATOR)
+    await update.message.reply_text(
+        "Utente aggiunto come moderatore!", reply_markup=ReplyKeyboardRemove()
+    )
+
+
+@with_logging
+async def remove_moderator_handler(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    user = get_user_from_message_command(update.message.text, "/removemod")
+    if user is None:
+        await update.message.reply_text(
+            "Utente non trovato!", reply_markup=ReplyKeyboardRemove()
+        )
+        return
+    if not has_role(user.id, Roles.MODERATOR):
+        await update.message.reply_text(
+            "L'utente non è moderatore!", reply_markup=ReplyKeyboardRemove()
+        )
+        return
+
+    remove_role_from_user(id=user.id, role_name=Roles.MODERATOR)
+    await update.message.reply_text(
+        "L'utente non è più moderatore!", reply_markup=ReplyKeyboardRemove()
     )
 
 

@@ -20,7 +20,7 @@ from app.card_search import (
     get_cropped_image,
 )
 from app.database import insert_guess_game_scores
-from app.filters import AdminFilter
+from app.filters import ModeratorFilter
 from app.utils import get_random_card_name, get_rankings_message_from_scores
 
 
@@ -46,7 +46,7 @@ def get_guess_game_conv_handler() -> list:
                 CommandHandler(
                     "guessthecard",
                     guess_the_card_handler,
-                    filters.ChatType.GROUPS & AdminFilter(),
+                    filters.ChatType.GROUPS & ModeratorFilter(),
                 )
             ],
             states={
@@ -61,7 +61,7 @@ def get_guess_game_conv_handler() -> list:
                 CommandHandler(
                     "stopgame",
                     stop_game_handler,
-                    filters.ChatType.GROUPS & AdminFilter(),
+                    filters.ChatType.GROUPS & ModeratorFilter(),
                 ),
             ],
             per_chat=True,
@@ -178,6 +178,7 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         await update.message.set_reaction(
             reaction=ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN)
         )
+        game_state_data.messages_to_delete.append(update.message)
         return GUESSING
 
     game_state_data.guessed_cards.append(game_state_data.card_to_guess_name)
