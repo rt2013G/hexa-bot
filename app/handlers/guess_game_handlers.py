@@ -4,21 +4,12 @@ from datetime import datetime
 
 from telegram import Message, ReactionTypeEmoji, Update
 from telegram.constants import ReactionEmoji
-from telegram.error import Forbidden, TimedOut
-from telegram.ext import (
-    CommandHandler,
-    ContextTypes,
-    ConversationHandler,
-    MessageHandler,
-    filters,
-)
+from telegram.error import BadRequest, Forbidden, TimedOut
+from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
+                          MessageHandler, filters)
 
-from app.card_search import (
-    CardDataEntry,
-    get_bytes_from_image,
-    get_card_data,
-    get_cropped_image,
-)
+from app.card_search import (CardDataEntry, get_bytes_from_image,
+                             get_card_data, get_cropped_image)
 from app.database import insert_guess_game_scores
 from app.filters import ModeratorFilter
 from app.utils import get_random_card_name, get_rankings_message_from_scores
@@ -171,6 +162,7 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         return GUESSING
     job = jobs[0]
     game_state_data: GameStateData = job.data
+    game_state_data.messages_to_delete.append(update.message)
 
     user_id = update.message.from_user.id
     guess_data = get_card_data(guess_word)
@@ -178,7 +170,6 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         await update.message.set_reaction(
             reaction=ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN)
         )
-        game_state_data.messages_to_delete.append(update.message)
         return GUESSING
 
     game_state_data.guessed_cards.append(game_state_data.card_to_guess_name)
@@ -237,9 +228,10 @@ async def chat_cleaner_job(context: ContextTypes.DEFAULT_TYPE) -> None:
         timed_out = False
         try:
             await message.delete()
-        except (TimedOut, Forbidden):
+        except TimedOut:
             timed_out = True
-
+        except (Forbidden, BadRequest):
+            pass
         if not timed_out:
             data.messages_to_delete.remove(message)
     if len(data.messages_to_delete) <= 0:

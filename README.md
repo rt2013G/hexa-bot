@@ -28,9 +28,17 @@ Also please keep in mind that this bot works to serve a specific community on Te
 
 ## Todo <a id="todo"></a>
 
-The bot is currently running on [an older version](https://github.com/rt2013G/YugiohHelper) that I've written almost a year ago. \
-This version is not 100% working yet, here is a list of things that needs to be done before the first deployment:
+The bot has been deployed and is currently running at @yugiohmainbot, but I'm still working on improving existing code and adding new features. \
+Here is a list of various things that I'm planning on doing:
 
 - Create an API to retrieve community analytics (and display them on this repo)
 - Add support for auctions, claims and other important group features
+- Add features for the judge role which is currently not used
+- Improve on the existing guess the card game by checking answers with a better method
+- Add caching to the feedback command
+- Use a better way to check if a post is a sell post or buy post, or neither
+- Add more roles and different permissions to roles, check the permissions instead of the roles
+- Export most bot messages into a configuration file or into app/constants.py instead of hard coding them
+- Add more games and events for the community
+- Build a userbot with another library to test the handlers
 - A plethora of other minor tweaks and fixes that I've written down in my personal todo list

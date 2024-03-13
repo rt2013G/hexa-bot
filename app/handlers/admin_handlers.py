@@ -4,8 +4,13 @@ from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
 from app.constants import Roles
-from app.database import (add_role_to_user, has_role, remove_role_from_user,
-                          reset_user_buy_post, reset_user_sell_post)
+from app.database import (
+    add_role_to_user,
+    has_role,
+    remove_role_from_user,
+    reset_user_buy_post,
+    reset_user_sell_post,
+)
 from app.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
 from app.logger import with_logging
 from app.utils import get_user_from_message_command
@@ -292,7 +297,7 @@ async def make_moderator_handler(
         return
     if has_role(user.id, Roles.MODERATOR):
         await update.message.reply_text(
-            "Utente già moderator!", reply_markup=ReplyKeyboardRemove()
+            "Utente già moderatore!", reply_markup=ReplyKeyboardRemove()
         )
         return
 
