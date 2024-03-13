@@ -10,8 +10,8 @@ from telegram.helpers import effective_message_type
 from app.config import get_feedback_channel_id
 from app.database import get_user, has_role, update_user_post_dates
 from app.database.models.feedback import insert_feedback
-from app.filters import (AdminFilter, FeedbackFilter, MarketGroupFilter,
-                         MediaGroupFilter)
+from app.filters import (AdminFilter, DebugUserFilter, FeedbackFilter,
+                         MarketGroupFilter, MediaGroupFilter)
 from app.utils import (get_user_from_text, has_sent_buy_post_today,
                        has_sent_sell_post_today, is_buy_post, is_sell_post)
 
@@ -37,7 +37,8 @@ def get_market_handlers() -> list:
             ~filters.COMMAND
             & MarketGroupFilter()
             & ~MediaGroupFilter()
-            & FeedbackFilter(),
+            & FeedbackFilter()
+            & ~DebugUserFilter(),
             feedback_msg_handler,
         ),
     ]
