@@ -5,11 +5,21 @@ from datetime import datetime
 from telegram import Message, ReactionTypeEmoji, Update
 from telegram.constants import ReactionEmoji
 from telegram.error import BadRequest, Forbidden, TimedOut
-from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
-                          MessageHandler, filters)
+from telegram.ext import (
+    CommandHandler,
+    ContextTypes,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
 
-from app.card_search import (CardDataEntry, get_bytes_from_image,
-                             get_card_data, get_cropped_image)
+from app.card_search import (
+    CardDataEntry,
+    get_bytes_from_image,
+    get_cached_card_name,
+    get_card_data,
+    get_cropped_image,
+)
 from app.database import insert_guess_game_scores
 from app.filters import ModeratorFilter
 from app.utils import get_random_card_name, get_rankings_message_from_scores
@@ -23,7 +33,7 @@ class GameStateData:
     guessed_cards: list[str]
     messages_to_delete: list[Message]
     card_to_guess_name: str
-    card_to_guess_data: CardDataEntry
+    card_to_guess_data: CardDataEntry | None
     crop_level: int
 
 
@@ -71,21 +81,15 @@ async def guess_the_card_handler(
         photo=get_bytes_from_image(card_data.image),
         caption="Venghino signori e signore!\nSta per iniziare il Guess The Card, non mancate mi raccomando!",
     )
-    time = datetime.now()
-    card_name = get_random_card_name()
-    card_data = get_card_data(card_name)
-    while card_data is None:
-        card_name = get_random_card_name()
-        card_data = get_card_data(card_name)
 
     game_state_data = GameStateData(
-        start_time=time,
+        start_time=datetime.now(),
         chat_id=chat_id,
         users_scores={},
         guessed_cards=[],
         messages_to_delete=[],
-        card_to_guess_name=card_name,
-        card_to_guess_data=card_data,
+        card_to_guess_name="",
+        card_to_guess_data=None,
         crop_level=4,
     )
     context.job_queue.run_repeating(
@@ -101,9 +105,10 @@ async def guess_the_card_handler(
 
 async def send_card_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     data: GameStateData = context.job.data
-    while data.card_to_guess_data is None:
-        card_name = get_random_card_name()
-        data.card_to_guess_data = get_card_data(card_name)
+    while data.card_to_guess_data is None or len(data.card_to_guess_name) == 0:
+        data.card_to_guess_name = get_random_card_name()
+        data.card_to_guess_data = get_card_data(data.card_to_guess_name)
+    data.card_to_guess_name = get_cached_card_name(data.card_to_guess_name)
 
     size = data.card_to_guess_data.image.size
     crop = data.crop_level if data.crop_level >= 0 else 0
@@ -117,8 +122,8 @@ async def send_card_job(context: ContextTypes.DEFAULT_TYPE) -> None:
         )
 
         data.messages_to_delete.append(message_to_delete)
-        data.card_to_guess_name = get_random_card_name()
-        data.card_to_guess_data = get_card_data(data.card_to_guess_name)
+        data.card_to_guess_name = ""
+        data.card_to_guess_data = None
         data.crop_level = 4
         context.job.schedule_removal()
         context.job_queue.run_repeating(
@@ -206,10 +211,8 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
 
         return ConversationHandler.END
 
-    game_state_data.card_to_guess_name = get_random_card_name()
-    game_state_data.card_to_guess_data = get_card_data(
-        game_state_data.card_to_guess_name
-    )
+    game_state_data.card_to_guess_name = ""
+    game_state_data.card_to_guess_data = None
     game_state_data.crop_level = 4
     job.schedule_removal()
     context.job_queue.run_repeating(
