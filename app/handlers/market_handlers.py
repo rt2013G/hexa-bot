@@ -115,7 +115,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
         )
 
     if post_type == "sell":
-        if has_sent_buy_post_today(user.id):
+        if has_sent_sell_post_today(user.id):
             post_type = "invalid"
             await context.bot.send_message(
                 user.id,
@@ -124,7 +124,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
         else:
             update_user_post_dates(id=user.id, last_buy_post=datetime.now())
     elif post_type == "buy":
-        if has_sent_sell_post_today(user.id):
+        if has_sent_buy_post_today(user.id):
             post_type = "invalid"
             await context.bot.send_message(
                 user.id,
@@ -162,7 +162,7 @@ async def market_post_handler(
         and (update.message.photo or update.message.video or update.message.video_note)
         and has_role(update.message.from_user.id, "seller")
     ):
-        if has_sent_buy_post_today(user.id):
+        if has_sent_sell_post_today(user.id):
             await context.bot.send_message(
                 user.id,
                 "Il tuo messaggio è stato eliminato, hai già inviato un post di cerco oggi!",
@@ -172,7 +172,7 @@ async def market_post_handler(
             update_user_post_dates(id=user.id, last_buy_post=datetime.now())
 
     elif is_buy_post(msg):
-        if has_sent_sell_post_today(user.id):
+        if has_sent_buy_post_today(user.id):
             await context.bot.send_message(
                 user.id,
                 "Il tuo messaggio è stato eliminato, hai già inviato un post di vendo oggi!",
@@ -219,12 +219,12 @@ async def feedback_msg_handler(
     insert_feedback(
         seller_id=seller.id, buyer_id=user.id, contents=msg, date=datetime.now()
     )
-    await context.bot.send_message(
-        user.id,
-        f"Il tuo feedback per @{seller.username} è stato inserito correttamente.",
-    )
     await context.bot.forward_message(
         chat_id=get_feedback_channel_id(),
         from_chat_id=update.message.chat_id,
         message_id=update.message.id,
+    )
+    await context.bot.send_message(
+        user.id,
+        f"Il tuo feedback per @{seller.username} è stato inserito correttamente.",
     )
