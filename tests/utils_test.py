@@ -5,6 +5,7 @@ from app.database import User, update_user_post_dates
 from app.utils import (
     clean_command_text,
     get_user_from_message_command,
+    get_user_from_text,
     has_sent_buy_post_today,
     has_sent_sell_post_today,
 )
@@ -69,6 +70,24 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual(users[6], None)
         self.assertEqual(users[7], None)
         self.assertEqual(users[8], mock_users[2])
+
+    def test_get_user_from_text(self) -> None:
+        test_cases = [
+            (
+                f"#Feedback positivo per @{mock_users[1].username}, arrivato tutto perfettamente",
+                mock_users[1].username,
+            ),
+            (
+                f"#feedback positivo per @{mock_users[2].username}, tutto perfetto e pacco super professionale, consigliato 👌🏼",
+                mock_users[2].username,
+            ),
+            (
+                f"#feedback positivo per @{mock_users[1].username}: disponibile, spedizione rapida e carte arrivate come da richiesta. Consigliato.",
+                mock_users[1].username,
+            ),
+        ]
+        for test_case in test_cases:
+            self.assertEqual(get_user_from_text(test_case[0]).username, test_case[1])
 
     def test_has_sent_posts_today(self) -> None:
         update_user_post_dates(1, datetime.now(), datetime.now() - timedelta(days=5))

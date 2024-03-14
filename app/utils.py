@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import re
 from datetime import datetime
 
 import requests
@@ -33,9 +34,11 @@ def get_user_from_text(message_text: str) -> User | None:
 
     for word in message_text.split():
         if "@" in word:
-            username = word.replace("@", "")
+            username = re.sub(r"[^a-zA-Z0-9_]", "", word)
             if len(username) > 0:
-                return get_user(username=username)
+                user = get_user(username=username)
+                if user is not None:
+                    return user
 
     return None
 

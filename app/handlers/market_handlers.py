@@ -114,7 +114,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
             )
         )
 
-    if post_type == "buy":
+    if post_type == "sell":
         if has_sent_buy_post_today(user.id):
             post_type = "invalid"
             await context.bot.send_message(
@@ -123,7 +123,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
             )
         else:
             update_user_post_dates(id=user.id, last_buy_post=datetime.now())
-    elif post_type == "sell":
+    elif post_type == "buy":
         if has_sent_sell_post_today(user.id):
             post_type = "invalid"
             await context.bot.send_message(
@@ -157,7 +157,11 @@ async def market_post_handler(
     if user is None:
         await update.message.delete()
         return
-    if is_buy_post(msg):
+    if (
+        is_sell_post(msg)
+        and (update.message.photo or update.message.video or update.message.video_note)
+        and has_role(update.message.from_user.id, "seller")
+    ):
         if has_sent_buy_post_today(user.id):
             await context.bot.send_message(
                 user.id,
@@ -167,11 +171,7 @@ async def market_post_handler(
         else:
             update_user_post_dates(id=user.id, last_buy_post=datetime.now())
 
-    elif (
-        is_sell_post(msg)
-        and (update.message.photo or update.message.video or update.message.video_note)
-        and has_role(update.message.from_user.id, "seller")
-    ):
+    elif is_buy_post(msg):
         if has_sent_sell_post_today(user.id):
             await context.bot.send_message(
                 user.id,
