@@ -119,19 +119,19 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
             post_type = "invalid"
             await context.bot.send_message(
                 user.id,
-                "Il tuo messaggio è stato eliminato, hai già inviato un post di cerco oggi!",
+                "Il tuo messaggio è stato eliminato, hai già inviato un post di vendo oggi!",
             )
         else:
-            update_user_post_dates(id=user.id, last_buy_post=datetime.now())
+            update_user_post_dates(id=user.id, last_sell_post=datetime.now())
     elif post_type == "buy":
         if has_sent_buy_post_today(user.id):
             post_type = "invalid"
             await context.bot.send_message(
                 user.id,
-                "Il tuo messaggio è stato eliminato, hai già inviato un post di vendo oggi!",
+                "Il tuo messaggio è stato eliminato, hai già inviato un post di cerco oggi!",
             )
         else:
-            update_user_post_dates(id=user.id, last_sell_post=datetime.now())
+            update_user_post_dates(id=user.id, last_buy_post=datetime.now())
 
     if post_type == "invalid":
         for media in data:
@@ -165,21 +165,21 @@ async def market_post_handler(
         if has_sent_sell_post_today(user.id):
             await context.bot.send_message(
                 user.id,
-                "Il tuo messaggio è stato eliminato, hai già inviato un post di cerco oggi!",
-            )
-            await update.message.delete()
-        else:
-            update_user_post_dates(id=user.id, last_buy_post=datetime.now())
-
-    elif is_buy_post(msg):
-        if has_sent_buy_post_today(user.id):
-            await context.bot.send_message(
-                user.id,
                 "Il tuo messaggio è stato eliminato, hai già inviato un post di vendo oggi!",
             )
             await update.message.delete()
         else:
             update_user_post_dates(id=user.id, last_sell_post=datetime.now())
+
+    elif is_buy_post(msg):
+        if has_sent_buy_post_today(user.id):
+            await context.bot.send_message(
+                user.id,
+                "Il tuo messaggio è stato eliminato, hai già inviato un post di cerco oggi!",
+            )
+            await update.message.delete()
+        else:
+            update_user_post_dates(id=user.id, last_buy_post=datetime.now())
     else:
         await update.message.delete()
 
