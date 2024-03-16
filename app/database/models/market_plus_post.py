@@ -9,12 +9,15 @@ from .base import get_connection
 
 class MarketPlusPost:
     def __init__(self, post_data: tuple) -> None:
-        self.message_id: int = post_data[0]
+        self.message_id: int = int(post_data[0])
         self.end_date: datetime = post_data[1]
         self.last_posted_date: datetime = post_data[2]
+        self.last_posted_market_id: int | None = (
+            int(post_data[3]) if post_data[3] is not None else None
+        )
 
 
-def insert_market_plus_post(message_id: int, end_date: int) -> None:
+def insert_market_plus_post(message_id: int, end_date: datetime) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -34,7 +37,9 @@ def insert_market_plus_post(message_id: int, end_date: int) -> None:
             conn.close()
 
 
-def update_market_plus_posted_date(message_id: int, date: datetime = None) -> None:
+def update_market_plus_posted_date(
+    message_id: int, market_id: int, date: datetime = None
+) -> None:
     if date is None:
         date = datetime.now()
     with get_connection() as conn:
@@ -43,10 +48,10 @@ def update_market_plus_posted_date(message_id: int, date: datetime = None) -> No
                 cur.execute(
                     """
                     UPDATE market_plus_post
-                    SET last_posted_date=%s
+                    SET last_posted_date=%s, last_posted_market_id=%s
                     WHERE market_plus_post.message_id=%s;
                 """,
-                    (date, message_id),
+                    (date, market_id, message_id),
                 )
             except psycopg.Error as err:
                 print(err)
@@ -78,7 +83,7 @@ def get_market_plus_posts_to_send() -> list[MarketPlusPost]:
             try:
                 cur.execute(
                     """
-                    SELECT message_id, end_date, last_posted_date
+                    SELECT message_id, end_date, last_posted_date, last_posted_market_id
                     FROM market_plus_post
                     WHERE end_date > CURRENT_TIMESTAMP
                     AND DATE(last_posted_date) < DATE(CURRENT_TIMESTAMP);
@@ -98,7 +103,7 @@ def get_market_plus_posts_to_delete() -> list[MarketPlusPost]:
             try:
                 cur.execute(
                     """
-                    SELECT message_id, end_date, last_posted_date
+                    SELECT message_id, end_date, last_posted_date, last_posted_market_id
                     FROM market_plus_post
                     WHERE end_date < CURRENT_TIMESTAMP
                     AND is_deleted = FALSE;

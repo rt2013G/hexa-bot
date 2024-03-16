@@ -30,12 +30,12 @@ class MarketPlusPostTest(unittest.TestCase):
         insert_market_plus_post(3, end_date=datetime(year=2012, month=10, day=10))
         posts: list[MarketPlusPost] = get_market_plus_posts_to_send()
         self.assertEqual(len(posts), 1)
-        post = posts[0]
+        post: MarketPlusPost = posts[0]
         self.assertEqual(post.message_id, 1)
         self.assertEqual(post.end_date, datetime(year=2025, month=10, day=10))
         self.assertEqual(post.last_posted_date, get_default_post_datetime())
 
-        update_market_plus_posted_date(1, datetime.now())
+        update_market_plus_posted_date(1, 1, datetime.now())
         posts: MarketPlusPost = get_market_plus_posts_to_send()
         self.assertEqual(len(posts), 0)
 

@@ -1,13 +1,14 @@
+import random
 from datetime import datetime, timedelta
-from random import random
 
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
-from app.config import get_market_plus_id
+from app.config import get_market_id, get_market_plus_id
 from app.database.models.market_plus_post import (
-    get_market_plus_posts_to_delete, insert_market_plus_post,
-    update_market_plus_posted_date)
+    MarketPlusPost, get_market_plus_posts_to_delete,
+    get_market_plus_posts_to_send, insert_market_plus_post,
+    set_delete_market_plus_post, update_market_plus_posted_date)
 from app.filters import AdminFilter
 from app.utils import clean_command_text
 
@@ -60,4 +61,40 @@ async def market_plus_handler(
 
 
 async def market_plus_job(context: ContextTypes.DEFAULT_TYPE) -> None:
-    pass
+    if datetime.now().hour < 8:
+        context.job.schedule_removal()
+        context.job_queue.run_repeating(
+            callback=market_plus_job,
+            interval=1800,
+            first=25200,
+        )
+
+    # trunk-ignore(bandit/B311)
+    post_to_send: MarketPlusPost = random.choice(get_market_plus_posts_to_send())
+    if post_to_send.last_posted_market_id:
+        await context.bot.delete_message(
+            chat_id=get_market_id(), message_id=post_to_send.last_posted_market_id
+        )
+    forwarded_post = await context.bot.forward_message(
+        chat_id=get_market_id(),
+        from_chat_id=get_market_plus_id(),
+        message_id=post_to_send.message_id,
+    )
+    await context.bot.pin_chat_message(
+        get_market_id(), message_id=forwarded_post.id, disable_notification=False
+    )
+    update_market_plus_posted_date(
+        message_id=post_to_send.message_id, market_id=forwarded_post.id
+    )
+
+    posts_to_delete: list[MarketPlusPost] = get_market_plus_posts_to_delete()
+    for post in posts_to_delete:
+        if post.message_id:
+            await context.bot.delete_message(
+                chat_id=get_market_plus_id(), message_id=post.message_id
+            )
+        if post.last_posted_market_id:
+            await context.bot.delete_message(
+                chat_id=get_market_id(), message_id=post.last_posted_market_id
+            )
+        set_delete_market_plus_post(post.message_id)

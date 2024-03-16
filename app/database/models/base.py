@@ -116,6 +116,7 @@ def create_database() -> None:
                     message_id NUMERIC PRIMARY KEY,
                     end_date TIMESTAMP NOT NULL,
                     last_posted_date TIMESTAMP NOT NULL,
+                    last_posted_market_id NUMERIC,
                     is_deleted BOOLEAN DEFAULT FALSE
                 );
                 """
