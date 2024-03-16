@@ -3,6 +3,7 @@ from .announce_handlers import get_announce_handlers
 from .command_handlers import get_command_handlers
 from .guess_game_handlers import get_guess_game_conv_handler
 from .market_handlers import get_market_handlers
+from .market_plus_handlers import get_market_plus_handlers
 from .seller_auth import get_auth_conv_handler
 from .service_handlers import get_service_handlers
 
@@ -14,4 +15,5 @@ handlers = {
     4: get_auth_conv_handler(),
     5: get_guess_game_conv_handler(),
     6: get_announce_handlers(),
+    7: get_market_plus_handlers(),
 }
