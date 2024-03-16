@@ -110,6 +110,15 @@ def create_database() -> None:
                 );
                 """
             )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS market_plus_post(
+                    message_id NUMERIC PRIMARY KEY,
+                    end_date TIMESTAMP NOT NULL,
+                    last_posted_date TIMESTAMP NOT NULL
+                );
+                """
+            )
             roles = {
                 Roles.ADMIN,
                 Roles.SELLER,

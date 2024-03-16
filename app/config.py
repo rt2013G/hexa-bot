@@ -45,6 +45,14 @@ def get_logging_channel_id() -> int:
     return int(GLOBAL_CONFIGS["channel_info"]["logging_id"])
 
 
+def get_photo_storage_id() -> int:
+    return int(GLOBAL_CONFIGS["channel_info"]["photo_storage_id"])
+
+
+def get_market_plus_id() -> int:
+    return int(GLOBAL_CONFIGS["channel_info"]["market_plus_id"])
+
+
 def get_debug_user_id() -> int:
     return int(GLOBAL_CONFIGS["debug_user_id"])
 
