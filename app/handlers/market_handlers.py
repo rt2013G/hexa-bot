@@ -101,6 +101,8 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
 
     for media in data:
         if media.caption is not None:
+            if "@asteygoitamarketing" in media.caption.lower():
+                return
             if is_buy_post(media.caption):
                 post_type = "buy"
             elif is_sell_post(media.caption) and has_role(user.id, "seller"):
@@ -150,7 +152,11 @@ async def market_post_handler(
         await update.message.delete()
         return
 
-    if ("admin" in msg and "cerco" in msg) or "@admin" in msg:
+    if (
+        ("admin" in msg and "cerco" in msg)
+        or "@admin" in msg
+        or "@asteygoitamarketing" in msg
+    ):
         return
 
     user = get_user(id=update.message.from_user.id)
