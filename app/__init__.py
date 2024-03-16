@@ -7,6 +7,7 @@ from telegram.ext import Application, Defaults
 
 from app.card_search import clean_card_data_job
 from app.database.cache import clean_roles_cache_job, clean_users_cache_job
+from app.handlers.market_plus_handlers import market_plus_job
 from app.logger import post_logs_job
 
 
@@ -37,6 +38,7 @@ class Bot:
         self.job_queue.run_repeating(clean_roles_cache_job, interval=43200, first=43200)
         self.job_queue.run_repeating(post_logs_job, interval=60, first=60)
         self.job_queue.run_repeating(clean_card_data_job, interval=21600, first=21600)
+        self.job_queue.run_repeating(market_plus_job, interval=1800, first=1800)
 
     def run(
         self,

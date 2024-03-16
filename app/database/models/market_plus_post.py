@@ -54,7 +54,25 @@ def update_market_plus_posted_date(message_id: int, date: datetime = None) -> No
             conn.close()
 
 
-def get_active_market_plus_posts() -> list[MarketPlusPost]:
+def set_delete_market_plus_post(message_id: int) -> None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute(
+                    """
+                    UPDATE market_plus_post
+                    SET is_deleted=TRUE
+                    WHERE market_plus_post.message_id=%s;
+                """,
+                    (message_id,),
+                )
+            except psycopg.Error as err:
+                print(err)
+            conn.commit()
+            conn.close()
+
+
+def get_market_plus_posts_to_send() -> list[MarketPlusPost]:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -62,7 +80,28 @@ def get_active_market_plus_posts() -> list[MarketPlusPost]:
                     """
                     SELECT message_id, end_date, last_posted_date
                     FROM market_plus_post
-                    WHERE end_date > CURRENT_TIMESTAMP;
+                    WHERE end_date > CURRENT_TIMESTAMP
+                    AND DATE(last_posted_date) < DATE(CURRENT_TIMESTAMP);
+                """
+                )
+            except psycopg.Error as err:
+                print(err)
+            records = cur.fetchall()
+            posts = [MarketPlusPost(record) for record in records]
+            conn.close()
+            return posts
+
+
+def get_market_plus_posts_to_delete() -> list[MarketPlusPost]:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute(
+                    """
+                    SELECT message_id, end_date, last_posted_date
+                    FROM market_plus_post
+                    WHERE end_date < CURRENT_TIMESTAMP
+                    AND is_deleted = FALSE;
                 """
                 )
             except psycopg.Error as err:

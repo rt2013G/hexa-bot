@@ -1,10 +1,13 @@
 from datetime import datetime, timedelta
+from random import random
 
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
 from app.config import get_market_plus_id
-from app.database.models.market_plus_post import insert_market_plus_post
+from app.database.models.market_plus_post import (
+    get_market_plus_posts_to_delete, insert_market_plus_post,
+    update_market_plus_posted_date)
 from app.filters import AdminFilter
 from app.utils import clean_command_text
 
@@ -54,3 +57,7 @@ async def market_plus_handler(
         "Messaggio market plus inviato correttamente!",
         reply_markup=ReplyKeyboardRemove(),
     )
+
+
+async def market_plus_job(context: ContextTypes.DEFAULT_TYPE) -> None:
+    pass

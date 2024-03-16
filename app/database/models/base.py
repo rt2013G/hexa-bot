@@ -115,7 +115,8 @@ def create_database() -> None:
                 CREATE TABLE IF NOT EXISTS market_plus_post(
                     message_id NUMERIC PRIMARY KEY,
                     end_date TIMESTAMP NOT NULL,
-                    last_posted_date TIMESTAMP NOT NULL
+                    last_posted_date TIMESTAMP NOT NULL,
+                    is_deleted BOOLEAN DEFAULT FALSE
                 );
                 """
             )
