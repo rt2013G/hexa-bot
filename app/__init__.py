@@ -38,7 +38,7 @@ class Bot:
         self.job_queue.run_repeating(clean_roles_cache_job, interval=43200, first=43200)
         self.job_queue.run_repeating(post_logs_job, interval=60, first=60)
         self.job_queue.run_repeating(clean_card_data_job, interval=21600, first=21600)
-        self.job_queue.run_repeating(market_plus_job, interval=1800, first=10)
+        self.job_queue.run_repeating(market_plus_job, interval=1800, first=1800)
 
     def run(
         self,
