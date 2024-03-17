@@ -69,8 +69,11 @@ async def market_plus_job(context: ContextTypes.DEFAULT_TYPE) -> None:
             first=25200,
         )
 
+    posts: list[MarketPlusPost] = get_market_plus_posts_to_send()
+    if len(posts) == 0:
+        return
     # trunk-ignore(bandit/B311)
-    post_to_send: MarketPlusPost = random.choice(get_market_plus_posts_to_send())
+    post_to_send: MarketPlusPost = random.choice(posts)
     if post_to_send.last_posted_market_id:
         await context.bot.delete_message(
             chat_id=get_market_id(), message_id=post_to_send.last_posted_market_id

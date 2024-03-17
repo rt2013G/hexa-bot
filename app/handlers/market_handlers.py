@@ -144,6 +144,9 @@ async def market_post_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
     msg: str
+    if update.message is None:
+        return
+
     if update.message.text is not None:
         msg = update.message.text
     elif update.message.caption is not None:
