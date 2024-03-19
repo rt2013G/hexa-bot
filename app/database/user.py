@@ -144,7 +144,7 @@ def update_user_info(
             conn.close()
 
 
-def update_last_buy_post(
+def update_user_last_buy_post(
     id: int,
     last_buy_post: datetime,
 ) -> None:
@@ -165,7 +165,7 @@ def update_last_buy_post(
             conn.close()
 
 
-def update_last_sell_post(
+def update_user_last_sell_post(
     id: int,
     last_sell_post: datetime,
 ) -> None:
