@@ -6,7 +6,7 @@ from telegram import LinkPreviewOptions
 from telegram.ext import Defaults
 
 from app import Bot, BotParameters
-from app.database.models.base import create_database
+from app.database import create_database
 from app.handlers import handlers
 from app.logger import set_up_logger
 from app.utils import load_card_name_db

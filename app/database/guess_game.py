@@ -5,6 +5,38 @@ import psycopg
 from .base import get_connection
 
 
+def create_guess_game_table() -> None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS guess_game(
+                    id SERIAL PRIMARY KEY,
+                    date TIMESTAMP UNIQUE
+                );
+                """
+            )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS users_guess_game(
+                    user_id NUMERIC,
+                    CONSTRAINT users_guess_game_user_fk
+                        FOREIGN KEY(user_id)
+                        REFERENCES users(id),
+                    game_id INTEGER,
+                    CONSTRAINT users_guess_game_game_fk
+                        FOREIGN KEY(game_id)
+                        REFERENCES guess_game(id),
+                    CONSTRAINT users_guess_game_pk
+                        PRIMARY KEY (user_id, game_id),
+                    user_score INTEGER NOT NULL
+                );
+                """
+            )
+            conn.commit()
+            conn.close()
+
+
 def insert_game(date: datetime) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -23,7 +55,7 @@ def insert_game(date: datetime) -> None:
             conn.close()
 
 
-def insert_user_score_into_game(user_id: int, score: int, game_date: datetime) -> None:
+def insert_user_score(user_id: int, score: int, game_date: datetime) -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -58,29 +90,6 @@ def get_guess_game_rankings(length: int) -> dict[int, int]:
                 )
             except psycopg.Error as err:
                 print(err)
-            scores = {}
-            records = cur.fetchall()
-            for record in records:
-                scores[record[0]] = record[1]
+            scores = {user_id: score for user_id, score in cur.fetchall()}
             conn.close()
             return scores
-
-
-def get_total_score_for_user(user_id: int) -> int | None:
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            try:
-                cur.execute(
-                    """
-                SELECT SUM(users_guess_game.user_score)
-                FROM users_guess_game
-                WHERE users_guess_game.user_id = %s;
-                """,
-                    (user_id,),
-                )
-            except psycopg.Error as err:
-                print(err)
-            record = cur.fetchone()
-            conn.close()
-            if record is not None:
-                return record[0]

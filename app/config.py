@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime
 
 
 def load_configs() -> dict:
@@ -59,10 +58,6 @@ def get_debug_user_id() -> int:
 
 def get_market_group_link() -> str:
     return str(GLOBAL_CONFIGS["links"]["market_group_link"])
-
-
-def get_default_post_datetime() -> datetime:
-    return datetime(year=2015, month=1, day=15)
 
 
 def get_max_data_cache_size() -> int:

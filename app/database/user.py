@@ -1,46 +1,31 @@
+import logging
 from datetime import datetime
 
 import psycopg
 
-from app.config import get_default_post_datetime
+from app.constants import Dates
 
 from .base import get_connection
+from .models import User
 
 
-class User:
-    def __init__(self, user_data: tuple) -> None:
-        self.id: int = int(user_data[0])
-        self.username: str | None = None
-        if user_data[1] is not None:
-            try:
-                self.username = user_data[1].decode("utf-8")
-            except AttributeError:
-                self.username = user_data[1]
-
-        self.first_name: str | None = None
-        if user_data[2] is not None:
-            try:
-                self.first_name = user_data[2].decode("utf-8")
-            except AttributeError:
-                self.first_name = user_data[2]
-
-        self.last_name: str | None = None
-        if user_data[3] is not None:
-            try:
-                self.last_name = user_data[3].decode("utf-8")
-            except AttributeError:
-                self.last_name = user_data[3]
-
-        self.last_buy_post: datetime = user_data[4]
-        self.last_sell_post: datetime = user_data[5]
-
-    def __eq__(self, __value: object) -> bool:
-        return (
-            self.id == __value.id
-            and self.username == __value.username
-            and self.first_name == __value.first_name
-            and self.last_name == __value.last_name
-        )
+def create_user_table() -> None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS users(
+                    id NUMERIC PRIMARY KEY,
+                    username VARCHAR(32),
+                    first_name TEXT,
+                    last_name TEXT,
+                    last_buy_post TIMESTAMP,
+                    last_sell_post TIMESTAMP
+                );
+                """
+            )
+            conn.commit()
+            conn.close()
 
 
 def insert_user(
@@ -52,9 +37,9 @@ def insert_user(
     last_sell_post: datetime | None = None,
 ) -> None:
     if last_buy_post is None:
-        last_buy_post = get_default_post_datetime()
+        last_buy_post = Dates.MARKET_EPOCH
     if last_sell_post is None:
-        last_sell_post = get_default_post_datetime()
+        last_sell_post = Dates.MARKET_EPOCH
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
@@ -79,7 +64,7 @@ def insert_user(
                     ),
                 )
             except psycopg.Error as err:
-                print(err)
+                logging.log(logging.ERROR, err)
             conn.commit()
             conn.close()
 
@@ -90,19 +75,17 @@ def get_user_from_id(id: int) -> User | None:
             try:
                 cur.execute(
                     """
-                    SELECT *
+                    SELECT id, username, first_name, last_name, last_buy_post, last_sell_post
                     FROM users
                     WHERE id=%s;
                 """,
                     (id,),
                 )
             except psycopg.Error as err:
-                print(err)
+                logging.log(logging.ERROR, err)
             record = cur.fetchone()
             conn.close()
-            if record is None:
-                return None
-            return User(record)
+            return User(record) if record else None
 
 
 def get_user_from_username(username: str) -> User | None:
@@ -111,42 +94,37 @@ def get_user_from_username(username: str) -> User | None:
             try:
                 cur.execute(
                     """
-                    SELECT *
+                    SELECT id, username, first_name, last_name, last_buy_post, last_sell_post
                     FROM users
                     WHERE username=%s;
                 """,
                     (username,),
                 )
             except psycopg.Error as err:
-                print(err)
+                logging.log(logging.ERROR, err)
             record = cur.fetchone()
             conn.close()
-            if record is None:
-                return None
-            return User(record)
+            return User(record) if record else None
 
 
-def get_users(size=1000000) -> list[User]:
+def get_all_users() -> list[User]:
     with get_connection() as conn:
         with conn.cursor() as cur:
             try:
                 cur.execute(
                     """
-                    SELECT *
+                    SELECT id, username, first_name, last_name, last_buy_post, last_sell_post
                     FROM users;
                 """
                 )
             except psycopg.Error as err:
                 print(err)
-            records = cur.fetchmany(size)
-            users = []
-            for record in records:
-                users.append(User(record))
+            users = [User(record) for record in cur.fetchall()]
             conn.close()
             return users
 
 
-def update_user_info_into_db(
+def update_user_info(
     id: int, username: str | None, first_name: str | None, last_name: str | None
 ) -> None:
     with get_connection() as conn:
@@ -166,9 +144,29 @@ def update_user_info_into_db(
             conn.close()
 
 
-def update_user_dates(
+def update_last_buy_post(
     id: int,
     last_buy_post: datetime,
+) -> None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute(
+                    """
+                    UPDATE users
+                    SET last_buy_post=%s
+                    WHERE users.id=%s;
+                """,
+                    (last_buy_post, id),
+                )
+            except psycopg.Error as err:
+                print(err)
+            conn.commit()
+            conn.close()
+
+
+def update_last_sell_post(
+    id: int,
     last_sell_post: datetime,
 ) -> None:
     with get_connection() as conn:
@@ -177,10 +175,10 @@ def update_user_dates(
                 cur.execute(
                     """
                     UPDATE users
-                    SET last_buy_post=%s, last_sell_post=%s
+                    SET last_sell_post=%s
                     WHERE users.id=%s;
                 """,
-                    (last_buy_post, last_sell_post, id),
+                    (last_sell_post, id),
                 )
             except psycopg.Error as err:
                 print(err)

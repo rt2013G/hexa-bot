@@ -2,20 +2,27 @@ from datetime import datetime
 
 from app.config import get_default_post_datetime
 
-from .cache import (
-    CACHE,
-    RolesEntry,
-    get_guess_game_score_from_cache,
-    get_id_from_username_cache,
-    get_user_from_cache,
-    insert_into_guess_game_scores_cache,
-    insert_into_roles_cache,
-    insert_into_username_cache,
-    insert_into_users_cache,
-    remove_role_from_roles_cache,
-)
+from .cache import (CACHE, RolesEntry, get_guess_game_score_from_cache,
+                    get_id_from_username_cache, get_user_from_cache,
+                    insert_into_guess_game_scores_cache,
+                    insert_into_roles_cache, insert_into_username_cache,
+                    insert_into_users_cache, remove_role_from_roles_cache)
 from .models.role import Role, get_roles_for_user
 from .models.user import User
+
+
+def create_database() -> None:
+    from .feedback import create_feedback_table
+    from .guess_game import create_guess_game_table
+    from .market_plus_post import create_market_plus_post_table
+    from .role import create_role_table
+    from .user import create_user_table
+
+    create_user_table()
+    create_feedback_table()
+    create_role_table()
+    create_guess_game_table()
+    create_market_plus_post_table()
 
 
 def get_user(id: int | None = None, username: str | None = None) -> User | None:
