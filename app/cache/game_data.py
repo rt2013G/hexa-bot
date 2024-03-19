@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+from app import database as db
+
 
 @dataclass
 class GuessGameRankingsEntry:
@@ -16,9 +18,22 @@ class GamesCache:
 games_cache = GamesCache(guess_game_rankings={})
 
 
-def insert_guess_game_rankings(length: int, scores: dict[int, int]) -> None:
-    pass
+def insert_guess_game_scores(
+    game_time: datetime, length: int, scores: dict[int, int]
+) -> None:
+    db.insert_game(date=datetime)
+    for user_id in scores.keys():
+        if score := scores[user_id] > 0:
+            db.insert_user_score(user_id=user_id, score=score, game_date=game_time)
+    games_cache.guess_game_rankings = {}
 
 
 def get_guess_game_rankings(length: int) -> dict[int, int]:
-    pass
+    if rankings_entry := games_cache.guess_game_rankings.get(length):
+        return rankings_entry.rankings
+
+    rankings = db.get_guess_game_rankings(length=length)
+    games_cache.guess_game_rankings[length] = GuessGameRankingsEntry(
+        rankings=rankings, time=datetime.now()
+    )
+    return rankings
