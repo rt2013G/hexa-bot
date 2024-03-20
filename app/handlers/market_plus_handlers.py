@@ -5,11 +5,9 @@ from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
 from app.config import get_market_id, get_market_plus_id
-
-"""from app.database.models.market_plus_post import (
-    MarketPlusPost, get_market_plus_posts_to_delete,
-    get_market_plus_posts_to_send, insert_market_plus_post,
-    set_delete_market_plus_post, update_market_plus_posted_date)"""
+from app.database import (MarketPlusPost, get_posts_to_delete,
+                          get_posts_to_send, insert_market_plus_post,
+                          update_delete_market_plus_post, update_posted_date)
 from app.filters import AdminFilter
 from app.utils import clean_command_text
 
@@ -70,7 +68,7 @@ async def market_plus_job(context: ContextTypes.DEFAULT_TYPE) -> None:
             first=25200,
         )
 
-    posts: list[MarketPlusPost] = get_market_plus_posts_to_send()
+    posts: list[MarketPlusPost] = get_posts_to_send()
     if len(posts) == 0:
         return
     # trunk-ignore(bandit/B311)
@@ -87,11 +85,9 @@ async def market_plus_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.pin_chat_message(
         get_market_id(), message_id=forwarded_post.id, disable_notification=False
     )
-    update_market_plus_posted_date(
-        message_id=post_to_send.message_id, market_id=forwarded_post.id
-    )
+    update_posted_date(message_id=post_to_send.message_id, market_id=forwarded_post.id)
 
-    posts_to_delete: list[MarketPlusPost] = get_market_plus_posts_to_delete()
+    posts_to_delete: list[MarketPlusPost] = get_posts_to_delete()
     for post in posts_to_delete:
         if post.message_id:
             await context.bot.delete_message(
@@ -101,4 +97,4 @@ async def market_plus_job(context: ContextTypes.DEFAULT_TYPE) -> None:
             await context.bot.delete_message(
                 chat_id=get_market_id(), message_id=post.last_posted_market_id
             )
-        set_delete_market_plus_post(post.message_id)
+        update_delete_market_plus_post(post.message_id)

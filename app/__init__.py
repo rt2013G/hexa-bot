@@ -5,8 +5,13 @@ from typing import Literal
 
 from telegram.ext import Application, Defaults
 
-# from app.card_search import clean_card_data_job
-# from app.database.cache import clean_roles_cache_job, clean_users_cache_job
+from app.cache import (
+    card_data_cache_job,
+    feedbacks_cache_job,
+    games_cache_job,
+    roles_cache_job,
+    users_cache_job,
+)
 from app.handlers.market_plus_handlers import market_plus_job
 from app.logger import post_logs_job
 
@@ -34,10 +39,13 @@ class Bot:
 
     def add_jobs(self) -> None:
         self.job_queue = self.application.job_queue
-        self.job_queue.run_repeating(clean_users_cache_job, interval=300, first=300)
-        self.job_queue.run_repeating(clean_roles_cache_job, interval=43200, first=43200)
+        self.job_queue.run_repeating(users_cache_job, interval=1800, first=120)
+        self.job_queue.run_repeating(roles_cache_job, interval=1800, first=240)
+        self.job_queue.run_repeating(feedbacks_cache_job, interval=1800, first=360)
+        self.job_queue.run_repeating(games_cache_job, interval=1800, first=480)
+        self.job_queue.run_repeating(card_data_cache_job, interval=1800, first=600)
+
         self.job_queue.run_repeating(post_logs_job, interval=60, first=60)
-        self.job_queue.run_repeating(clean_card_data_job, interval=21600, first=21600)
         self.job_queue.run_repeating(market_plus_job, interval=1800, first=1800)
 
     def run(

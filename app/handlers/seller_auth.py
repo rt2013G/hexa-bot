@@ -2,9 +2,9 @@ from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
                           MessageHandler, filters)
 
+from app.cache import has_role
 from app.config import get_approval_id
 from app.constants import Roles
-# from app.database import has_role
 from app.utils import get_auth_code_from_id
 
 CODE, VIDEO = range(2)

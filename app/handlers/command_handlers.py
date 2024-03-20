@@ -3,17 +3,26 @@ import logging
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
-# from app.card_search import (CardDataEntry, get_bytes_from_image,
-#                             get_cached_card_name, get_card_data)
+from app.api import CardData, get_image_bytes
+from app.cache import (
+    get_card_data,
+    get_feedbacks,
+    get_guess_game_rankings,
+    get_user,
+    has_role,
+)
 from app.config import get_market_group_link
 from app.constants import Roles
-# from app.database import User, get_top_guess_game_users, get_user, has_role
-# from app.database.models.feedback import get_feedback_count, get_feedbacks
+from app.database import User
 from app.filters import AdminFilter, MainGroupFilter, MarketGroupFilter
 from app.logger import with_logging
-from app.utils import (clean_command_text, get_rankings_message_from_scores,
-                       get_user_from_message_command, has_sent_buy_post_today,
-                       has_sent_sell_post_today)
+from app.utils import (
+    clean_command_text,
+    get_rankings_message_from_scores,
+    get_user_from_message_command,
+    has_sent_buy_post_today,
+    has_sent_sell_post_today,
+)
 
 
 def get_command_handlers() -> list:
@@ -63,27 +72,27 @@ async def card_search_handler(
     search_term = clean_command_text(update.message.text, "/search")
     if len(search_term) > 40:
         return
-    card_data_entry: CardDataEntry | None = get_card_data(search_term)
-    if card_data_entry is None:
+    card_data: CardData | None = await get_card_data(search_term)
+    if card_data is None:
         await context.bot.send_message(
             update.message.from_user.id,
             f'La carta "{search_term}" non è stata trovata.',
         )
         return
 
-    card_name = get_cached_card_name(search_term)
+    card_name = card_data.name
     if card_name is None:
         logging.log(
             logging.ERROR,
             "An unexpected error has occured while retrieving a cached card name.",
         )
         return
-    bytes = get_bytes_from_image(card_data_entry.image)
+    bytes = get_image_bytes(card_data.image)
 
     await context.bot.send_photo(
         update.message.from_user.id,
         photo=bytes,
-        caption=f"{card_name}\n\n{card_data_entry.desc}",
+        caption=f"{card_name}\n\n{card_data.desc}",
     )
 
 
@@ -233,7 +242,7 @@ async def feedback_list_handler(
             reply_markup=ReplyKeyboardRemove(),
         )
 
-    total_feedback_count = get_feedback_count(seller_id=seller.id)
+    total_feedback_count = len(get_feedbacks(seller_id=seller.id))
     await context.bot.send_message(
         update.message.from_user.id,
         f"L'utente @{seller.username} ha {total_feedback_count} feedback in totale, eccone alcuni 👆👆",
@@ -254,7 +263,7 @@ async def guess_game_rankings_handler(
     if length < 2:
         length = 10
 
-    rankings = get_top_guess_game_users(length=length)
+    rankings = get_guess_game_rankings(length=length)
     rankings_message = get_rankings_message_from_scores(rankings)
     await context.bot.send_message(
         chat_id=update.message.chat.id,

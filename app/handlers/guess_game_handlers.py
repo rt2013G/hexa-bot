@@ -5,18 +5,17 @@ from datetime import datetime
 from telegram import Message, ReactionTypeEmoji, Update
 from telegram.constants import ReactionEmoji
 from telegram.error import BadRequest, Forbidden, TimedOut
-from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
-                          MessageHandler, filters)
+from telegram.ext import (
+    CommandHandler,
+    ContextTypes,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
 
-"""from app.card_search import (
-    CardDataEntry,
-    get_bytes_from_image,
-    get_cached_card_name,
-    get_card_data,
-    get_cropped_image,
-)"""
-from app.cache.card_data import CardDataEntry
-# from app.database import insert_guess_game_scores
+from app.api import CardData, get_cropped_image, get_image_bytes
+from app.cache import get_card_data, insert_guess_game_scores
+from app.constants import GuessGame
 from app.filters import ModeratorFilter
 from app.utils import get_random_card_name, get_rankings_message_from_scores
 
@@ -29,7 +28,7 @@ class GameStateData:
     guessed_cards: list[str]
     messages_to_delete: list[Message]
     card_to_guess_name: str
-    card_to_guess_data: CardDataEntry | None
+    card_to_guess_data: CardData | None
     crop_level: int
 
 
@@ -70,11 +69,11 @@ def get_guess_game_conv_handler() -> list:
 async def guess_the_card_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> object:
-    card_data = get_card_data("Question")
+    card_data = await get_card_data("Question")
     chat_id = update.message.chat.id
     await context.bot.send_photo(
         chat_id=chat_id,
-        photo=get_bytes_from_image(card_data.image),
+        photo=get_image_bytes(card_data.image),
         caption="Venghino signori e signore!\nSta per iniziare il Guess The Card, non mancate mi raccomando!",
     )
 
@@ -107,8 +106,9 @@ async def send_card_job(context: ContextTypes.DEFAULT_TYPE) -> None:
         or len(data.card_to_guess_name) == 0
     ):
         data.card_to_guess_name = get_random_card_name()
-        data.card_to_guess_data = get_card_data(data.card_to_guess_name)
-        data.card_to_guess_name = get_cached_card_name(data.card_to_guess_name)
+        data.card_to_guess_data = await get_card_data(data.card_to_guess_name)
+
+    data.card_to_guess_name = data.card_to_guess_data.name
 
     size = data.card_to_guess_data.image.size
     crop = data.crop_level if data.crop_level >= 0 else 0
@@ -117,7 +117,7 @@ async def send_card_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     if data.crop_level < 0:
         message_to_delete = await context.bot.send_photo(
             data.chat_id,
-            photo=get_bytes_from_image(image_to_send),
+            photo=get_image_bytes(image_to_send),
             caption=f"La carta era {data.card_to_guess_name}, nessuno ha indovinato!",
         )
 
@@ -137,7 +137,7 @@ async def send_card_job(context: ContextTypes.DEFAULT_TYPE) -> None:
 
     message_to_delete = await context.bot.send_photo(
         data.chat_id,
-        photo=get_bytes_from_image(image_to_send),
+        photo=get_image_bytes(image_to_send),
         caption="Guess the card!",
     )
     data.crop_level -= 1
@@ -170,7 +170,7 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
     game_state_data.messages_to_delete.append(update.message)
 
     user_id = update.message.from_user.id
-    guess_data = get_card_data(guess_word)
+    guess_data = await get_card_data(guess_word)
     if guess_data is None or guess_data.desc != game_state_data.card_to_guess_data.desc:
         await update.message.set_reaction(
             reaction=ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN)
@@ -190,11 +190,11 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         text=f'"{game_state_data.card_to_guess_name}" è corretto! Ti sei aggiudicato {score_gained} {score_text_display}!'
     )
 
-    if len(game_state_data.guessed_cards) >= 10:
+    if len(game_state_data.guessed_cards) >= GuessGame.GAME_LENGTH:
         job.schedule_removal()
         insert_guess_game_scores(
             game_time=game_state_data.start_time,
-            users_scores=game_state_data.users_scores,
+            scores=game_state_data.users_scores,
         )
         rankings = get_rankings_message_from_scores(game_state_data.users_scores)
 

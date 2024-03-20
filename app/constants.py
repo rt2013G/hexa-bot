@@ -21,3 +21,7 @@ class CacheLimits:
     MAX_GUESS_GAME_RANKINGS_SIZE = 999
     MAX_SEARCH_WORD_SIZE = 9999
     MAX_FEEDBACK_SIZE = 1999
+
+
+class GuessGame:
+    GAME_LENGTH = 10

@@ -124,5 +124,5 @@ def has_role(id: int, role_name: db.Role) -> bool:
             return False
 
     roles = db.get_roles(user_id=id)
-    users_cache.roles[id] = roles
+    users_cache.roles[id] = UserRolesEntry(roles=roles, time=datetime.now())
     return True if role_name in roles else False

@@ -6,7 +6,7 @@ from telegram.error import BadRequest, Forbidden, TimedOut
 from telegram.ext import CommandHandler, ContextTypes
 from telegram.helpers import effective_message_type
 
-# from app.database.models.user import get_users
+from app.database import get_all_users
 from app.filters import AdminFilter, DebugUserFilter
 from app.logger import with_logging
 from app.utils import get_user_from_message_command
@@ -48,15 +48,13 @@ async def announce_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     )
 
     message = update.message.reply_to_message
-    users = get_users()
-    users_id_list: list[int] = []
-    for user in users:
-        users_id_list.append(user.id)
+    users = get_all_users()
+    id_list: list[int] = [user.id for user in users]
     context.job_queue.run_repeating(
         callback=send_announce_job,
         interval=10,
         first=1,
-        data=AnnounceData(users_id_list=users_id_list, message=message),
+        data=AnnounceData(users_id_list=id_list, message=message),
         name=f"announce{message.id}",
     )
 

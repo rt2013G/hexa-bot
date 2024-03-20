@@ -8,8 +8,8 @@ from .market_plus_post import (get_posts_to_delete, get_posts_to_send,
                                update_posted_date)
 from .models import Feedback, MarketPlusPost, Role, User
 from .role import get_roles, insert_role, remove_role
-from .user import (get_user_from_id, get_user_from_username, insert_user,
-                   update_user_info, update_user_last_buy_post,
+from .user import (get_all_users, get_user_from_id, get_user_from_username,
+                   insert_user, update_user_info, update_user_last_buy_post,
                    update_user_last_sell_post)
 
 

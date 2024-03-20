@@ -7,9 +7,8 @@ from telegram import (InputMediaDocument, InputMediaPhoto, InputMediaVideo,
 from telegram.ext import ContextTypes, MessageHandler, filters
 from telegram.helpers import effective_message_type
 
+from app.cache import get_user, has_role, insert_feedback, update_user_date
 from app.config import get_feedback_channel_id
-# from app.database import get_user, has_role, update_user_post_dates
-# from app.database.models.feedback import insert_feedback
 from app.filters import (AdminFilter, DebugUserFilter, FeedbackFilter,
                          MarketGroupFilter, MediaGroupFilter)
 from app.utils import (get_user_from_text, has_sent_buy_post_today,
@@ -124,7 +123,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
                 "Il tuo messaggio è stato eliminato, hai già inviato un post di vendo oggi!",
             )
         else:
-            update_user_post_dates(id=user.id, last_sell_post=datetime.now())
+            update_user_date(id=user.id, last_sell_post=datetime.now())
     elif post_type == "buy":
         if has_sent_buy_post_today(user.id):
             post_type = "invalid"
@@ -133,7 +132,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
                 "Il tuo messaggio è stato eliminato, hai già inviato un post di cerco oggi!",
             )
         else:
-            update_user_post_dates(id=user.id, last_buy_post=datetime.now())
+            update_user_date(id=user.id, last_buy_post=datetime.now())
 
     if post_type == "invalid":
         for media in data:
@@ -178,7 +177,7 @@ async def market_post_handler(
             )
             await update.message.delete()
         else:
-            update_user_post_dates(id=user.id, last_sell_post=datetime.now())
+            update_user_date(id=user.id, last_sell_post=datetime.now())
 
     elif is_buy_post(msg):
         if has_sent_buy_post_today(user.id):
@@ -188,7 +187,7 @@ async def market_post_handler(
             )
             await update.message.delete()
         else:
-            update_user_post_dates(id=user.id, last_buy_post=datetime.now())
+            update_user_date(id=user.id, last_buy_post=datetime.now())
     else:
         await update.message.delete()
 

@@ -3,15 +3,8 @@ import sys
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
-from app.constants import Roles
-
-"""from app.database import (
-    add_role_to_user,
-    has_role,
-    remove_role_from_user,
-    reset_user_buy_post,
-    reset_user_sell_post,
-)"""
+from app.cache import has_role, insert_role, remove_role, update_user_date
+from app.constants import Dates, Roles
 from app.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
 from app.logger import with_logging
 from app.utils import get_user_from_message_command
@@ -63,7 +56,7 @@ async def make_seller_handler(
         )
         return
 
-    add_role_to_user(id=user.id, role_name=Roles.SELLER)
+    insert_role(id=user.id, role_name=Roles.SELLER)
     await update.message.reply_text(
         "Utente approvato come venditore!", reply_markup=ReplyKeyboardRemove()
     )
@@ -90,7 +83,7 @@ async def remove_seller_handler(
         )
         return
 
-    remove_role_from_user(id=user.id, role_name=Roles.SELLER)
+    remove_role(id=user.id, role_name=Roles.SELLER)
     await update.message.reply_text(
         "L'utente non è più un venditore!", reply_markup=ReplyKeyboardRemove()
     )
@@ -147,7 +140,7 @@ async def make_scammer_handler(
         )
         return
 
-    add_role_to_user(id=user.id, role_name=Roles.SCAMMER)
+    insert_role(id=user.id, role_name=Roles.SCAMMER)
     await update.message.reply_text(
         "Utente inserito nella lista scammer!", reply_markup=ReplyKeyboardRemove()
     )
@@ -169,7 +162,7 @@ async def remove_scammer_handler(
         )
         return
 
-    remove_role_from_user(id=user.id, role_name=Roles.SCAMMER)
+    remove_role(id=user.id, role_name=Roles.SCAMMER)
     await update.message.reply_text(
         "L'utente non è più nella lista scammer!", reply_markup=ReplyKeyboardRemove()
     )
@@ -197,8 +190,9 @@ async def reset_date_handler(
         )
         return
 
-    reset_user_buy_post(id=user.id)
-    reset_user_sell_post(id=user.id)
+    update_user_date(
+        id=user.id, last_buy_post=Dates.MARKET_EPOCH, last_sell_post=Dates.MARKET_EPOCH
+    )
     await update.message.reply_text(
         f"Date di {user.username} resettate!", reply_markup=ReplyKeyboardRemove()
     )
@@ -258,7 +252,7 @@ async def make_admin_handler(
         )
         return
 
-    add_role_to_user(id=user.id, role_name=Roles.ADMIN)
+    insert_role(id=user.id, role_name=Roles.ADMIN)
     await update.message.reply_text(
         "Utente aggiunto come admin!", reply_markup=ReplyKeyboardRemove()
     )
@@ -280,7 +274,7 @@ async def remove_admin_handler(
         )
         return
 
-    remove_role_from_user(id=user.id, role_name=Roles.ADMIN)
+    remove_role(id=user.id, role_name=Roles.ADMIN)
     await update.message.reply_text(
         "L'utente non è più admin!", reply_markup=ReplyKeyboardRemove()
     )
@@ -302,7 +296,7 @@ async def make_moderator_handler(
         )
         return
 
-    add_role_to_user(id=user.id, role_name=Roles.MODERATOR)
+    insert_role(id=user.id, role_name=Roles.MODERATOR)
     await update.message.reply_text(
         "Utente aggiunto come moderatore!", reply_markup=ReplyKeyboardRemove()
     )
@@ -324,7 +318,7 @@ async def remove_moderator_handler(
         )
         return
 
-    remove_role_from_user(id=user.id, role_name=Roles.MODERATOR)
+    remove_role(id=user.id, role_name=Roles.MODERATOR)
     await update.message.reply_text(
         "L'utente non è più moderatore!", reply_markup=ReplyKeyboardRemove()
     )

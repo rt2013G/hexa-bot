@@ -64,12 +64,9 @@ async def fetch_card_data(search_word: str) -> CardData | None:
     return CardData(name=card_name, desc=card_description, image=image)
 
 
-def get_cropped_image_bytes(image: Image, crop_level: CropLevel) -> bytes:
-    byte_array = BytesIO()
-
+def get_cropped_image(image: Image, crop_level: CropLevel = 0) -> Image:
     if crop_level == 0:
-        image.save(byte_array, format='BMP')
-        return byte_array.getvalue()
+        return image
 
     width, height = image.size
     crop_level = 2 * crop_level
@@ -80,5 +77,10 @@ def get_cropped_image_bytes(image: Image, crop_level: CropLevel) -> bytes:
     crop_area = (random_pos, random_pos, random_pos + height / crop_level, random_pos + width / crop_level)
     cropped_image: Image = image.crop(crop_area)
 
-    cropped_image.save(byte_array, format='BMP')
+    return cropped_image
+
+
+def get_image_bytes(image: Image) -> bytes:
+    byte_array = BytesIO()
+    image.save(byte_array, format='BMP')
     return byte_array.getvalue()
