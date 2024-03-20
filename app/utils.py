@@ -6,10 +6,9 @@ from datetime import datetime
 
 import requests
 
+from app.cache import get_user
 from app.config import get_bot_username
 from app.database import User
-
-# get_user
 
 
 def get_user_from_message_command(message_text: str, command_text: str) -> User | None:
@@ -36,13 +35,17 @@ def get_user_from_text(message_text: str) -> User | None:
 
     for word in message_text.split():
         if "@" in word:
-            username = re.sub(r"[^a-zA-Z0-9_]", "", word)
+            username = remove_non_alpha_characters(word)
             if len(username) > 0:
                 user = get_user(username=username)
                 if user is not None:
                     return user
 
     return None
+
+
+def remove_non_alpha_characters(text: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9_]", "", text)
 
 
 def clean_command_text(text: str, command: str) -> str:

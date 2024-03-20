@@ -1,7 +1,8 @@
 import unittest
 from datetime import datetime, timedelta
 
-from app.database import User, update_user_post_dates
+from app.cache import update_user_date
+from app.database import User
 from app.utils import (clean_command_text, get_user_from_message_command,
                        get_user_from_text, has_sent_buy_post_today,
                        has_sent_sell_post_today)
@@ -86,10 +87,10 @@ class UtilsTest(unittest.TestCase):
             self.assertEqual(get_user_from_text(test_case[0]).username, test_case[1])
 
     def test_has_sent_posts_today(self) -> None:
-        update_user_post_dates(1, datetime.now(), datetime.now() - timedelta(days=5))
-        update_user_post_dates(2, datetime.now(), datetime.now())
-        update_user_post_dates(3, datetime.now() - timedelta(days=10), datetime.now())
-        update_user_post_dates(
+        update_user_date(1, datetime.now(), datetime.now() - timedelta(days=5))
+        update_user_date(2, datetime.now(), datetime.now())
+        update_user_date(3, datetime.now() - timedelta(days=10), datetime.now())
+        update_user_date(
             4, datetime.now() - timedelta(days=2), datetime.now() - timedelta(days=1)
         )
 
