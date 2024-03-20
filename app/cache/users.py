@@ -77,6 +77,9 @@ def update_user_info(
         id=id, username=username, first_name=first_name, last_name=last_name
     )
     users_cache.ids[username] = id
+    users_cache.users[id].user.username = username
+    users_cache.users[id].user.first_name = first_name
+    users_cache.users[id].user.last_name = last_name
 
 
 def update_user_date(

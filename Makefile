@@ -10,3 +10,5 @@ test:
 	@python -m unittest discover -v -s tests/ -p "*test.py" || true
 testdb:
 	@python -m unittest discover -v -s tests/database -p "*test.py" || true
+testcache:
+	@python -m unittest discover -v -s tests/cache -p "*test.py" || true
