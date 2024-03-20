@@ -2,6 +2,10 @@
 
 from .feedback import get_feedbacks, insert_feedback
 from .guess_game import get_guess_game_rankings, insert_game, insert_user_score
+from .market_plus_post import (get_posts_to_delete, get_posts_to_send,
+                               insert_market_plus_post,
+                               update_delete_market_plus_post,
+                               update_posted_date)
 from .models import Feedback, MarketPlusPost, Role, User
 from .role import get_roles, insert_role, remove_role
 from .user import (get_user_from_id, get_user_from_username, insert_user,
