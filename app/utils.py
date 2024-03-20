@@ -7,7 +7,9 @@ from datetime import datetime
 import requests
 
 from app.config import get_bot_username
-from app.database import User, get_user
+from app.database import User
+
+# get_user
 
 
 def get_user_from_message_command(message_text: str, command_text: str) -> User | None:

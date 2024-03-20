@@ -5,10 +5,11 @@ from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
 from app.config import get_market_id, get_market_plus_id
-from app.database.models.market_plus_post import (
+
+"""from app.database.models.market_plus_post import (
     MarketPlusPost, get_market_plus_posts_to_delete,
     get_market_plus_posts_to_send, insert_market_plus_post,
-    set_delete_market_plus_post, update_market_plus_posted_date)
+    set_delete_market_plus_post, update_market_plus_posted_date)"""
 from app.filters import AdminFilter
 from app.utils import clean_command_text
 

@@ -4,7 +4,7 @@ from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
 
 from app.config import get_approval_id
 from app.constants import Roles
-from app.database import has_role
+# from app.database import has_role
 from app.utils import get_auth_code_from_id
 
 CODE, VIDEO = range(2)

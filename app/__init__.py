@@ -5,8 +5,8 @@ from typing import Literal
 
 from telegram.ext import Application, Defaults
 
-from app.card_search import clean_card_data_job
-from app.database.cache import clean_roles_cache_job, clean_users_cache_job
+# from app.card_search import clean_card_data_job
+# from app.database.cache import clean_roles_cache_job, clean_users_cache_job
 from app.handlers.market_plus_handlers import market_plus_job
 from app.logger import post_logs_job
 

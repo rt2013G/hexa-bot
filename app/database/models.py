@@ -31,6 +31,8 @@ class User:
         self.last_sell_post: datetime = user_data[5]
 
     def __eq__(self, __value: object) -> bool:
+        if __value is None:
+            return False
         return bool(self.id == __value.id)
 
 
