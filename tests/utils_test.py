@@ -2,24 +2,20 @@ import unittest
 from datetime import datetime, timedelta
 
 from app.database import User, update_user_post_dates
-from app.utils import (
-    clean_command_text,
-    get_user_from_message_command,
-    get_user_from_text,
-    has_sent_buy_post_today,
-    has_sent_sell_post_today,
-)
-from tests.test_data import clean_test_database, mock_users, start_test_database
+from app.utils import (clean_command_text, get_user_from_message_command,
+                       get_user_from_text, has_sent_buy_post_today,
+                       has_sent_sell_post_today)
+from tests.data import clear_test_database, create_test_database, mock_users
 
 
 class UtilsTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        start_test_database()
+        create_test_database()
 
     @classmethod
     def tearDownClass(cls) -> None:
-        clean_test_database()
+        clear_test_database()
 
     def test_clean_command_text(self) -> None:
         commands = [

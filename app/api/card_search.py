@@ -36,7 +36,7 @@ async def fetch_card_data(search_word: str) -> CardData | None:
     data: dict = data[0]
 
     card_name = data.get("name")
-    card_description = data.get("description")
+    card_description = data.get("desc")
     if card_name is None or card_description is None:
         return None
     
