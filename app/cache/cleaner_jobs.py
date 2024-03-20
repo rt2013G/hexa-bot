@@ -44,7 +44,16 @@ async def roles_cache_job(context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def feedbacks_cache_job(context: ContextTypes.DEFAULT_TYPE) -> None:
-    pass
+    for seller_id in list(feedbacks_cache.sellers.keys()):
+        if feedbacks_cache.sellers[seller_id].time < datetime.now() - timedelta(days=1):
+            del feedbacks_cache.sellers[seller_id]
+
+    if len(feedbacks_cache.sellers) > CacheLimits.MAX_FEEDBACK_SIZE:
+        size = CacheLimits.MAX_FEEDBACK_SIZE // 2
+        for i, seller_id in enumerate(list(feedbacks_cache.sellers.keys())):
+            del feedbacks_cache.sellers[seller_id]
+            if i > size:
+                break
 
 
 async def card_data_cache_job(context: ContextTypes.DEFAULT_TYPE) -> None:

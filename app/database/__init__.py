@@ -1,5 +1,6 @@
 # trunk-ignore-all(ruff)
 
+from .feedback import get_feedbacks, insert_feedback
 from .guess_game import get_guess_game_rankings, insert_game, insert_user_score
 from .models import Feedback, MarketPlusPost, Role, User
 from .role import get_roles, insert_role, remove_role
