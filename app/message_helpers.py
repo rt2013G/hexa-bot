@@ -127,41 +127,30 @@ def get_rankings_message_from_scores(users_scores: dict[int, int]) -> str:
 
 def is_sell_post(text: str) -> bool:
     text = text.lower()
-    return (
-        True
-        if "vendo" in text
-        or "vendere" in text
-        or "vendesi" in text
-        or "vendono" in text
-        or "ammortizzo" in text
-        or "up" == text
-        else False
-    )
+    if text == "up":
+        return True
+    keywords = [
+        "vendo",
+        "vendere",
+        "vendesi",
+        "vendono,",
+        "ammortizzo",
+        "ammortizzare",
+        "scambio",
+    ]
+    return True if any(word in text for word in keywords) else False
 
 
 def is_buy_post(text: str) -> bool:
     text = text.lower()
-    return (
-        True
-        if "cerco" in text
-        or "compro" in text
-        or "cercare" in text
-        or "cercasi" in text
-        or "cercano" in text
-        else False
-    )
+    keywords = ["cerco", "compro", "cercare", "cercasi", "cercano"]
+    return True if any(word in text for word in keywords) else False
 
 
 def is_feedback_post(text: str) -> bool:
     text = text.lower()
-    return (
-        True
-        if "feedback" in text
-        or "feed" in text
-        or "feedb" in text
-        or "feed" in text in text
-        else False
-    )
+    keywords = ["feedback", "feed", "feedb"]
+    return True if any(word in text for word in keywords) else False
 
 
 def has_sent_buy_post_today(user: User) -> bool:

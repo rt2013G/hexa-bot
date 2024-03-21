@@ -147,9 +147,9 @@ async def market_post_handler(
     if update.message is None:
         return
 
-    if update.message.text is not None:
+    if update.message.text:
         msg = update.message.text
-    elif update.message.caption is not None:
+    elif update.message.caption:
         msg = update.message.caption
     else:
         await update.message.delete()
@@ -180,7 +180,7 @@ async def market_post_handler(
         else:
             update_user_date(id=user.id, last_sell_post=datetime.now())
 
-    elif is_buy_post(msg):
+    elif is_buy_post(msg) and not is_sell_post(msg):
         if has_sent_buy_post_today(user):
             await context.bot.send_message(
                 user.id,
