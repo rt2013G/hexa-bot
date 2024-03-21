@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from typing import Literal
 
 from telegram import Message, ReplyKeyboardRemove
@@ -88,3 +89,84 @@ async def send_message_with_bot(
                 raise err
         case _:
             raise Forbidden
+
+
+def get_rankings_message_from_scores(users_scores: dict[int, int]) -> str:
+    scores: list[tuple[str, int]] = []
+    for key in sorted(
+        users_scores,
+        key=users_scores.get,
+        reverse=True,
+    ):
+        value = users_scores[key]
+        user = get_user(key)
+        user_to_display = ""
+        if user.username:
+            user_to_display = "@" + user.username
+        else:
+            if user.first_name and user.last_name:
+                user_to_display = user.first_name + user.last_name
+            elif user.first_name:
+                user_to_display = user.first_name
+            elif user.last_name:
+                user_to_display = user.last_name
+
+        scores.append((user_to_display, value))
+
+    emoji_dict = {0: "🥇", 1: "🥈", 2: "🥉"}
+    rankings = ""
+    for i, score in enumerate(scores):
+        emoji_to_add = emoji_dict.get(i)
+        if emoji_to_add is None:
+            emoji_to_add = ""
+
+        rankings += f"{emoji_to_add} {score[0]}, punteggio: {score[1]}\n"
+
+    return rankings
+
+
+def is_sell_post(text: str) -> bool:
+    text = text.lower()
+    return (
+        True
+        if "vendo" in text
+        or "vendere" in text
+        or "vendesi" in text
+        or "vendono" in text
+        or "ammortizzo" in text
+        or "up" == text
+        else False
+    )
+
+
+def is_buy_post(text: str) -> bool:
+    text = text.lower()
+    return (
+        True
+        if "cerco" in text
+        or "compro" in text
+        or "cercare" in text
+        or "cercasi" in text
+        or "cercano" in text
+        else False
+    )
+
+
+def is_feedback_post(text: str) -> bool:
+    text = text.lower()
+    return (
+        True
+        if "feedback" in text
+        or "feed" in text
+        or "feedb" in text
+        or "feed" in text in text
+        else False
+    )
+
+
+def has_sent_buy_post_today(user: User) -> bool:
+    return True if user.last_buy_post.date() == datetime.today().date() else False
+
+
+def has_sent_sell_post_today(user: User) -> bool:
+    return True if user.last_sell_post.date() == datetime.today().date() else False

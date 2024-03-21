@@ -11,11 +11,12 @@ from app.cache import get_user, has_role, insert_feedback, update_user_date
 from app.config import get_feedback_channel_id
 from app.filters import (AdminFilter, DebugUserFilter, FeedbackFilter,
                          MarketGroupFilter, MediaGroupFilter)
-from app.utils import (get_user_from_text, has_sent_buy_post_today,
-                       has_sent_sell_post_today, is_buy_post, is_sell_post)
+from app.message_helpers import (get_user_from_text, has_sent_buy_post_today,
+                                 has_sent_sell_post_today, is_buy_post,
+                                 is_sell_post)
 
 
-def get_market_handlers() -> list:
+def market_handlers() -> list:
     return [
         MessageHandler(
             ~filters.COMMAND
@@ -116,7 +117,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
         )
 
     if post_type == "sell":
-        if has_sent_sell_post_today(user.id):
+        if has_sent_sell_post_today(user):
             post_type = "invalid"
             await context.bot.send_message(
                 user.id,
@@ -125,7 +126,7 @@ async def media_group_job(context: ContextTypes.DEFAULT_TYPE) -> None:
         else:
             update_user_date(id=user.id, last_sell_post=datetime.now())
     elif post_type == "buy":
-        if has_sent_buy_post_today(user.id):
+        if has_sent_buy_post_today(user):
             post_type = "invalid"
             await context.bot.send_message(
                 user.id,
@@ -170,7 +171,7 @@ async def market_post_handler(
         and (update.message.photo or update.message.video or update.message.video_note)
         and has_role(update.message.from_user.id, "seller")
     ):
-        if has_sent_sell_post_today(user.id):
+        if has_sent_sell_post_today(user):
             await context.bot.send_message(
                 user.id,
                 "Il tuo messaggio è stato eliminato, hai già inviato un post di vendo oggi!",
@@ -180,7 +181,7 @@ async def market_post_handler(
             update_user_date(id=user.id, last_sell_post=datetime.now())
 
     elif is_buy_post(msg):
-        if has_sent_buy_post_today(user.id):
+        if has_sent_buy_post_today(user):
             await context.bot.send_message(
                 user.id,
                 "Il tuo messaggio è stato eliminato, hai già inviato un post di cerco oggi!",

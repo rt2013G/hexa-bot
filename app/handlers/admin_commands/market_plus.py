@@ -9,10 +9,9 @@ from app.database import (MarketPlusPost, get_posts_to_delete,
                           get_posts_to_send, insert_market_plus_post,
                           update_delete_market_plus_post, update_posted_date)
 from app.filters import AdminFilter
-from app.utils import clean_command_text
 
 
-def get_market_plus_handlers() -> list:
+def market_plus_handlers() -> list[CommandHandler]:
     return [
         CommandHandler(
             "marketplus", market_plus_handler, filters.ChatType.PRIVATE & AdminFilter()
@@ -37,9 +36,7 @@ async def market_plus_handler(
         )
         return
 
-    try:
-        hours = int(clean_command_text(update.message.text, "/marketplus"))
-    except ValueError:
+    if len(context.args) != 1 or not context.args[0].isdigit():
         await context.bot.send_message(
             update.message.from_user.id,
             "Per inviare un messaggio nel market plus, scrivi prima il messaggio, dopodiché rispondi ad esso con /marketplus <durata in ore>.",
@@ -50,7 +47,7 @@ async def market_plus_handler(
     forwarded_message = await update.message.reply_to_message.forward(
         chat_id=get_market_plus_id()
     )
-    end_date = datetime.now() + timedelta(hours=hours)
+    end_date = datetime.now() + timedelta(hours=int(context.args[0]))
     insert_market_plus_post(message_id=forwarded_message.id, end_date=end_date)
     await context.bot.send_message(
         update.message.from_user.id,

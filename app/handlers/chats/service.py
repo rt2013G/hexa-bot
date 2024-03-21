@@ -5,7 +5,7 @@ from app.cache import get_user, insert_user, update_user_info
 from app.database import User
 
 
-def get_service_handlers() -> list:
+def service_handlers() -> list:
     return [TypeHandler(Update, user_update_handler)]
 
 

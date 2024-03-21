@@ -1,5 +1,5 @@
+# trunk-ignore-all(ruff)
 from .helpers import helpers_handlers
 from .market import market_handlers
+from .market_plus import market_plus_handlers
 from .roles import role_handlers
-
-admin_commands_handlers: list = role_handlers() + helpers_handlers() + market_handlers()

@@ -5,8 +5,11 @@ from app.cache import get_feedbacks, get_user, has_role
 from app.constants import Messages, Roles
 from app.database import User
 from app.filters import AdminFilter, MainGroupFilter
-from app.message_helpers import get_user_from_command_arg
-from app.utils import has_sent_buy_post_today, has_sent_sell_post_today
+from app.message_helpers import (
+    get_user_from_command_arg,
+    has_sent_buy_post_today,
+    has_sent_sell_post_today,
+)
 
 
 def market_handlers() -> list[CommandHandler]:
@@ -103,14 +106,14 @@ async def check_posts_handler(
 
     buy_post_display = (
         "L'utente ha inviato un post di cerco oggi!"
-        if has_sent_buy_post_today(user_id=user.id)
+        if has_sent_buy_post_today(user=user)
         else "L'utente NON ha inviato un post di cerco oggi!"
     )
     sell_post_display = ""
     if has_role(user.id, Roles.SELLER):
         sell_post_display = (
             "L'utente ha inviato un post di vendo oggi!"
-            if has_sent_sell_post_today(user_id=user.id)
+            if has_sent_sell_post_today(user=user)
             else "L'utente NON ha inviato un post di vendo oggi!"
         )
     else:

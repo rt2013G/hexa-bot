@@ -5,14 +5,9 @@ from typing import Literal
 
 from telegram.ext import Application, Defaults
 
-from app.cache import (
-    card_data_cache_job,
-    feedbacks_cache_job,
-    games_cache_job,
-    roles_cache_job,
-    users_cache_job,
-)
-from app.handlers.market_plus_handlers import market_plus_job
+from app.cache import (card_data_cache_job, feedbacks_cache_job,
+                       games_cache_job, roles_cache_job, users_cache_job)
+from app.handlers.admin_commands.market_plus import market_plus_job
 from app.logger import post_logs_job
 
 

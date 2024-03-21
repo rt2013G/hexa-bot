@@ -9,7 +9,6 @@ from app import Bot, BotParameters
 from app.database import create_database
 from app.handlers import handlers
 from app.logger import set_up_logger
-from app.utils import load_card_name_db
 
 
 def main() -> None:
@@ -28,7 +27,6 @@ def main() -> None:
 
     set_up_logger()
     create_database()
-    load_card_name_db()
 
     bot_token = os.getenv("BOT_TOKEN")
     if bot_token is None:

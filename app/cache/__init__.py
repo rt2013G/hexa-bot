@@ -1,6 +1,6 @@
 # trunk-ignore-all(ruff)
 
-from .card_data import get_card_data
+from .card_data import CardData, get_card_data
 from .cleaner_jobs import (card_data_cache_job, feedbacks_cache_job,
                            games_cache_job, roles_cache_job, users_cache_job)
 from .feedbacks import get_feedbacks, insert_feedback

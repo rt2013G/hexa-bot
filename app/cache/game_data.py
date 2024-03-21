@@ -19,7 +19,7 @@ games_cache = GamesCache(guess_game_rankings={})
 
 
 def insert_guess_game_scores(game_time: datetime, scores: dict[int, int]) -> None:
-    db.insert_game(date=datetime)
+    db.insert_game(date=game_time)
     for user_id, score in scores.items():
         if score > 0:
             db.insert_user_score(user_id=user_id, score=score, game_date=game_time)

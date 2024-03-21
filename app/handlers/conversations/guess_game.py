@@ -1,7 +1,12 @@
+import asyncio
+import json
 import logging
+import os
+import random
 from dataclasses import dataclass
 from datetime import datetime
 
+import requests
 from telegram import Message, ReactionTypeEmoji, Update
 from telegram.constants import ReactionEmoji
 from telegram.error import BadRequest, Forbidden, TimedOut
@@ -17,7 +22,7 @@ from app.api import CardData, get_cropped_image, get_image_bytes
 from app.cache import get_card_data, insert_guess_game_scores
 from app.constants import GuessGame
 from app.filters import ModeratorFilter
-from app.utils import get_random_card_name, get_rankings_message_from_scores
+from app.message_helpers import get_rankings_message_from_scores
 
 
 @dataclass
@@ -35,7 +40,7 @@ class GameStateData:
 GUESSING = range(1)
 
 
-def get_guess_game_conv_handler() -> list:
+def guess_game_conv_handler() -> list[ConversationHandler]:
     return [
         ConversationHandler(
             entry_points=[
@@ -69,6 +74,7 @@ def get_guess_game_conv_handler() -> list:
 async def guess_the_card_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> object:
+    await load_card_name_db()
     card_data = await get_card_data("Question")
     chat_id = update.message.chat.id
     await context.bot.send_photo(
@@ -96,6 +102,26 @@ async def guess_the_card_handler(
     )
     context.bot_data[chat_id] = game_state_data
     return GUESSING
+
+
+async def load_card_name_db() -> None:
+    path = "app/static/card_names.json"
+    if not os.path.exists(os.path.abspath(path)):
+        CARD_NAME_URL = "https://db.ygorganization.com/data/idx/card/name/en"
+        response = await asyncio.to_thread(requests.get, url=CARD_NAME_URL, timeout=10)
+        response_json = json.loads(response.content)
+        with open(os.path.abspath(path), "w") as f:
+            json.dump(response_json, f)
+
+
+def get_random_card_name() -> str:
+    path = "app/static/card_names.json"
+    card_database: dict[str, list[int]]
+    with open(os.path.abspath(path), "r") as f:
+        card_database = dict(json.load(f))
+
+    # trunk-ignore(bandit/B311)
+    return random.choice(list(card_database.keys()))
 
 
 async def send_card_job(context: ContextTypes.DEFAULT_TYPE) -> None:
