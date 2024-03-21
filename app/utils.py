@@ -1,55 +1,11 @@
 import json
 import os
 import random
-import re
 from datetime import datetime
 
 import requests
 
 from app.cache import get_user
-from app.config import get_bot_username
-from app.database import User
-
-
-def get_user_from_message_command(message_text: str, command_text: str) -> User | None:
-    msg = clean_command_text(message_text, command_text)
-    MAX_USERNAME_LENGTH = 32
-    if len(msg) > 1 + MAX_USERNAME_LENGTH:
-        return None
-
-    if "@" in msg:
-        msg = msg.replace("@", "")
-        if msg.isnumeric():
-            return None
-        else:
-            return get_user(username=msg)
-    elif msg.isnumeric():
-        return get_user(id=int(msg))
-
-    return None
-
-
-def get_user_from_text(message_text: str) -> User | None:
-    if "@" not in message_text:
-        return None
-
-    for word in message_text.split():
-        if "@" in word:
-            username = remove_non_alpha_characters(word)
-            if len(username) > 0:
-                user = get_user(username=username)
-                if user is not None:
-                    return user
-
-    return None
-
-
-def remove_non_alpha_characters(text: str) -> str:
-    return re.sub(r"[^a-zA-Z0-9_]", "", text)
-
-
-def clean_command_text(text: str, command: str) -> str:
-    return text.replace(get_bot_username(), "").replace(command, "").lstrip()
 
 
 def get_auth_code_from_id(user_id: int) -> int:

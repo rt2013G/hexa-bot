@@ -25,3 +25,11 @@ class CacheLimits:
 
 class GuessGame:
     GAME_LENGTH = 10
+
+
+class MessageLimits:
+    MAX_USERNAME_LENGTH = 32
+
+
+class Messages:
+    USER_NOT_FOUND = "Utente non trovato!"
