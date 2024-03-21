@@ -20,10 +20,6 @@ def load_configs() -> dict:
 GLOBAL_CONFIGS: dict = load_configs()
 
 
-def get_bot_username() -> str:
-    return str(GLOBAL_CONFIGS["bot_username"])
-
-
 def get_main_id() -> int:
     return int(GLOBAL_CONFIGS["group_info"]["main_id"])
 
@@ -58,7 +54,3 @@ def get_debug_user_id() -> int:
 
 def get_market_group_link() -> str:
     return str(GLOBAL_CONFIGS["links"]["market_group_link"])
-
-
-def get_max_data_cache_size() -> int:
-    return int(GLOBAL_CONFIGS["global_variables"]["max_card_data_cache_size"])

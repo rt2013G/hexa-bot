@@ -7,7 +7,7 @@ from app.filters import AdminFilter, ApprovalGroupFilter, DebugUserFilter
 from app.message_helpers import get_user_from_command_arg
 
 
-def get_role_handlers() -> list[CommandHandler]:
+def role_handlers() -> list[CommandHandler]:
     return [
         CommandHandler(
             "makeseller", make_seller_handler, AdminFilter() & ApprovalGroupFilter()
