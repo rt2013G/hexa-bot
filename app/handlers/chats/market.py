@@ -8,7 +8,7 @@ from telegram.ext import ContextTypes, MessageHandler, filters
 from telegram.helpers import effective_message_type
 
 from app.cache import get_user, has_role, insert_feedback, update_user_date
-from app.config import get_feedback_channel_id
+from app.config import feedback_channel_id
 from app.filters import (AdminFilter, DebugUserFilter, FeedbackFilter,
                          MarketGroupFilter, MediaGroupFilter)
 from app.message_helpers import (get_user_from_text, has_sent_buy_post_today,
@@ -229,7 +229,7 @@ async def feedback_msg_handler(
         seller_id=seller.id, buyer_id=user.id, contents=msg, date=datetime.now()
     )
     await context.bot.forward_message(
-        chat_id=get_feedback_channel_id(),
+        chat_id=feedback_channel_id(),
         from_chat_id=update.message.chat_id,
         message_id=update.message.id,
     )

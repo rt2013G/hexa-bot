@@ -1,11 +1,16 @@
 from typing import Union
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
-from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
-                          MessageHandler, filters)
+from telegram.ext import (
+    CommandHandler,
+    ContextTypes,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
 
 from app.cache import has_role
-from app.config import get_approval_id
+from app.config import approval_id
 from app.constants import Messages, Roles
 from app.filters import AdminFilter, ApprovalGroupFilter
 from app.message_helpers import get_user_from_command_arg
@@ -88,14 +93,14 @@ async def video_state_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> object:
     await context.bot.forward_message(
-        get_approval_id(), update.message.chat_id, update.message.message_id
+        approval_id(), update.message.chat_id, update.message.message_id
     )
     await context.bot.send_message(
-        get_approval_id(),
+        approval_id(),
         f"Codice: {user_code(update.message.from_user.id)}",
     )
     await context.bot.send_message(
-        get_approval_id(),
+        approval_id(),
         f"/makeseller {update.message.from_user.id}",
         reply_markup=ReplyKeyboardMarkup(
             [[f"/makeseller {update.message.from_user.id}"]], one_time_keyboard=True

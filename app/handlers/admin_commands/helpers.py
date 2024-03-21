@@ -8,7 +8,8 @@ from telegram.ext import CommandHandler, ContextTypes, filters
 from app.constants import Messages
 from app.database import get_all_users
 from app.filters import AdminFilter, DebugUserFilter
-from app.message_helpers import get_user_from_command_arg, send_message_with_bot
+from app.message_helpers import (get_user_from_command_arg,
+                                 send_message_with_bot)
 
 
 def helpers_handlers() -> list[CommandHandler]:
@@ -41,7 +42,7 @@ async def shutdown_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await update.message.reply_text(
         "Shutting down...", reply_markup=ReplyKeyboardRemove()
     )
-    await context.application.shutdown()
+    await context.application.stop()
     sys.exit(0)
 
 

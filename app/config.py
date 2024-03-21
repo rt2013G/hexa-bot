@@ -20,37 +20,37 @@ def load_configs() -> dict:
 GLOBAL_CONFIGS: dict = load_configs()
 
 
-def get_main_id() -> int:
+def main_id() -> int:
     return int(GLOBAL_CONFIGS["group_info"]["main_id"])
 
 
-def get_market_id() -> int:
+def market_id() -> int:
     return int(GLOBAL_CONFIGS["group_info"]["market_id"])
 
 
-def get_approval_id() -> int:
+def approval_id() -> int:
     return int(GLOBAL_CONFIGS["group_info"]["approval_id"])
 
 
-def get_feedback_channel_id() -> int:
+def feedback_channel_id() -> int:
     return int(GLOBAL_CONFIGS["channel_info"]["feedback_id"])
 
 
-def get_logging_channel_id() -> int:
+def logging_channel_id() -> int:
     return int(GLOBAL_CONFIGS["channel_info"]["logging_id"])
 
 
-def get_photo_storage_id() -> int:
+def photo_storage_id() -> int:
     return int(GLOBAL_CONFIGS["channel_info"]["photo_storage_id"])
 
 
-def get_market_plus_id() -> int:
+def market_plus_id() -> int:
     return int(GLOBAL_CONFIGS["channel_info"]["market_plus_id"])
 
 
-def get_debug_user_id() -> int:
+def debug_user_id() -> int:
     return int(GLOBAL_CONFIGS["debug_user_id"])
 
 
-def get_market_group_link() -> str:
+def market_group_link() -> str:
     return str(GLOBAL_CONFIGS["links"]["market_group_link"])

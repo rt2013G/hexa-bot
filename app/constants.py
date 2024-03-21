@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.config import get_market_group_link
+from app.config import market_group_link
 
 
 class Roles:
@@ -40,7 +40,7 @@ class Messages:
     )
     USER_NOT_SELLER = "L'utente NON è un venditore!"
     START = f"""Benvenuto sul gruppo Yu-Gi-Oh ITA Main.
-Per entrare nel gruppo market segui questo link: {get_market_group_link()}.\n
+Per entrare nel gruppo market segui questo link: {market_group_link()}.\n
 Ricorda di leggere le regole! Solo i venditori approvati possono vendere sul gruppo.
 Se vuoi diventare venditore, usa il comando /seller.\n
 Ricorda che in ogni caso, puoi effettuare solo 1 post di vendita e 1 post di acquisto al giorno."""
