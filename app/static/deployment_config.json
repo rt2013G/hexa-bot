@@ -1,9 +1,5 @@
 {
-    "bot_username": "@yugiohmainbot",
     "debug_user_id": "136539798",
-    "global_variables": {
-        "max_card_data_cache_size": 100
-    },
     "links": {
         "market_group_link": "https://t.me/joinchat/CCNulkgtmbNoWoKtKEqd0A"
     },
