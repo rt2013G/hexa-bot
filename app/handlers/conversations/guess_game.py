@@ -5,19 +5,28 @@ import os
 import random
 from dataclasses import dataclass
 from datetime import datetime
+from difflib import SequenceMatcher
 
 import requests
 from telegram import Message, ReactionTypeEmoji, Update
 from telegram.constants import ReactionEmoji
 from telegram.error import BadRequest, Forbidden, TimedOut
-from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
-                          MessageHandler, filters)
+from telegram.ext import (
+    CommandHandler,
+    ContextTypes,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
 
 from app.api import CardData, get_cropped_image, get_image_bytes
 from app.cache import get_card_data, insert_guess_game_scores
 from app.constants import GuessGame
 from app.filters import ModeratorFilter
-from app.message_helpers import get_rankings_message_from_scores
+from app.message_helpers import (
+    get_rankings_message_from_scores,
+    remove_non_alpha_characters,
+)
 
 
 @dataclass
@@ -191,8 +200,11 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
     game_state_data.messages_to_delete.append(update.message)
 
     user_id = update.message.from_user.id
-    guess_data = await get_card_data(guess_word)
-    if guess_data is None or guess_data.desc != game_state_data.card_to_guess_data.desc:
+    guess = remove_non_alpha_characters(guess_word).lower()
+    answer = remove_non_alpha_characters(game_state_data.card_to_guess_name).lower()
+    correctness = SequenceMatcher(None, guess, answer).ratio()
+
+    if correctness < GuessGame.CORRECT_THRESHOLD:
         await update.message.set_reaction(
             reaction=ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN)
         )

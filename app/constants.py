@@ -1,8 +1,10 @@
+from dataclasses import dataclass
 from datetime import datetime
 
 from app.config import market_group_link
 
 
+@dataclass(frozen=True, init=False, eq=False, repr=False)
 class Roles:
     ADMIN = "admin"
     SELLER = "seller"
@@ -11,10 +13,12 @@ class Roles:
     MODERATOR = "moderator"
 
 
+@dataclass(frozen=True, init=False, eq=False, repr=False)
 class Dates:
     MARKET_EPOCH = datetime(year=2015, month=1, day=15)
 
 
+@dataclass(frozen=True, init=False, eq=False, repr=False)
 class CacheLimits:
     MAX_USER_SIZE = 9999
     MAX_USERNAME_SIZE = 9999
@@ -25,14 +29,18 @@ class CacheLimits:
     MAX_FEEDBACK_SIZE = 1999
 
 
+@dataclass(frozen=True, init=False, eq=False, repr=False)
 class GuessGame:
     GAME_LENGTH = 10
+    CORRECT_THRESHOLD = 0.8
 
 
+@dataclass(frozen=True, init=False, eq=False, repr=False)
 class MessageLimits:
     MAX_USERNAME_LENGTH = 32
 
 
+@dataclass(frozen=True, init=False, eq=False, repr=False)
 class Messages:
     USER_NOT_FOUND = "Utente non trovato!"
     USER_NOT_FOUND_WITH_MENTION = (
