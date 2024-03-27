@@ -137,6 +137,7 @@ def is_sell_post(text: str) -> bool:
         "ammortizzo",
         "ammortizzare",
         "scambio",
+        "scambiare",
     ]
     return True if any(word in text for word in keywords) else False
 

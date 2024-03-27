@@ -32,7 +32,7 @@ class CacheLimits:
 @dataclass(frozen=True, init=False, eq=False, repr=False)
 class GuessGame:
     GAME_LENGTH = 10
-    CORRECT_THRESHOLD = 0.8
+    CORRECT_THRESHOLD = 0.90
 
 
 @dataclass(frozen=True, init=False, eq=False, repr=False)
