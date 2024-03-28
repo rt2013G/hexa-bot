@@ -22,7 +22,7 @@ from telegram.ext import (
 from app.api import CardData, get_cropped_image, get_image_bytes
 from app.cache import get_card_data, insert_guess_game_scores
 from app.constants import GuessGame
-from app.filters import ModeratorFilter
+from app.filters import MarketGroupFilter, ModeratorFilter
 from app.message_helpers import (
     get_rankings_message_from_scores,
     remove_non_alpha_characters,
@@ -51,7 +51,7 @@ def guess_game_conv_handler() -> list[ConversationHandler]:
                 CommandHandler(
                     "guessthecard",
                     guess_the_card_handler,
-                    filters.ChatType.GROUPS & ModeratorFilter(),
+                    filters.ChatType.GROUPS & ~MarketGroupFilter() & ModeratorFilter(),
                 )
             ],
             states={
@@ -204,7 +204,7 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
     answer = remove_non_alpha_characters(game_state_data.card_to_guess_name).lower()
     correctness = SequenceMatcher(None, guess, answer).ratio()
 
-    if correctness < GuessGame.CORRECT_THRESHOLD:
+    if correctness < GuessGame.CORRECT_THRESHOLD or len(answer) <= 1:
         await update.message.set_reaction(
             reaction=ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN)
         )
