@@ -196,7 +196,7 @@ async def guess_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> o
         return GUESSING
 
     game_state_data.guessed_archetypes.append(game_state_data.archetype_name)
-    score_gained = 8 - game_state_data.current_emoji_index
+    score_gained = 1 if game_state_data.current_emoji_index > 3 else 2
     current_score: int | None = game_state_data.users_scores.get(user_id)
     if current_score is None:
         game_state_data.users_scores[user_id] = score_gained
